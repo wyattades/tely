@@ -1,0 +1,97 @@
+-
+  if (!htmlWebpackPlugin || !htmlWebpackPlugin.options)
+    throw new Error('Must provide config variable: htmlWebpackPlugin');
+
+  let item, key;
+  const { options, files } = htmlWebpackPlugin;
+
+  options.appMountIds = options.appMountIds || (options.appMountId && [ options.appMountId ]) || [];
+    
+  options.lang = options.lang || 'en-US';
+
+  options.scripts = options.scripts || [];
+  for (item of options.scripts) {
+    if (typeof item === 'string' || item instanceof String) { 
+      item = { src: item, type: 'text/javascript' };
+    }
+  }
+
+  options.links = options.links || [];
+  for (item of options.links) {
+    if (typeof item === 'string' || item instanceof String) { 
+      item = { href: item, rel: 'stylesheet' };
+    }
+  }
+
+  options.meta = options.meta || [];
+  if (!Array.isArray(options.meta)) {
+    options.meta = [ options.meta ];
+  }
+
+  if (options.googleAnalytics && !options.googleAnalytics.trackingId) {
+    throw new Error('html-webpack-template requires googleAnalytics.trackingId config');
+  }
+
+doctype html
+
+html(lang=options.lang, manifest=files.manifest || '')
+  head
+    meta(charset='utf-8')
+    meta(content='ie=edge' http-equiv='x-ua-compatible')
+
+    if (options.baseHref)
+      base(href=options.baseHref)
+
+    each item in options.meta
+      meta&attributes(item)
+
+    title= options.title
+
+    if (files.favicon)
+      link(href=files.favicon rel='shortcut icon')
+
+    if (options.cache === false)
+      meta(http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate')
+      meta(http-equiv='Pragma' content='no-cache')
+      meta(http-equiv='Expires' content='0')
+
+    if (options.mobile)
+      meta(content='width=device-width, initial-scale=1' name='viewport')
+
+    each item in options.links
+      link&attributes(item)
+
+    each val, key in files.css
+      link(href=val rel='stylesheet')
+
+  body
+
+    block page_content
+
+    each id in options.appMountIds
+      div(id=id)
+
+    if (options.window)
+      script(type='text/javascript').
+        for (key in options.window) {
+          window[key] = JSON.stringify(options.window[key]);
+        }
+
+    if (options.inlineManifestWebpackName)
+      != htmlWebpackPlugin.files[options.inlineManifestWebpackName]
+
+    each url in options.scripts
+      script(src=url type='text/javascript')
+
+    each key in Object.keys(files.chunks)
+      script(src=files.chunks[key].entry type='text/javascript')
+
+    if (options.googleAnalytics)
+      script(type='text/javascript')
+        | window.GoogleAnalyticsObject='ga';window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+        = `ga('create','${options.googleAnalytics.trackingId}','auto');`
+
+        if (options.googleAnalytics.pageViewOnLoad)
+          | ga('send','pageview')
+
+      script(async defer src='https://www.google-analytics.com/analytics.js' type='text/javascript')
