@@ -1,5 +1,76 @@
+// Imports
 
-html, body {
+@import 'spinner';
+
+// Main containers
+
+html {
+  background-color: white;
+  height: 100%;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+body {
   margin: 0;
-  padding: 0;
+  height: 100%;
+  background-color: #d35400; // #FF6D00
+}
+
+#react-root {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+// Element defaults
+
+button {
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  padding: 10px 14px;
+  outline-color: white;
+}
+
+// Custom
+
+.home-title {
+  color: white;
+  font-size: 120px;
+  margin-top: 0;
+  text-align: center;
+}
+
+#google-sign-in {
+  color: #ecf0f1;
+  background-color: rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 20px;
+  &:hover {
+    background-color: #FFFFFF44;
+  }
+}
+
+nav {
+  a {
+    padding: 4px;
+    color: black;
+    font-size: 20px;
+    text-decoration: none;
+    &.active {
+      border-bottom: 1px solid black;
+    }
+  }
+}
+
+.text-404 {
+  background-color: #FFFFFF;
+  font-size: 300px;
+  color: black;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-width: 4px;
+  -webkit-text-stroke-color: black;
 }

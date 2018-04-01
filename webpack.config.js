@@ -13,6 +13,12 @@ PATHS.src = res(__dirname, 'src');
 PATHS.template = res(PATHS.src, 'boilerplate.pug');
 PATHS.assetName = 'asset/[name].[ext]';
 PATHS.entry = './src/index.js';
+
+const loaderHTML = `<div class="spinner">
+<div class="bounce1"></div>
+<div class="bounce2"></div>
+<div class="bounce3"></div>
+</div>`;
   
 const baseConfig = {
 
@@ -103,6 +109,7 @@ const sharedPlugins = [
       content: 'Mom! Come look at the Tely!',
     }],
     mobile: true,
+    loader: loaderHTML,
     // cache: false,
     // favicon: res(PATHS.src, 'images/favicon.ico'),
     appMountId: 'react-root',
@@ -132,7 +139,7 @@ if (process.env.NODE_ENV === 'production') { // PRODUCTION CONFIG
 
     output: {
       path: PATHS.dist,
-      publicPath: '/',
+      publicPath: '/tely/', // use gh-pages directory as root
       filename: '[name].[chunkhash].js',
     },
 

@@ -4,8 +4,6 @@
 
   let item, key;
   const { options, files } = htmlWebpackPlugin;
-
-  options.appMountIds = options.appMountIds || (options.appMountId && [ options.appMountId ]) || [];
     
   options.lang = options.lang || 'en-US';
 
@@ -68,8 +66,10 @@ html(lang=options.lang, manifest=files.manifest || '')
 
     block page_content
 
-    each id in options.appMountIds
-      div(id=id)
+    if (options.appMountId)
+      div(id=options.appMountId)
+        if (options.loader)
+          != options.loader
 
     if (options.window)
       script(type='text/javascript').

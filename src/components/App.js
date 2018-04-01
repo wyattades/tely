@@ -1,10 +1,43 @@
 import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
 import { hot } from 'react-hot-loader';
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
+import {
+  BrowserRouter as Router,
+  Route,
+  NavLink,
+  Switch,
+} from 'react-router-dom';
 
-const App = () => <div>Hello World!</div>;
+import Home from './Home';
+import NoMatch from './NoMatch';
+import MediaList from './MediaList';
+import NewMediaList from './NewMediaList';
+import Header from './Header';
+
+class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loading: false,
+    };
+  }
+
+  render() {
+    return this.state.loading ? null : (
+      <Router>
+        <div>
+          <Header/>
+          <Switch>
+            <Route exact path="/" component={Home}/>
+            <Route exact path="/list/new" component={NewMediaList}/>
+            <Route exact path="/list/:listid" component={MediaList}/>
+            <Route component={NoMatch}/>
+          </Switch>
+        </div>
+      </Router>
+    );
+  }
+}
 
 export default hot(module)(App);

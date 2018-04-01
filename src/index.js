@@ -1,7 +1,11 @@
 import { render } from 'react-dom';
 import React from 'react';
 
-import App from './components/App';
 import './styles/style.scss';
+import * as db from './db'; // Init firebase
+import App from './components/App';
 
-render(<App/>, document.getElementById('react-root'));
+db.init()
+.then(() => {
+  render(<App/>, document.getElementById('react-root'));
+});
