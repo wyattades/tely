@@ -8,16 +8,16 @@ const api = (path, method = 'GET', body) => fetch(`${DISCORD_API}${path}`, {
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${getProfile().accessToken}`,
-    'User-Agent': 'myDiscordUser (https://example.com, v0.1)',
+    // 'User-Agent': 'myDiscordUser (https://example.com, v0.1)',
   },
   mode: 'cors',
 })
 .then((res) => {
   if (res.status !== 200) {
-    console.error(res);
     return res.json()
-    .then(({ message }) => {
-      throw { code: res.status, msg: message };
+    .then((data) => {
+      console.error(res, data);
+      throw { code: res.status, msg: data.message };
     });
   } else return res.json();
 });

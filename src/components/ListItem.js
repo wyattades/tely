@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default ({ id, title, desc, author, date, img }) => (
-  <div className="box">
+  <div className="box" key={id}>
     <article className="media">
       <div className="media-left">
         <figure className="image is-64x64">

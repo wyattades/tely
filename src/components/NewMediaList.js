@@ -1,6 +1,7 @@
 import React from 'react';
 
 import * as discord from '../discord';
+import * as db from '../db';
 import { MultiSelect } from './form';
 import { SmallSection } from './misc';
 
@@ -13,23 +14,37 @@ const types = [
     desc: 'Spotify\'s extensive music library' },
 ];
 
-const done = () => {};
-
 class NewMediaList extends React.Component {
   
   state = {
+    listName: '',
     type: null,
     shareDiscord: '',
     err: {},
     submitting: false,
   };
 
+  createList = (name, type, optionalGuild) => db.lists.add({
+    created: Date.now(),
+    name,
+    type,
+    share: [ optionalGuild ],
+  })
+  .then((ref) => {
+    this.props.history.push(`/list/${ref.id}`);
+  });
+
   handleSubmit = (event) => {
     event.preventDefault();
     
-    const { type, shareDiscord } = this.state;
+    const { listName, type, shareDiscord } = this.state;
     let valid = true;
     const err = {};
+
+    if (!listName) {
+      valid = false;
+      err.listName = true;
+    }
     
     if (shareDiscord && !/^[\d]{1,19}$/.test(shareDiscord)) {
       valid = false;
@@ -44,15 +59,13 @@ class NewMediaList extends React.Component {
     this.setState({ err });
 
     if (valid) {
-      console.log(this.state);
 
       if (shareDiscord) {
         this.setState({ submitting: true });
 
         discord.getGuild(shareDiscord)
         .then((guild) => {
-          console.log('guild', guild);
-          done();
+          this.createList(listName, type, guild);
         })
         .catch((error) => {
           console.error('getGuild', error);
@@ -61,28 +74,48 @@ class NewMediaList extends React.Component {
           this.setState({ submitting: false, err });
         });
       } else {
-        done();
+        this.setState({ submitting: true });
+
+        this.createList(listName, type)
+        .catch((error) => {
+          console.error(error);
+          this.setState({
+            submitting: false,
+            err: { submit: 'Oops! Something went wrong' },
+          });
+        });
       }
     }
   }
 
-  shareDiscordChange = (e) => {
-    const val = e.target.value;
-    this.setState({
-      shareDiscord: val,
-    });
-  }
+  shareDiscordChange = (e) => this.setState({
+    shareDiscord: e.target.value,
+  });
+
+  listNameChange = (e) => this.setState({
+    listName: e.target.value,
+  });
 
   typeChange = (type) => this.setState({ type })
 
   render() {
-    const { type, shareDiscord, err, submitting } = this.state;
+    const { listName, type, shareDiscord, err, submitting } = this.state;
 
     return (
       <SmallSection>
         <h1 className="is-size-1">Create a New List</h1>
         <br/>
         <form onSubmit={this.handleSubmit}>
+          <div className="field">
+            <label className="label" htmlFor="list-name">List Name</label>
+            <div className="control">
+              <input type="text" className="input" id="list-name" value={listName}
+                maxLength={48} onChange={this.listNameChange}/>
+            </div>
+            { err.listName &&
+              <p className="help is-danger">This is a required field</p>
+            }
+          </div>
           <div className="field">
             <label className="label" htmlFor="list-type">Select a List Type</label>
             <div className="control">
@@ -111,6 +144,9 @@ class NewMediaList extends React.Component {
                 Create
               </button>
             </div>
+            { err.submit &&
+              <p className="help is-danger">{err.submit}</p>
+            }
           </div>
         </form>
       </SmallSection>
