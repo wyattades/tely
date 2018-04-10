@@ -7,3 +7,15 @@ export const spinner = (
     <div className="bounce3"/>
   </div>
 );
+
+export const SmallSection = ({ children }) => (
+  <section className="section">
+    <div className="container">
+      <div className="columns is-centered">
+        <div className="column is-half">
+          {children}
+        </div>
+      </div>
+    </div>
+  </section>
+);

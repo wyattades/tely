@@ -1,102 +1,85 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const request = require('superagent');
+const express = require('express');
+const passport = require('passport');
+const DiscordStrategy = require('passport-discord').Strategy;
+const refresh = require('passport-oauth2-refresh');
+const Query = require('querystring');
 
-const OAUTH_TOKEN_URL = 'https://discordapp.com/api/oauth2/token';
-const MY_REDIRECT = 'https://wyattades.github.io/tely';
-const WEBHOOK_URL = 'https://discordapp.com/api/webhooks/428338133902295050/\
-PyeWq3w6EPvC2MCTMB6wncv8JreIcaEu-nk4vyP_NuEk7BnaxDrqP0MTHKm1kCwQYdmj';
+const config = functions.config();
+
+const CALLBACK_URL = 'https://us-central1-tely-db.cloudfunctions.net/widgets/auth/discord/callback';
+const SCOPES = [ 'identify', 'email', 'guilds' ];
+const ORIGIN = 'http://localhost:8080'; // TEMP
+const ORIGIN_URL = `${ORIGIN}/tely`;
+
+// Store service account credentials in base64 to simplify env variables
+const SERVICE_ACCOUNT = JSON.parse(Buffer.from(config.admin.account, 'base64').toString('ascii'));
 
 // Enable database access
-admin.initializeApp(functions.config().firebase);
-
-const db = admin.firestore();
-const users = db.collection('users');
-
-exports.writeUser = functions.firestore.document('users/{userId}').onWrite((event) => {
-  const newValue = event.data.data();
-  const previousValue = event.data.previous.data();
-
-  console.log(previousValue && previousValue.name, newValue && newValue.name);
-
+admin.initializeApp({
+  databaseURL: config.firebase.databaseURL,
+  credential: admin.credential.cert(SERVICE_ACCOUNT),
 });
 
-// exports.refreshDiscordToken = functions.https.onCall((data, ctx) =>
-//   userData.auth.discord.expires >= Date.now() ?
-//     request('POST', OAUTH_TOKEN_URL)
-//     .type('form')
-//     .accept('application/json')
-//     .send({
-//       client_id: functions.config().discord.client_id,
-//       client_secret: functions.config().discord.client_secret,
-//       refresh_token: userData.auth.discord.refresh_token,
-//       grant_type: 'refresh_token',
-//       redirect_uri: MY_REDIRECT,
-//     })
-//     .then((res) =>
-//       users.doc(`${uid}/auth/discord`).set({
-//         access_token: res.body.access_token,
-//         refresh_token: res.body.refresh_token,
-//         expires: Date.now() + res.body.expires_in,
-//       }))
-//     .catch((err) => {
-//       console.error(err);
-//       return err;
-//     }) : Promise.resolve(),
-// );
+// TODO: necessary?
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
 
-const updateDiscordToken = functions.https.onCall((data, ctx) =>
-  
-  request('POST', OAUTH_TOKEN_URL)
-  .type('form')
-  .accept('application/json')
-  .send({
-    client_id: functions.config().discord.client_id,
-    client_secret: functions.config().discord.client_secret,
-    redirect_uri: MY_REDIRECT,
-    ...req,
+const discordStrat = new DiscordStrategy({
+  clientID: config.discord.client_id,
+  clientSecret: config.discord.client_secret,
+  callbackURL: CALLBACK_URL,
+  scope: SCOPES,
+}, (accessToken, refreshToken, profile, cb) => {
+
+  if (refreshToken) profile.refreshToken = refreshToken;
+
+  admin.auth().createCustomToken(profile.id)
+  .then((token) => {
+    profile.token = token;
+    cb(null, profile);
   })
-  .then((res) =>
-    .set({
-      access_token: res.body.access_token,
-      refresh_token: res.body.refresh_token,
-      expires: Date.now() + res.body.expires_in,
-    }))
-  .catch((err) => {
-    console.error(err);
-    return err;
-  }));
+  .catch(cb);
+});
 
-// firebase.firestore.FieldValue.serverTimestamp()
-exports.getDiscordToken = functions.https.onCall((data, ctx) =>
-  request('POST', OAUTH_TOKEN_URL)
-  .type('form')
-  .accept('application/json')
-  .send({
-    client_id: functions.config().discord.client_id,
-    client_secret: functions.config().discord.client_secret,
-    code: data.code,
-    grant_type: 'authorization_code',
-    redirect_uri: MY_REDIRECT,
-  })
-  .then((res) =>
-    users.doc(`${ctx.auth.uid}/auth/discord`).set({
-      access_token: res.body.access_token,
-      refresh_token: res.body.refresh_token,
-      expires: Date.now() + res.body.expires_in,
-    }))
-  .catch((err) => {
-    console.error(err);
-    return err;
-  }));
+passport.use(discordStrat);
+refresh.use(discordStrat);
 
+const app = express();
+app.use(passport.initialize());
+app.use(express.json());
 
-exports.discordMessage = functions.https.onCall((data, ctx) =>
-  request('POST', WEBHOOK_URL)
-  .accept('application/json')
-  .send({ content: data.msg })
-  .then(() => {})
-  .catch((err) => {
-    console.error(err);
-    return err;
-  }));
+// CORS!
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', ORIGIN);
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+// build multiple CRUD interfaces:
+
+app.get('/auth/discord', passport.authenticate('discord'));
+
+app.get('/auth/discord/callback', passport.authenticate('discord', {
+  failureRedirect: `${ORIGIN_URL}?error`,
+}), (req, res) => {
+  res.redirect(`${ORIGIN_URL}/list?${Query.stringify(req.user)}`);
+});
+
+app.post('/auth/discord/refresh', (req, res) => {
+
+  const refreshToken = req.body.token;
+  if (!refreshToken) {
+    res.status(400).end();
+    return;
+  }
+
+  refresh.requestNewAccessToken('discord', refreshToken, (err, accessToken) => {
+    if (err) res.status((err && err.status) || 500).send(err);
+    else res.send({ token: accessToken });
+  });
+});
+
+// Expose Express API as a single Cloud Function:
+exports.widgets = functions.https.onRequest(app);

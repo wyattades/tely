@@ -1,76 +1,46 @@
 // Imports
 
+@import '~@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
+@import '~@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
 @import 'spinner';
+@import 'bulma';
 
 // Main containers
 
 html {
-  background-color: white;
-  height: 100%;
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-}
-
-body {
-  margin: 0;
-  height: 100%;
-  background-color: #d35400; // #FF6D00
-}
-
-#react-root {
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-}
-
-// Element defaults
-
-button {
-  border: none;
-  cursor: pointer;
-  background-color: transparent;
-  padding: 10px 14px;
-  outline-color: white;
-}
-
-// Custom
-
-.home-title {
-  color: white;
-  font-size: 120px;
-  margin-top: 0;
-  text-align: center;
-}
-
-#google-sign-in {
-  color: #ecf0f1;
-  background-color: rgba(0, 0, 0, 0.1);
-  font-weight: bold;
-  letter-spacing: 1px;
-  font-size: 20px;
-  &:hover {
-    background-color: #FFFFFF44;
-  }
-}
-
-nav {
-  a {
-    padding: 4px;
-    color: black;
-    font-size: 20px;
-    text-decoration: none;
-    &.active {
-      border-bottom: 1px solid black;
-    }
-  }
+  overflow-y: auto;
 }
 
 .text-404 {
-  background-color: #FFFFFF;
   font-size: 300px;
-  color: black;
+  line-height: 100%;
+  color: $dark; 
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke-width: 4px;
-  -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 6px;
+  -webkit-text-stroke-color: $dark;
+}
+
+.multiline {
+  height: auto;
+}
+
+.dir-column {
+  flex-direction: column;
+}
+
+.flex-start {
+  justify-content: flex-start;
+}
+
+.well {
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+}
+
+.label.optional::after {
+  content: ' (optional)';
+  font-size: 80%;
+  color: $grey;
+  font-weight: normal;
 }

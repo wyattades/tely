@@ -1,6 +1,7 @@
 # Custom
 dist/
 package-lock.json
+.env.json
 
 # Logs
 logs

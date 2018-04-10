@@ -3,15 +3,31 @@ import { hot } from 'react-hot-loader';
 import {
   BrowserRouter as Router,
   Route,
-  NavLink,
   Switch,
+  Redirect,
 } from 'react-router-dom';
 
 import Home from './Home';
 import NoMatch from './NoMatch';
+import MediaLists from './MediaLists';
 import MediaList from './MediaList';
 import NewMediaList from './NewMediaList';
 import Header from './Header';
+
+import * as db from '../db';
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={props =>
+    db.getUser() ? (
+      <Component {...props} />
+    ) : (
+      <Redirect to={{
+        pathname: '/',
+        state: { from: props.location },
+      }}/>
+    )
+  }/>
+);
 
 class App extends React.Component {
 
@@ -25,13 +41,13 @@ class App extends React.Component {
 
   render() {
     return this.state.loading ? null : (
-      <Router>
+      <Router basename="/tely">
         <div>
-          <Header/>
           <Switch>
             <Route exact path="/" component={Home}/>
-            <Route exact path="/list/new" component={NewMediaList}/>
-            <Route exact path="/list/:listid" component={MediaList}/>
+            <PrivateRoute exact path="/list" component={MediaLists}/>
+            <PrivateRoute exact path="/list/new" component={NewMediaList}/>
+            <PrivateRoute exact path="/list/:listid" component={MediaList}/>
             <Route component={NoMatch}/>
           </Switch>
         </div>
