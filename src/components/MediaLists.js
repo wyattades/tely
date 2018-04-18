@@ -1,6 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { SmallSection } from './misc';
 
 import * as db from '../db';
+
+const ListItem = ({ id, type, name }) => (
+  <div key={id}>
+    <Link to={`/list/${id}`} className="button">{name} - {type}</Link>
+  </div>
+);
 
 class MediaLists extends React.Component {
 
@@ -9,17 +17,19 @@ class MediaLists extends React.Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = db.users
-    .doc(`/${db.getUser().providerId}`)
-    .collection('lists')
+    this.unsubscribe = db.lists
+    .where('owner', '==', db.getUser().uid)
     .onSnapshot((snap) => {
-      console.log(snap);
       const lists = [];
       snap.forEach((item) => {
-        lists.push(item.data());
+        const itemData = item.data();
+        itemData.id = item.id;
+        lists.push(itemData);
       });
       this.setState({ lists });
-    }, console.error);
+    }, (err) => {
+      this.setState({ err: err.code });
+    });
   }
 
   componentWillUnmount() {
@@ -27,15 +37,23 @@ class MediaLists extends React.Component {
   }
 
   render() {
-    return this.state.lists ? (
-      <div>
-        <h3>Lists</h3>
+    return (this.state.lists || this.state.err) ? (
+      <SmallSection>
+        <h1 className="is-size-1">Your Lists</h1>
+        <div className="control has-icons-left">
+          <Link to="/list/new" className="button is-success">Create a List</Link>
+          <span className="icon is-small is-left">
+            <i className="fas fa-plus"></i>
+          </span>
+        </div>
+        { this.state.err &&
+          <div className="has-text-error">{this.state.err}</div>
+        }
+        <hr/>
         <ul>
-          {this.state.lists.map((list) => (
-            <li>{list.id}</li>
-          ))}
+          {this.state.lists.map(ListItem)}
         </ul>
-      </div>
+      </SmallSection>
     ) : (
       <div>Loading...</div>
     );

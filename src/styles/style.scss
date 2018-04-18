@@ -2,8 +2,8 @@
 
 @import '~@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
 @import '~@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
-@import 'spinner';
 @import 'bulma';
+@import 'spinner';
 
 // Main containers
 
@@ -11,8 +11,8 @@ html {
   overflow-y: auto;
 }
 
-.text-404 {
-  font-size: 300px;
+.big-error-code {
+  font-size: 30vw;
   line-height: 100%;
   color: $dark; 
   -webkit-text-fill-color: transparent;
@@ -44,3 +44,43 @@ html {
   color: $grey;
   font-weight: normal;
 }
+
+// #search-results.dropdown {
+//   width: 100%;
+
+//   .dropdown-menu{
+//     width: 100%;
+//   }
+
+//   .dropdown-content {
+//     width: 100%;
+//     max-height: 400px;
+//     overflow-y: auto;
+//     padding-top: 1rem;
+//     padding-bottom: 1rem;
+//   }
+
+//   .media {
+//     padding-left: 1rem;
+//     padding-right: 1rem;
+//   }
+
+//   .no-results {
+//     margin: 0 16px;
+//     align-self: stretch;
+//   }
+// }
+
+.icon-clickable {
+  & > * {
+    pointer-events: all;
+    color: $grey-light;
+    &:hover {
+      color: $grey;
+      cursor: pointer;
+    }
+  }
+}
+
+.is-flex-row { flex-direction: row; }
+.is-flex-align-end { align-items: flex-end; }

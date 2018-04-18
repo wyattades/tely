@@ -19,3 +19,11 @@ export const SmallSection = ({ children }) => (
     </div>
   </section>
 );
+
+export const ContainerSection = ({ children }) => (
+  <section className="section">
+    <div className="container">
+      {children}
+    </div>
+  </section>
+);

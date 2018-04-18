@@ -60,16 +60,21 @@ export const init = () => new Promise((resolve) => {
     console.log('Signed in status:', !!auth.currentUser);
     unsubscribe();
 
-    getMe()
-    .then((profile) => console.log('init profile', profile))
-    .catch((err) => {
-      if (err.code === 401) {
-        return refreshToken();
-      } else {
-        console.error('getMe error', err);
-      }
-    })
-    .then(resolve);
+    if (auth.currentUser) {
+      getMe()
+      .then((profile) => console.log('init profile', profile))
+      .catch((err) => {
+        if (err.code === 401) {
+          return refreshToken();
+        } else {
+          console.error('getMe error', err);
+          return Promise.resolve();
+        }
+      })
+      .then(resolve);
+    } else {
+      resolve();
+    }
 
   }, (err) => {
     console.error('Sign in error:', err);
@@ -110,9 +115,3 @@ export const signIn = () => new Promise((resolve, reject) => {
   updateUser(profile);
   return auth.signInWithCustomToken(profile.token);
 });
-
-export const search = (type, str) => {
-  return Promise.resolve([{
-    id: 'test', title: 'Wow wow',
-  }]);
-};

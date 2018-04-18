@@ -25,14 +25,18 @@ class NewMediaList extends React.Component {
   };
 
   createList = (name, type, optionalGuild) => db.lists.add({
+    owner: db.getUser().uid, // = db.getProfile().id
     created: Date.now(),
     name,
     type,
-    share: [ optionalGuild ],
+    share: optionalGuild ? [ optionalGuild ] : [],
   })
   .then((ref) => {
     this.props.history.push(`/list/${ref.id}`);
-  });
+  })
+  .catch((err) => {
+    this.setState({ err: { submit: `Failed to create list. Error: ${err.code}` } });
+  })
 
   handleSubmit = (event) => {
     event.preventDefault();

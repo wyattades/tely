@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ id, title, desc, author, date, img }) => (
+export default ({ id, title, desc, author, created, img }) => (
   <div className="box" key={id}>
     <article className="media">
       <div className="media-left">
@@ -11,9 +11,9 @@ export default ({ id, title, desc, author, date, img }) => (
       <div className="media-content">
         <div className="content">
           <p>
-            <strong>John Smith</strong> <small>@johnsmith</small> <small>31m</small>
+            <strong>{title}</strong> <small>@{author}</small> <small>{created}</small>
             <br />
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+            {desc}
           </p>
         </div>
         <nav className="level is-mobile">

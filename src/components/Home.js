@@ -5,7 +5,7 @@ import * as db from '../db';
 
 export default ({ history }) => {
   const signIn = () => db.signIn()
-  .then(() => history.push('/list/new'))
+  .then(() => history.push('/list'))
   .catch((err) => console.error(err));
 
   return (
@@ -19,7 +19,7 @@ export default ({ history }) => {
       <div className="hero-footer">
         {db.getUser() && (
           <div className="container has-text-centered">
-            <Link className="button" to="/list/new">Continue as {db.getProfile().username}</Link>
+            <Link className="button" to="/list">Continue as {db.getProfile().username}</Link>
             <br/><br/>
           </div>
         )}

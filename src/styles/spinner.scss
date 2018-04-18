@@ -1,3 +1,5 @@
+$spinner-color: $primary;
+
 .spinner {
   // margin: 0 auto;
   vertical-align: middle;
@@ -8,7 +10,7 @@
 .spinner > div {
   width: 18px;
   height: 18px;
-  background-color: #fff;
+  background-color: $spinner-color;
 
   border-radius: 100%;
   display: inline-block;

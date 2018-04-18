@@ -8,16 +8,17 @@ import {
 } from 'react-router-dom';
 
 import Home from './Home';
-import NoMatch from './NoMatch';
+import About from './About';
+import ErrorBoundary from './ErrorBoundary';
 import MediaLists from './MediaLists';
 import MediaList from './MediaList';
 import NewMediaList from './NewMediaList';
-import Header from './Header';
+// import Header from './Header';
 
 import * as db from '../db';
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={props =>
+  <Route {...rest} render={(props) =>
     db.getUser() ? (
       <Component {...props} />
     ) : (
@@ -42,15 +43,18 @@ class App extends React.Component {
   render() {
     return this.state.loading ? null : (
       <Router basename="/tely">
-        <div>
+        <ErrorBoundary>
           <Switch>
             <Route exact path="/" component={Home}/>
+            <Route exact path="/about" component={About}/>
             <PrivateRoute exact path="/list" component={MediaLists}/>
             <PrivateRoute exact path="/list/new" component={NewMediaList}/>
             <PrivateRoute exact path="/list/:listid" component={MediaList}/>
-            <Route component={NoMatch}/>
+            <Route render={() => {
+              throw { code: 404 };
+            }}/>
           </Switch>
-        </div>
+        </ErrorBoundary>
       </Router>
     );
   }

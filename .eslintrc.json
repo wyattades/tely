@@ -7,6 +7,8 @@
     "node": true
   },
   "rules": {
+    "prefer-promise-reject-errors": 0,
+    "jsx-a11y/click-events-have-key-events": 0,
     "curly": 0,
     "prefer-destructuring": 0,
     "no-multi-str": 0,

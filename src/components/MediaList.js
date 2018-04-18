@@ -1,8 +1,10 @@
 import React from 'react';
 
 import * as db from '../db';
-import { spinner } from './misc';
+import { spinner, ContainerSection } from './misc';
 import ListItem from './ListItem';
+import Header from './Header';
+import Search from './Search';
 
 class MediaList extends React.Component {
 
@@ -14,35 +16,32 @@ class MediaList extends React.Component {
     this.contents = this.meta.collection('contents');
     
     this.state = {
-      loading: true,
+      list: null,
+      meta: null,
+      err: null,
     };
   }
 
-  componentDidMount() {    
+  componentDidMount() {
     this.meta.get()
     .then((snap) => {
+      if (!snap.exists) throw { code: 404 };
+
       const meta = snap.data();
-      this.setState({ meta, loading: false });
+      this.setState({ meta });
     })
-    .catch((err) => {
-      console.error('list fetch', err);
-      this.setState({ loading: false });
-    });
+    .catch((err) => this.setState({ err }));
 
     this.unsubscribe = this.contents.orderBy('created')
     .onSnapshot((snap) => {
-      this.setState({ list: [] });
-
+      const list = [];
       snap.forEach((itemSnap) => {
-        this.setState((prev) => {
-          const itemData = itemSnap.data();
-          itemData.id = itemSnap.id;
-          prev.list.push(itemData);
-          return prev;
-        });
+        const itemData = itemSnap.data();
+        itemData.id = itemSnap.id;
+        list.push(itemData);
       });
-    });
-    // .catch((err) => console.error('contents', err));
+      this.setState({ list });
+    }, (err) => this.setState({ err }));
   }
 
   componentWillUnmount() {
@@ -51,33 +50,36 @@ class MediaList extends React.Component {
 
   newListItem = () => {
     this.contents.add({
-      name: 'random thing' + Date.now(),
+      title: 'random thing',
+      author: db.getProfile().id,
       created: Date.now(),
+      desc: 'here is some random text for the things',
     })
     .then(console.log)
     .catch(console.error);
   }
 
   render() {
-    if (this.state.loading) {
+    const { meta, list, err } = this.state;
+
+    if (err) throw err;
+
+    if (!meta || !list) {
       return spinner;
-    } else if (Array.isArray(this.state.list)) {
-
-      const { name } = this.state.meta;
-
-      return (
-        <div>
-          <h2>List: {name}</h2>
-          <button onClick={this.newListItem}>New Item</button>
-          <div>
-            {this.state.list.map(ListItem)}
-          </div>
-        </div>
-      );
     } else {
-      return (
-        <div>Sorry, this list does not exist or you do not have access</div>
-      );
+      return [
+        <Header/>,
+        <ContainerSection>
+          <p className="is-size-5 has-text-grey">Your List:</p>
+          <h1 className="is-size-1">{meta.name}</h1>
+          <Search type={meta.type}/>
+          <div>
+            {list.length ? list.map(ListItem) : (
+              <p className="is-size-4">Empty List!</p>
+            )}
+          </div>
+        </ContainerSection>,
+      ];
     }
   }
 }

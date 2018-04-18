@@ -178,7 +178,7 @@ if (process.env.NODE_ENV === 'production') { // PRODUCTION CONFIG
 
   module.exports = {
 
-    devtool: 'eval-source-map',
+    devtool: 'cheap-module-source-map',
 
     output: {
       publicPath: '/',
