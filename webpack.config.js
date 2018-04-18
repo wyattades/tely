@@ -114,7 +114,7 @@ const sharedPlugins = [
     mobile: true,
     loader: loaderHTML,
     // cache: false,
-    favicon: 'src/images/favicon.ico',
+    faviconExternal: 'https://www.iconj.com/ico/2/p/2pq0a0yp63.ico',
     appMountId: 'react-root',
 
     ...(process.env.NODE_ENV === 'production' ? {

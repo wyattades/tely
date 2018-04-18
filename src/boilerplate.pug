@@ -45,8 +45,8 @@ html(lang=options.lang)
 
     title= options.title
 
-    if (files.favicon)
-      link(href=files.favicon rel='shortcut icon')
+    if (files.favicon || options.faviconExternal)
+      link(href=files.favicon || options.faviconExternal rel='shortcut icon')
 
     if (options.cache === false)
       meta(http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate')
