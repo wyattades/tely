@@ -14,12 +14,14 @@ PATHS.template = res(PATHS.src, 'boilerplate.pug');
 PATHS.assetName = 'asset/[name].[ext]';
 PATHS.entry = './src/index.js';
 
-const loaderHTML = `<div class="spinner">
+const loaderHTML = `<div class="full-page">
+<div class="spinner">
 <div class="bounce1"></div>
 <div class="bounce2"></div>
 <div class="bounce3"></div>
+</div>
 </div>`;
-  
+
 const baseConfig = {
 
   mode: process.env.NODE_ENV,

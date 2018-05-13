@@ -4,15 +4,16 @@ import * as discord from '../discord';
 import * as db from '../db';
 import { MultiSelect } from './form';
 import { SmallSection } from './misc';
+import services from '../services';
 
 // TODO: check discord id dynamically
 
-const types = [
-  { id: 'movies-tv', label: 'Movies & TV', className: 'is-warning',
-    desc: 'Select from a large database of movies and television' },
-  { id: 'spotify-music', label: 'Spotify Music', className: 'is-success',
-    desc: 'Spotify\'s extensive music library' },
-];
+const types = services.asArray.map(({ ID, LABEL, DESCRIPTION, CLASS }) => ({
+  id: ID,
+  label: LABEL,
+  desc: DESCRIPTION,
+  className: CLASS,
+}));
 
 class NewMediaList extends React.Component {
   

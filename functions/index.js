@@ -10,7 +10,7 @@ const config = functions.config();
 
 const CALLBACK_URL = 'https://us-central1-tely-db.cloudfunctions.net/widgets/auth/discord/callback';
 const SCOPES = [ 'identify', 'email', 'guilds' ];
-const ORIGIN = 'http://localhost:8080'; // TEMP
+const ORIGIN = config.mode.dev ? 'http://localhost:8080' : 'https://wyattades.github.io'; // TEMP?
 const ORIGIN_URL = `${ORIGIN}/tely`;
 
 // Store service account credentials in base64 to simplify env variables

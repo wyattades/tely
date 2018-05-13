@@ -25,11 +25,10 @@ export const MultiSelect = ({ options, name, onChange, value }) => (
   <div className="box well">
     {options.map(({ id, label, desc, className }) => (
       <div key={id} className="buttons">
-        <label className={`button multiline flex-start has-text-left is-large is-fullwidth
-          ${value === id && `${className} is-selected`}`} htmlFor={id}>
+        <label className={`button multiline space-between has-text-left
+          is-large is-fullwidth ${value === id && `${className} is-selected`}`} htmlFor={id}>
           <input type="radio" hidden name={name} id={id}
             onChange={() => onChange(id)} value={id} checked={value === id}/>
-          {/* <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Spotify_logo_without_text.svg/2000px-Spotify_logo_without_text.svg.png" alt="Spotify Logo" width="48"/> */}
           <div>
             <p className="is-size-4">{label}</p>
             <p className="help">{desc}</p>

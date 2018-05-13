@@ -1,12 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SmallSection } from './misc';
+import { SmallSection, Spinner } from './misc';
 
 import * as db from '../db';
 
-const ListItem = ({ id, type, name }) => (
-  <div key={id}>
-    <Link to={`/list/${id}`} className="button">{name} - {type}</Link>
+const ListView = ({ id, type, name }) => (
+  <div key={id} className="buttons">
+    <Link to={`/list/${id}`} className="button multiline space-between
+    has-text-left is-large is-fullwidth">
+      <span>
+        <p className="is-size-4">{name}</p>
+        <p className="help">{type}</p>
+      </span>
+      <span className="icon"><i className="fa fa-tv"/></span>
+    </Link>
   </div>
 );
 
@@ -37,25 +44,41 @@ class MediaLists extends React.Component {
   }
 
   render() {
-    return (this.state.lists || this.state.err) ? (
+
+    let Content;
+    if (this.state.lists) {
+      if (this.state.lists.length) {
+        Content = <ul>{this.state.lists.map(ListView)}</ul>;
+      } else {
+        Content = <p>No Lists!</p>;
+      }
+    } else {
+      Content = <Spinner/>;
+    }
+
+    return (
       <SmallSection>
-        <h1 className="is-size-1">Your Lists</h1>
-        <div className="control has-icons-left">
-          <Link to="/list/new" className="button is-success">Create a List</Link>
-          <span className="icon is-small is-left">
-            <i className="fas fa-plus"></i>
-          </span>
+        <div className="level">
+          <div className="level-left">
+            <div className="level-item">
+              <h1 className="is-size-1">Your Lists</h1>
+            </div>
+          </div>
+          <div className="level-right">
+            <Link to="/list/new" className="button is-success">
+              <span className="icon is-small is-left">
+                <i className="fas fa-plus"/>
+              </span>
+              <span>Create New List</span>
+            </Link>
+          </div>
         </div>
         { this.state.err &&
           <div className="has-text-error">{this.state.err}</div>
         }
         <hr/>
-        <ul>
-          {this.state.lists.map(ListItem)}
-        </ul>
+        {Content}
       </SmallSection>
-    ) : (
-      <div>Loading...</div>
     );
   }
 }

@@ -28,8 +28,8 @@ html {
   flex-direction: column;
 }
 
-.flex-start {
-  justify-content: flex-start;
+.space-between {
+  justify-content: space-between;
 }
 
 .well {
@@ -44,32 +44,6 @@ html {
   color: $grey;
   font-weight: normal;
 }
-
-// #search-results.dropdown {
-//   width: 100%;
-
-//   .dropdown-menu{
-//     width: 100%;
-//   }
-
-//   .dropdown-content {
-//     width: 100%;
-//     max-height: 400px;
-//     overflow-y: auto;
-//     padding-top: 1rem;
-//     padding-bottom: 1rem;
-//   }
-
-//   .media {
-//     padding-left: 1rem;
-//     padding-right: 1rem;
-//   }
-
-//   .no-results {
-//     margin: 0 16px;
-//     align-self: stretch;
-//   }
-// }
 
 .icon-clickable {
   & > * {

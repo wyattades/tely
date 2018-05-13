@@ -5,7 +5,10 @@ import 'firebase/firestore';
 import { decodeQuery, popupCenter } from './utils';
 import { getMe } from './discord';
 
-const AUTH_URL = 'https://us-central1-tely-db.cloudfunctions.net/widgets/auth/discord';
+const SERVER_URL = process.env.NODE_ENV === 'development' ?
+  'http://localhost:5000/tely-db/us-central1/widgets' :
+  'https://us-central1-tely-db.cloudfunctions.net/widgets';
+const AUTH_URL = `${SERVER_URL}/auth/discord`;
 
 firebase.initializeApp({
   apiKey: 'AIzaSyBXbBg-6gZx7eehLHUC4GzPbAQVPgpZqp8',

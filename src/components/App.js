@@ -10,18 +10,20 @@ import {
 import Home from './Home';
 import About from './About';
 import ErrorBoundary from './ErrorBoundary';
+import Account from './Account';
 import MediaLists from './MediaLists';
 import MediaList from './MediaList';
 import NewMediaList from './NewMediaList';
-// import Header from './Header';
+import Header from './Header';
 
 import * as db from '../db';
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) =>
-    db.getUser() ? (
-      <Component {...props} />
-    ) : (
+    db.getUser() ? <>
+      <Header/>
+      <Component {...props}/>
+    </> : (
       <Redirect to={{
         pathname: '/',
         state: { from: props.location },
@@ -47,12 +49,12 @@ class App extends React.Component {
           <Switch>
             <Route exact path="/" component={Home}/>
             <Route exact path="/about" component={About}/>
+            <Route exact path="/browse" render={() => { throw { code: 501 }; }}/>
+            <PrivateRoute exact path="/account" component={Account}/>
             <PrivateRoute exact path="/list" component={MediaLists}/>
             <PrivateRoute exact path="/list/new" component={NewMediaList}/>
             <PrivateRoute exact path="/list/:listid" component={MediaList}/>
-            <Route render={() => {
-              throw { code: 404 };
-            }}/>
+            <Route render={() => { throw { code: 404 }; }}/>
           </Switch>
         </ErrorBoundary>
       </Router>

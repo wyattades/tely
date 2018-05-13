@@ -1,10 +1,12 @@
 import React from 'react';
 
-export const spinner = (
-  <div className="spinner">
-    <div className="bounce1"/>
-    <div className="bounce2"/>
-    <div className="bounce3"/>
+export const Spinner = ({ fullPage }) => (
+  <div className={fullPage ? 'full-page' : ''}>
+    <div className="spinner">
+      <div className="bounce1"/>
+      <div className="bounce2"/>
+      <div className="bounce3"/>
+    </div>
   </div>
 );
 

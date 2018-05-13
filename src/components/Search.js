@@ -1,148 +1,124 @@
 import React from 'react';
 
-import { encodeQuery } from '../utils';
-import * as db from '../db';
+import services from '../services';
 
-const MOVIEDB_API_KEY = 'e516ac54480a35fac52c1c9c8af54200';
-const MOVIEDB_API_URL = 'https://api.themoviedb.org/3/search';
+class TruncateText extends React.Component {
 
-/*
-"poster_sizes": [
-  "w92",
-  "w154",
-  "w185",
-  "w342",
-  "w500",
-  "w780",
-  "original"
-],
-*/
+  constructor(props) {
+    super(props);
 
-const TruncateText = ({ text }) => {
-  if (text.length > 150) {
-    return (
-      <span>{text.substring(0, 150)}...<br/><a href="#">Show More</a></span>
-    );
-  } else {
-    return text;
+    this.state = {
+      truncated: props.text.length > props.maxLength,
+    };
   }
+
+  open = () => this.setState({
+    truncated: false,
+  })
+  
+  render() {
+    if (this.state.truncated) {
+      return (
+        <span>
+          {this.props.text.substring(0, this.props.maxLength - 3)}...
+          <br/>
+          <a onClick={this.open}>Show More</a>
+        </span>
+      );
+    } else {
+      return this.props.text;
+    }
+  }
+}
+
+TruncateText.defaultProps = {
+  maxLength: 200,
 };
 
-class MoviesTV {
-  IMAGE_SRC = 'https://image.tmdb.org/t/p/w92';
-  MEDIA_URL = 'https://tmdb.org';
+export class SearchItem extends React.Component {
 
-  label = 'Movie or TV Show';
+  state = {
+    hovered: false,
+  }
 
-  search = (str, page = 1) => {
-    const query = encodeQuery({
-      api_key: MOVIEDB_API_KEY,
-      query: encodeURIComponent(str).replace(/%20/g, '+'),
-      page,
-      include_adult: false,
-      language: 'en-US',
+  render() {
+    const { item, toggle } = this.props;
+    const { id, title, desc, image, released, type, link } = item;
+    const { hovered } = this.state;
+
+    const hover = (val) => () => this.setState({
+      hovered: val,
     });
 
-    const fetchMovies = fetch(`${MOVIEDB_API_URL}/movie?${query}`)
-    .then((res) => res.json())
-    .then((res) => res.results.map(({ id, title, poster_path, overview, release_date }) => ({
-      type: 'Movie',
-      title,
-      image: poster_path && `${this.IMAGE_SRC}/${poster_path}`,
-      desc: overview,
-      id,
-      link: `${this.MEDIA_URL}/movie/${id}`,
-      released: release_date,
-    })));
-
-    const fetchTV = fetch(`${MOVIEDB_API_URL}/tv?${query}`)
-    .then((res) => res.json())
-    .then((res) => res.results.map(({ id, name, poster_path, overview, first_air_date }) => ({
-      type: 'TV',
-      title: name,
-      image: poster_path && `${this.IMAGE_SRC}/${poster_path}`,
-      desc: overview,
-      id,
-      link: `${this.MEDIA_URL}/tv/${id}`,
-      released: first_air_date,
-    })));
-
-    return Promise.all([ fetchMovies, fetchTV ])
-    .then(([ l1, l2 ]) => l1.concat(l2));
-  }
-
-  renderItem = ({ id, title, desc, image, released, type, link }) => (
-    <article className="media" key={id}>
-      <figure className="media-left">
-        <p className="image is-3by4">
-          { image &&
-            <img src={image} alt={title}/>
-          }
-        </p>
-      </figure>
-      <div className="media-content">
-        <div className="content">
-          <p>
-            <a href={link}><strong>{title}</strong></a> <small>{released}</small> <strong><small>{type}</small></strong>
-            <br/>
-            <TruncateText text={desc}/>
+    return (
+      <article className="media">
+        <figure className="media-left">
+          <p className="image is-3by4">
+            { image &&
+              <img src={image} alt={title}/>
+            }
           </p>
-        </div>
-        {/* <nav className="level is-mobile">
-          <div className="level-left">
-            <a className="level-item">
-              <span className="icon is-small"><i className="fas fa-plus" /></span>
-            </a>
-            <a className="level-item">
-              <span className="icon is-small"><i className="fas fa-retweet" /></span>
-            </a>
-            <a className="level-item">
-              <span className="icon is-small"><i className="fas fa-heart" /></span>
-            </a>
+        </figure>
+        <div className="media-content">
+          <div className="content">
+            <p>
+              <a href={link}><strong>{title}</strong></a>&nbsp;
+              <small>{released}</small>&nbsp;
+              <strong><small>{type}</small></strong>
+              <br/>
+              <TruncateText text={desc}/>
+            </p>
           </div>
-        </nav> */}
-      </div>
-      <div className="media-right">
-        <a className="icon" onClick={() => this.addItem(id)}>
-          <i className="fas fa-plus"/>
-        </a>
-      </div>
-    </article>
-  );
-}
-
-class SpotifyMusic {
-  label = 'Spotify Song';
-
-  search = () => {
-    throw 'Not implemented';
+          {/* <nav className="level is-mobile">
+            <div className="level-left">
+              <a className="level-item">
+                <span className="icon is-small"><i className="fas fa-plus" /></span>
+              </a>
+              <a className="level-item">
+                <span className="icon is-small"><i className="fas fa-retweet" /></span>
+              </a>
+              <a className="level-item">
+                <span className="icon is-small"><i className="fas fa-heart" /></span>
+              </a>
+            </div>
+          </nav> */}
+        </div>
+        <div className="media-right">
+          {!id ? (
+            <a className="icon" onClick={toggle}>
+              <i className="fas fa-plus"/>
+            </a>
+          ) : (
+            <a className={`icon has-text-${hovered ? 'danger' : 'success'}`}
+              onMouseEnter={hover(true)} onMouseLeave={hover(false)}
+              onClick={toggle}>
+              <i className={`fas ${hovered ? 'fa-times' : 'fa-check'}`}/>
+            </a>
+          )}
+        </div>
+      </article>
+    );
   }
-
-  renderItem = () => (
-    null
-  );
 }
 
-class Search extends React.Component {
+export class Search extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
       searching: false,
-      results: null,
       searchQuery: '',
+      results: false,
     };
+    this.media = services.asObject[props.type];
+  }
 
-    switch (props.type) {
-      case 'spotify-music': this.media = new SpotifyMusic(); break;
-      case 'movies-tv': default: this.media = new MoviesTV(); break;
-    }
-
-    this.media.addItem = (id) => {
-      console.log('addItem', id, props.type);
-      // props.listRef.add();
-    };
+  setResults = (results) => {
+    this.props.setResults(results);
+    this.setState({
+      results: !!results,
+    });
   }
 
   search = () => {
@@ -152,14 +128,16 @@ class Search extends React.Component {
         searching: true,
       }, () => {
         this.media.search(str)
-        .then((results) => this.setState({
-          results,
-          searching: false,
-        }))
+        .then((results) => {
+          this.setState({
+            searching: false,
+          });
+          this.setResults(results);
+        })
         .catch(console.error);
       });
     } else {
-      this.setState({ results: null });
+      this.setResults(null);
     }
   }
 
@@ -186,50 +164,38 @@ class Search extends React.Component {
     this.search(this.state.searchQuery);
   }
 
-  clearSearch = () => this.setState({
-    searchQuery: '',
-    results: null,
-  })
+  clearSearch = () => {
+    this.setState({
+      searchQuery: '',
+    });
+    this.setResults(null);
+  }
 
   render() {
-    const { results, searchQuery, searching } = this.state;
-
-    let Results = null;
-    if (results) {
-      Results = (
-        <div>
-          {results.length === 0 ? (
-            <p className="no-results">No results!</p>
-          ) : results.map(this.media.renderItem)}
-        </div>
-      );
-    }
+    const { searchQuery, searching, results } = this.state;
 
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <div className="field has-addons">
-            <div className="control has-icons-right is-expanded">
-              <input className="input is-large" value={searchQuery}
-                type="text" onChange={this.handleChange}
-                placeholder={`Add a ${this.media.label}`}/>
-              { searching ? (
-                <span className="icon is-large is-right">
-                  <i className="fas fa-circle-notch fa-spin"/>
-                </span>
-              ) : (results && (
-                <span className="icon is-large is-right icon-clickable" onClick={this.clearSearch}>
-                  <i className="fas fa-times-circle"/>
-                </span>
-              ))}
-            </div>
-            <div className="control">
-              <button type="submit" className="button is-info is-large">Search</button>
-            </div>
+      <form onSubmit={this.handleSubmit}>
+        <div className="field has-addons">
+          <div className="control has-icons-right is-expanded">
+            <input className="input is-large" value={searchQuery}
+              type="text" onChange={this.handleChange}
+              placeholder={`Add ${this.media.LABEL}`}/>
+            { searching ? (
+              <span className="icon is-large is-right">
+                <i className="fas fa-circle-notch fa-spin"/>
+              </span>
+            ) : (results && (
+              <span className="icon is-large is-right icon-clickable" onClick={this.clearSearch}>
+                <i className="fas fa-times-circle"/>
+              </span>
+            ))}
           </div>
-        </form>
-        { Results }
-      </div>
+          <div className="control">
+            <button type="submit" className="button is-info is-large">Search</button>
+          </div>
+        </div>
+      </form>
     );
   }
 }
@@ -238,5 +204,3 @@ Search.defaultProps = {
   searchDelay: 1000,
   type: 'movies-tv',
 };
-
-export default Search;
