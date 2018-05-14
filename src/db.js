@@ -102,7 +102,16 @@ export const signIn = () => new Promise((resolve, reject) => {
     if (!popup) {
       window.clearInterval(intervalId);
       throw 'Window closed unexpectedly!';
-    } else if (popup.location.hostname === window.location.hostname) {
+    }
+    
+    let arrived = false;
+    try {
+      if (popup.location.hostname === window.location.hostname) arrived = true;
+    } catch (_) {
+      // Do nothing
+    }
+
+    if (arrived) {
       window.clearInterval(intervalId);
       const { error, ...profile } = decodeQuery(popup.location.search);
       popup.close();

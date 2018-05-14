@@ -7,8 +7,7 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "update-config": "firebase functions:config:set `tr '\n' ' ' < .env`",
-    "save-config": "firebase functions:config:get > .runtimeconfig.json"
+    "update-config": "firebase functions:config:set `tr '\n' ' ' < .env`"
   },
   "dependencies": {
     "express": "^4.16.3",

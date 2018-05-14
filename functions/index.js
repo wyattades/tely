@@ -8,9 +8,14 @@ const Query = require('querystring');
 
 const config = functions.config();
 
-const CALLBACK_URL = 'https://us-central1-tely-db.cloudfunctions.net/widgets/auth/discord/callback';
+const SERVER_URL = config.admin.mode === 'development' ?
+  'http://localhost:5000/tely-db/us-central1/widgets' :
+  'https://us-central1-tely-db.cloudfunctions.net/widgets';
+const CALLBACK_URL = `${SERVER_URL}/auth/discord/callback`;
 const SCOPES = [ 'identify', 'email', 'guilds' ];
-const ORIGIN = config.mode.dev ? 'http://localhost:8080' : 'https://wyattades.github.io'; // TEMP?
+const ORIGIN = config.admin.mode === 'development' ?
+  'http://localhost:8080' :
+  'https://wyattades.github.io';
 const ORIGIN_URL = `${ORIGIN}/tely`;
 
 // Store service account credentials in base64 to simplify env variables
@@ -64,7 +69,7 @@ app.get('/auth/discord', passport.authenticate('discord'));
 app.get('/auth/discord/callback', passport.authenticate('discord', {
   failureRedirect: `${ORIGIN_URL}?error`,
 }), (req, res) => {
-  res.redirect(`${ORIGIN_URL}/list?${Query.stringify(req.user)}`);
+  res.redirect(`${ORIGIN_URL}?${Query.stringify(req.user)}`);
 });
 
 app.post('/auth/discord/refresh', (req, res) => {
