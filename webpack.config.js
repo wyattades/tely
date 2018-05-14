@@ -109,11 +109,14 @@ const sharedPlugins = [
     meta: [{
       name: 'description',
       content: 'Mom! Come look at the Tely!',
+    }, {
+      name: 'keywords',
+      content: 'tely,live,media,tv,television,movie,music,spotify',
     }],
     mobile: true,
     loader: loaderHTML,
     // cache: false,
-    // favicon: res(PATHS.src, 'images/favicon.ico'),
+    faviconExternal: 'https://www.iconj.com/ico/2/p/2pq0a0yp63.ico',
     appMountId: 'react-root',
 
     ...(process.env.NODE_ENV === 'production' ? {

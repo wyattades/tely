@@ -32,7 +32,7 @@
 
 doctype html
 
-html(lang=options.lang, manifest=files.manifest || '')
+html(lang=options.lang)
   head
     meta(charset='utf-8')
     meta(content='ie=edge' http-equiv='x-ua-compatible')
@@ -45,15 +45,15 @@ html(lang=options.lang, manifest=files.manifest || '')
 
     title= options.title
 
-    if (files.favicon)
-      link(href=files.favicon rel='shortcut icon')
+    if (files.favicon || options.faviconExternal)
+      link(href=files.favicon || options.faviconExternal rel='shortcut icon')
 
     if (options.cache === false)
       meta(http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate')
       meta(http-equiv='Pragma' content='no-cache')
       meta(http-equiv='Expires' content='0')
 
-    if (options.mobile)
+    if (options.mobile === false)
       meta(content='width=device-width, initial-scale=1' name='viewport')
 
     each item in options.links
