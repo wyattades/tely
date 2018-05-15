@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import * as db from '../db';
 
@@ -8,7 +8,10 @@ const logout = () => db.signOut()
   window.location.href = '/tely'; // Reloads page
 });
 
-class NavBar extends React.Component {
+// To support a fixed header, add this class to document head
+document.documentElement.classList.add('has-navbar-fixed-top');
+
+class Header extends React.Component {
 
   state = {
     open: false,
@@ -22,13 +25,14 @@ class NavBar extends React.Component {
     const username = loggedIn && db.getProfile().username;
 
     return (
-      <nav className="navbar is-transparent">
+      <nav className="navbar is-transparent has-shadow is-fixed-top">
         <div className="container">
           <div className="navbar-brand">
             <Link className="navbar-item" to="/">
               <h1 className="is-size-4 has-text-primary">Tely</h1>
             </Link>
-            <div className={`navbar-burger burger ${this.state.open ? 'is-active' : ''}`} onClick={this.toggle} role="button" tabIndex="0">
+            <div className={`navbar-burger burger ${this.state.open ? 'is-active' : ''}`}
+              onClick={this.toggle} role="button" tabIndex="0">
               <span/>
               <span/>
               <span/>
@@ -36,21 +40,21 @@ class NavBar extends React.Component {
           </div>
           <div className={`navbar-menu ${this.state.open ? 'is-active' : ''}`}>
             <div className="navbar-start">
-              <Link className="navbar-item" to="/browse">
+              <NavLink className="navbar-item" to="/browse">
                 Browse
-              </Link>
+              </NavLink>
             </div>
             <div className="navbar-end">
-              <Link className="navbar-item" to="/list">
+              <NavLink className="navbar-item" to="/list">
                 <span>My Lists</span>
                 {/* <span className="icon">
                   <i className="fas fa-list" />
                 </span> */}
-              </Link>
+              </NavLink>
               <div className="navbar-item has-dropdown is-hoverable">
-                <Link className="navbar-link" to="/account">
+                <NavLink className="navbar-link" to="/account">
                   {username}
-                </Link>
+                </NavLink>
                 <div className="navbar-dropdown is-right is-boxed">
                   <Link className="navbar-item" to="/account">
                     Account
@@ -69,4 +73,4 @@ class NavBar extends React.Component {
   }
 }
 
-export default NavBar;
+export default Header;

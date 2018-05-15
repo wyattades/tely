@@ -34,6 +34,11 @@ class ErrorBoundary extends React.Component {
       code,
       message,
     });
+
+    const unlisten = this.props.history.listen((location, action) => {
+      this.setState({ hasError: false });
+      unlisten();
+    });
   }
 
   goBack = () => {

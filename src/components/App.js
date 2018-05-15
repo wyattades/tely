@@ -5,6 +5,7 @@ import {
   Route,
   Switch,
   Redirect,
+  NavLink,
 } from 'react-router-dom';
 
 import Home from './Home';
@@ -17,6 +18,9 @@ import NewMediaList from './NewMediaList';
 import Header from './Header';
 
 import * as db from '../db';
+
+// Set default NavLink activeClassName
+NavLink.defaultProps.activeClassName = 'is-active';
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) =>
@@ -53,7 +57,7 @@ class App extends React.Component {
             <PrivateRoute exact path="/account" component={Account}/>
             <PrivateRoute exact path="/list" component={MediaLists}/>
             <PrivateRoute exact path="/list/new" component={NewMediaList}/>
-            <PrivateRoute exact path="/list/:listid" component={MediaList}/>
+            <PrivateRoute path="/list/:listid" component={MediaList}/>
             <Route render={() => { throw { code: 404 }; }}/>
           </Switch>
         </ErrorBoundary>

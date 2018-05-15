@@ -22,6 +22,7 @@ export const ID = 'movies_tv';
 export const LABEL = 'Movies & TV';
 export const DESCRIPTION = 'Select from a large database of movies and television';
 export const CLASS = 'is-warning';
+export const ICON = 'tv';
 
 export const search = (str, page = 1) => {
   const query = encodeQuery({

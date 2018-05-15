@@ -107,37 +107,37 @@ export class Search extends React.Component {
     super(props);
 
     this.state = {
+      resultCount: null,
       searching: false,
       searchQuery: '',
-      results: false,
     };
     this.media = services.asObject[props.type];
   }
 
-  setResults = (results) => {
-    this.props.setResults(results);
-    this.setState({
-      results: !!results,
-    });
-  }
+  SEARCH_DELAY = 1000;
 
   search = () => {
     const str = this.state.searchQuery;
     if (str) {
       this.setState({
         searching: true,
+        resultCount: null,
       }, () => {
         this.media.search(str)
         .then((results) => {
           this.setState({
             searching: false,
+            resultCount: results.length,
           });
-          this.setResults(results);
+          this.props.setResults(results.length ? results : null);
         })
         .catch(console.error);
       });
     } else {
-      this.setResults(null);
+      this.setState({
+        resultCount: null,
+      });
+      this.props.setResults(null);
     }
   }
 
@@ -151,7 +151,7 @@ export class Search extends React.Component {
 
     this.searchDelayTimer = window.setTimeout(
       this.search.bind(this, searchQuery),
-      this.props.searchDelay,
+      this.SEARCH_DELAY,
     );
   }
 
@@ -167,40 +167,44 @@ export class Search extends React.Component {
   clearSearch = () => {
     this.setState({
       searchQuery: '',
+      resultCount: null,
     });
-    this.setResults(null);
+    this.props.setResults(null);
   }
 
   render() {
-    const { searchQuery, searching, results } = this.state;
+    const { searchQuery, resultCount, searching } = this.state;
 
-    return (
+    if (!this.media) throw `Invalid list type: ${this.props.type}`;
+
+    let Side = null;
+    if (searching) Side = (
+      <span className="icon is-large is-right">
+        <i className="fas fa-circle-notch fa-spin"/>
+      </span>
+    );
+    else if (resultCount !== null) Side = (
+      <span className="icon is-large is-right icon-clickable" onClick={this.clearSearch}>
+        <i className="fas fa-times-circle"/>
+      </span>
+    );
+
+    return <>
       <form onSubmit={this.handleSubmit}>
         <div className="field has-addons">
           <div className="control has-icons-right is-expanded">
-            <input className="input is-large" value={searchQuery}
+            <input className={`input is-large ${resultCount === 0 && 'is-danger'}`} value={searchQuery}
               type="text" onChange={this.handleChange}
               placeholder={`Add ${this.media.LABEL}`}/>
-            { searching ? (
-              <span className="icon is-large is-right">
-                <i className="fas fa-circle-notch fa-spin"/>
-              </span>
-            ) : (results && (
-              <span className="icon is-large is-right icon-clickable" onClick={this.clearSearch}>
-                <i className="fas fa-times-circle"/>
-              </span>
-            ))}
+            {Side}
           </div>
           <div className="control">
             <button type="submit" className="button is-info is-large">Search</button>
           </div>
         </div>
       </form>
-    );
+      <br/>
+      { resultCount !== null && <p className="has-text-grey has-text-centered">{resultCount} Results</p> }
+    </>;
   }
 }
-
-Search.defaultProps = {
-  searchDelay: 1000,
-  type: 'movies-tv',
-};

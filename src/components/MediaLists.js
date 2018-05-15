@@ -1,21 +1,27 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { SmallSection, Spinner } from './misc';
+import services from '../services';
 
 import * as db from '../db';
 
-const ListView = ({ id, type, name }) => (
-  <div key={id} className="buttons">
-    <Link to={`/list/${id}`} className="button multiline space-between
-    has-text-left is-large is-fullwidth">
-      <span>
-        <p className="is-size-4">{name}</p>
-        <p className="help">{type}</p>
-      </span>
-      <span className="icon"><i className="fa fa-tv"/></span>
-    </Link>
-  </div>
-);
+const ListView = ({ id, type, name }) => {
+
+  const service = services.asObject[type];
+
+  return (
+    <div key={id} className="buttons">
+      <Link to={`/list/${id}`} className="button multiline space-between
+      has-text-left is-large is-fullwidth">
+        <span>
+          <p className="is-size-4">{name}</p>
+          <p className="help">{type}</p>
+        </span>
+        <span className="icon"><i className={`fa fa-${service && service.ICON}`}/></span>
+      </Link>
+    </div>
+  );
+};
 
 class MediaLists extends React.Component {
 
