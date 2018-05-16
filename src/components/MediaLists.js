@@ -15,7 +15,7 @@ const ListView = ({ id, type, name }) => {
       has-text-left is-large is-fullwidth">
         <span>
           <p className="is-size-4">{name}</p>
-          <p className="help">{type}</p>
+          <p className="help">{service.LABEL}</p>
         </span>
         <span className="icon"><i className={`fa fa-${service && service.ICON}`}/></span>
       </Link>
@@ -27,11 +27,14 @@ class MediaLists extends React.Component {
 
   state = {
     lists: null,
+    sharedLists: [],
   }
 
   componentDidMount() {
+    const uid = db.getUser().uid;
+
     this.unsubscribe = db.lists
-    .where('owner', '==', db.getUser().uid)
+    .where('owner', '==', uid)
     .onSnapshot((snap) => {
       const lists = [];
       snap.forEach((item) => {
@@ -43,23 +46,49 @@ class MediaLists extends React.Component {
     }, (err) => {
       this.setState({ err: err.code });
     });
+
+    // this.unsubscribeShared = db.lists
+    // .where('shared', 'has', uid)
+    // .onSnapshot((snap) => {
+    //   const sharedLists = [];
+    //   snap.forEach((item) => {
+    //     const itemData = item.data();
+    //     itemData.id = item.id;
+    //     sharedLists.push(itemData);
+    //   });
+    //   this.setState({ sharedLists });
+    // }, (err) => {
+    //   this.setState({ err: err.code });
+    // });
   }
 
   componentWillUnmount() {
     this.unsubscribe();
+    // this.unsubscribeShared();
   }
 
   render() {
 
-    let Content;
+    let MyLists;
     if (this.state.lists) {
       if (this.state.lists.length) {
-        Content = <ul>{this.state.lists.map(ListView)}</ul>;
+        MyLists = <ul>{this.state.lists.map(ListView)}</ul>;
       } else {
-        Content = <p>No Lists!</p>;
+        MyLists = <p className="has-text-centered">No Lists!</p>;
       }
     } else {
-      Content = <Spinner/>;
+      MyLists = <Spinner centered/>;
+    }
+
+    let SharedLists;
+    if (this.state.sharedLists) {
+      if (this.state.sharedLists.length) {
+        SharedLists = <ul>{this.state.sharedLists.map(ListView)}</ul>;
+      } else {
+        SharedLists = <p className="has-text-centered">No Shared Lists!</p>;
+      }
+    } else {
+      SharedLists = <Spinner centered/>;
     }
 
     return (
@@ -83,7 +112,11 @@ class MediaLists extends React.Component {
           <div className="has-text-error">{this.state.err}</div>
         }
         <hr/>
-        {Content}
+        {MyLists}
+        <br/><br/><br/>
+        <h1 className="is-size-1">Shared With You</h1>
+        <hr/>
+        {SharedLists}
       </SmallSection>
     );
   }

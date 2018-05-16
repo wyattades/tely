@@ -43,28 +43,30 @@ class Header extends React.Component {
               <NavLink className="navbar-item" to="/browse">
                 Browse
               </NavLink>
+              <NavLink className="navbar-item" to="/about">
+                About
+              </NavLink>
             </div>
             <div className="navbar-end">
-              <NavLink className="navbar-item" to="/list">
-                <span>My Lists</span>
-                {/* <span className="icon">
-                  <i className="fas fa-list" />
-                </span> */}
-              </NavLink>
-              <div className="navbar-item has-dropdown is-hoverable">
-                <NavLink className="navbar-link" to="/account">
-                  {username}
+              { loggedIn ? <>
+                <NavLink className="navbar-item" to="/list">
+                  <span>My Lists</span>
                 </NavLink>
-                <div className="navbar-dropdown is-right is-boxed">
-                  <Link className="navbar-item" to="/account">
-                    Account
-                  </Link>
-                  <hr className="navbar-divider" />
-                  <a className="navbar-item" onClick={logout}>
-                    Logout
-                  </a>
+                <div className="navbar-item has-dropdown is-hoverable">
+                  <NavLink className="navbar-link" to="/account">
+                    {username}
+                  </NavLink>
+                  <div className="navbar-dropdown is-right is-boxed">
+                    <Link className="navbar-item" to="/account">
+                      Account
+                    </Link>
+                    <hr className="navbar-divider" />
+                    <a className="navbar-item" onClick={logout}>
+                      Logout
+                    </a>
+                  </div>
                 </div>
-              </div>
+              </> : null}
             </div>
           </div>
         </div>

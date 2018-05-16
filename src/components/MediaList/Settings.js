@@ -2,7 +2,7 @@ import React from 'react';
 
 export default ({ history, metaData, meta }) => {
   const deleteList = () => {
-    if (window.confirm(`Are you sure you want to delete "${metaData.name}"`)) {
+    if (window.confirm(`Are you sure you want to delete "${metaData.name}?"`)) {
       meta.delete()
       .then(() => history.push('/list'))
       .catch(console.error);

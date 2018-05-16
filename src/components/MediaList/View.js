@@ -11,14 +11,14 @@ export default ({ meta, contents, searchResults, list, onSearch }) => {
       if (item.id) return contents.doc(item.id).delete()
       .then(() => {
         item.id = null;
-        this.setState({ searchResults: [...searchResults] });
+        onSearch([ ...searchResults ]);
       });
       else {
         item.created = Date.now();
-        return this.contents.add(item)
+        return contents.add(item)
         .then((snap) => {
           item.id = snap.id;
-          this.setState({ searchResults: [...searchResults] });
+          onSearch([ ...searchResults ]);
         });
       }
     };

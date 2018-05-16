@@ -30,6 +30,7 @@ try {
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
+export const Helpers = firebase.firestore;
 export const users = firestore.collection('users');
 export const lists = firestore.collection('lists');
 

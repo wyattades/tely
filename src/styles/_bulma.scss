@@ -6,6 +6,8 @@
 
 // $family-serif: Georgia, Cambria, "Times New Roman", Times, serif;
 
+$discordmain: #7289DA;
+$discordmain-invert: findColorInvert($discordmain);
 $discord: #333;
 $discord-invert: findColorInvert($discord);
 
@@ -17,7 +19,8 @@ $discord-invert: findColorInvert($discord);
 $navbar-item-active-color: $link;
 
 $addColors: (
-  "discord": ($discord, $discord-invert)
+  "discord": ($discord, $discord-invert),
+  "discordmain": ($discordmain, $discordmain-invert)
 );
 $colors: map-merge($colors, $addColors);
 

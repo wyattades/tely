@@ -28,16 +28,14 @@ class MediaList extends React.Component {
   }
 
   componentDidMount() {
-    this.meta.get()
-    .then((snap) => {
+    this.unsubscribeMeta = this.meta.onSnapshot((snap) => {
       if (!snap.exists) throw { code: 404 };
 
       const meta = snap.data();
       this.setState({ meta });
-    })
-    .catch((err) => this.setState({ err }));
+    }, (err) => this.setState({ err }));
 
-    this.unsubscribe = this.contents.orderBy('created')
+    this.unsubscribeContent = this.contents.orderBy('created')
     .onSnapshot((snap) => {
       const list = [];
       snap.forEach((itemSnap) => {
@@ -50,7 +48,8 @@ class MediaList extends React.Component {
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    this.unsubscribeContent();
+    this.unsubscribeMeta();
   }
 
   onSearch = (searchResults) => {
@@ -88,7 +87,6 @@ class MediaList extends React.Component {
         <div className="columns">
           <aside className="column is-3-touch is-2"> {/* TODO: fix (when collapsed) */}
             <section className="section">
-              <p className="menu-label is-hidden-mobile">Navigation</p>
               <ul className="menu-list">
                 <li>
                   <NavLink exact to={`/list/${this.listid}`}>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { matchPath } from 'react-router-dom';
 
-export const Spinner = ({ fullPage }) => (
-  <div className={fullPage ? 'full-page' : ''}>
+export const Spinner = ({ fullPage, centered }) => (
+  <div className={`${fullPage && 'full-page'} ${centered && 'buttons is-centered'}`}>
     <div className="spinner">
       <div className="bounce1"/>
       <div className="bounce2"/>

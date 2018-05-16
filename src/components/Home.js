@@ -9,7 +9,7 @@ export default ({ history }) => {
   .catch((err) => console.error(err));
 
   return (
-    <section className="hero is-fullheight">
+    <section className="hero is-fullheight-flex">
       <div className="hero-body">
         <div className="container has-text-centered">
           <h3 className="title is-1">Tely</h3>

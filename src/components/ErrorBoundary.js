@@ -1,6 +1,8 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
+import Header from './Header';
+
 const getMessage = (code) => {
   switch (code) {
     case 401: return 'You don\'t have access to this list!';
@@ -35,7 +37,7 @@ class ErrorBoundary extends React.Component {
       message,
     });
 
-    const unlisten = this.props.history.listen((location, action) => {
+    const unlisten = this.props.history.listen(() => {
       this.setState({ hasError: false });
       unlisten();
     });
@@ -55,7 +57,7 @@ class ErrorBoundary extends React.Component {
     const { hasError, code, message } = this.state;
 
     return !hasError ? this.props.children : (
-      <section className="hero is-fullheight">
+      <section className="hero is-fullheight-flex">
         <div className="hero-body">
           <div className="container has-text-centered">
             <h1 className="big-error-code">{code}</h1>

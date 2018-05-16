@@ -12,7 +12,7 @@ html {
 }
 
 .big-error-code {
-  font-size: 30vw;
+  font-size: 25vw;
   line-height: 100%;
   color: $dark; 
   -webkit-text-fill-color: transparent;
@@ -20,15 +20,52 @@ html {
   -webkit-text-stroke-color: $dark;
 }
 
+.image.is-rounded {
+  border-radius: 50%;
+}
+
+// is-fullheight but account for header
+.hero.is-fullheight-flex {
+  min-height: calc(100vh - 60px);
+  .hero-body {
+    align-items: center;
+    display: flex;
+    & > .container {
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+  }
+}
+
+.is-clipped {
+  text-overflow: ellipsis;
+}
+
 .multiline {
   height: auto;
 }
 
-.dir-column {
-  flex-direction: column;
+// Clickable helper
+.is-clickable {
+  cursor: pointer;
+}
+.is-unclickable {
+  pointer-events: none;
+  button {
+    pointer-events: all;
+  }
+}
+
+.dropdown-icon {
+  @include arrow($link);
+  display: inline-block;
+  position: relative;
 }
 
 .space-between {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
 }
 
@@ -55,6 +92,3 @@ html {
     }
   }
 }
-
-.is-flex-row { flex-direction: row; }
-.is-flex-align-end { align-items: flex-end; }
