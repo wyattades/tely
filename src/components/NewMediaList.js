@@ -25,7 +25,7 @@ class NewMediaList extends React.Component {
     submitting: false,
   };
 
-  createList = (name, type, optionalGuild) => 
+  createList = (name, type, optionalGuild) =>
     (optionalGuild ? discord.getGuild(optionalGuild) : Promise.resolve())
     .then((guild) => db.lists.add({
       owner: db.getUser().uid, // = db.getProfile().id
@@ -38,7 +38,7 @@ class NewMediaList extends React.Component {
       this.props.history.push(`/list/${ref.id}`);
     })
     .catch((err) => {
-      this.setState({ err: { submit: `Failed to create list. Error: ${err.code}` } });
+      this.setState({ submitting: false, err: { submit: `Failed to create list. Error: ${err.code}` } });
     });
 
   handleSubmit = (event) => {

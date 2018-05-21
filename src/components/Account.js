@@ -11,25 +11,30 @@ const deleteAll = () => {
 };
 
 export default () => {
-  const user = db.getProfile();
+  const profile = db.getProfile();
+  const user = db.getUser();
+
   return (
     <SmallSection>
       <h1 className="is-size-1">Account</h1>
       <br/>
       {/* <label className="label">Avatar</label> */}
-      { user.avatar && (
+      { profile.avatar && (
         <p>
-          <img className="image" alt={user.username}
-            src={`${AVATAR_URL}/${user.id}/${user.avatar}.png`}/>
+          <img className="image" alt={profile.username}
+            src={`${AVATAR_URL}/${profile.id}/${profile.avatar}.png`}/>
         </p>
       )}
       <br/>
-      {/* <label className="label">Discord Information</label> */}
+      <label className="label">Discord Profile</label>
       <pre>
-        Username: {user.username}#{user.discriminator}<br/>
-        { user.email && <>Email: {user.email}<br/></> }
-        Id: {user.id}
+        Username: {profile.username}#{profile.discriminator}<br/>
+        { profile.email && <>Email: {profile.email}<br/></> }
+        Id: {profile.id}
       </pre>
+      <br/>
+      <label className="label">Account Created</label>
+      <p>{new Date(user.metadata.creationTime).toLocaleString()}</p>
       <br/>
       <button className="button is-danger" onClick={deleteAll}>Delete Everything</button>
     </SmallSection>

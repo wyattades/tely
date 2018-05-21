@@ -34,18 +34,10 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   }/>
 );
 
+// eslint-disable-next-line react/prefer-stateless-function
 class App extends React.Component {
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      loading: false,
-    };
-  }
-
   render() {
-    return this.state.loading ? null : (
+    return (
       <Router basename="/tely">
         <>
           <Header/>

@@ -100,12 +100,14 @@ class MediaLists extends React.Component {
             </div>
           </div>
           <div className="level-right">
-            <Link to="/list/new" className="button is-success">
-              <span className="icon is-small is-left">
-                <i className="fas fa-plus"/>
-              </span>
-              <span>Create New List</span>
-            </Link>
+            <div className="level-item">
+              <Link to="/list/new" className="button is-success">
+                <span className="icon is-small is-left">
+                  <i className="fas fa-plus"/>
+                </span>
+                <span>Create New List</span>
+              </Link>
+            </div>
           </div>
         </div>
         { this.state.err &&

@@ -4,7 +4,7 @@ const DISCORD_API = 'https://discordapp.com/api';
 
 const api = (path, method = 'GET', body) => {
   const profile = getProfile();
-  if (!profile) return Promise.reject({ code: 0 });
+  if (!profile) return Promise.reject({ code: 403 });
 
   return fetch(`${DISCORD_API}${path}`, {
     method,
@@ -31,6 +31,7 @@ export const getMe = () => api('/users/@me');
 
 export const getGuilds = () => api('/users/@me/guilds');
 
+// TODO: /channels/${id} ???
 export const getGuild = (id) => getGuilds()
 .then((guilds) => {
   for (const guild of guilds) {

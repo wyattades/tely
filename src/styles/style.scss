@@ -92,3 +92,26 @@ html {
     }
   }
 }
+
+.fixed-column {
+  position: fixed;
+  z-index: 29;
+  @include mobile {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    border-top: 1px solid $grey-lighter;
+    background-color: $white;
+    .section {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .menu-list {
+      display: flex;
+      justify-content: center;
+      li {
+        flex-grow: 1;
+      }
+    }
+  }
+}

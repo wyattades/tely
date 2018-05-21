@@ -5,10 +5,11 @@ import Header from './Header';
 
 const getMessage = (code) => {
   switch (code) {
-    case 401: return 'You don\'t have access to this list!';
-    case 404: return 'Sorry, the thing you want isn\'t here.';
-    case 501: return 'Unimplemented! This feature will be available soon.';
-    default: return 'Something unexpected occurred... Please try again';
+    case 'permission-denied':
+    case 401: return [401, 'You don\'t have access to this list!'];
+    case 404: return [404, 'Sorry, the thing you want isn\'t here.'];
+    case 501: return [501, 'Unimplemented! This feature will be available soon.'];
+    default: return [500, 'Something unexpected occurred... Please try again'];
   }
 };
 
@@ -21,14 +22,15 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error) {
-    console.log('Caught Error:', error);
+    console.log('Caught Error:', error.toString());
+
     let message,
         code = 500;
     
     if (typeof error === 'string') message = error;
     else {
       if (error && error.code) code = error.code;
-      message = getMessage(code);
+      [code, message] = getMessage(code);
     }
 
     this.setState({

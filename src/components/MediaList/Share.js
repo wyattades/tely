@@ -3,6 +3,17 @@ import React from 'react';
 import * as discord from '../../discord';
 import { Helpers } from '../../db';
 
+const sameSet = (A, B) => {
+  if (A !== B) return false;
+  const keysA = Object.keys(A).sort(),
+        keysB = Object.keys(B).sort();
+  if (keysA.length !== keysB.length) return false;
+  for (let i = 0; i < keysA.length; i++) {
+    if (keysA[i] !== keysB[i]) return false;
+  }
+  return true;
+};
+
 const ICON_URL = 'https://cdn.discordapp.com/icons';
 
 const SharedItem = (shared, onClick) => (guild) => (
@@ -15,14 +26,14 @@ const SharedItem = (shared, onClick) => (guild) => (
       <button className="button is-medium is-discordmain is-marginless" onClick={onClick(guild.id, guild)}>
         {shared ? 'Unshare' : 'Share'}
       </button>
-    </div>
+    </div>  
   </div>
 );
 
-class AddShared extends React.Component {
+export default class Share extends React.Component {
 
   state = {
-    searchField: '',
+    // searchField: '',
     showGuilds: false,
     showFriends: false,
     guilds: null,
@@ -31,9 +42,22 @@ class AddShared extends React.Component {
 
   componentDidMount() {
     discord.getGuilds()
-    .then((guilds) => this.setState({ guilds }))
+    .then((guilds) => {
+      this.guilds = guilds;
+      this.filterGuilds(this.props.metaData.share);
+    })
     .catch((error) => this.setState({ error }));
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (!sameSet(nextProps.metaData.share, this.props.metaData.share)) {
+      this.filterGuilds(nextProps.metaData.share);
+    }
+  }
+
+  filterGuilds = (share) => this.setState({
+    guilds: this.guilds.filter((guild) => !(guild.id in share)),
+  });
 
   toggleShowGuilds = () => this.setState({
     showGuilds: !this.state.showGuilds,
@@ -43,11 +67,11 @@ class AddShared extends React.Component {
     [state]: toggle,
   });
 
-  changeSearch = (e) => {
-    this.setState({
-      searchField: e.target.value,
-    });
-  };
+  // changeSearch = (e) => {
+  //   this.setState({
+  //     searchField: e.target.value,
+  //   });
+  // };
 
   share = (id, data) => () => {
     this.props.meta.update({
@@ -55,43 +79,6 @@ class AddShared extends React.Component {
     })
     .catch(console.error);
   };
-
-  render() {
-    const { searchField, showGuilds, showFriends, guilds, friends, error } = this.state;
-
-    return <>
-      {/* <div className="field has-addons is-marginless">
-        <p className="control is-expanded">
-          <input type="text" className="input" value={searchField} onChange={this.changeSearch}/>
-        </p>
-        <div className="control">
-          <button className="button is-link">Search</button>
-        </div>
-      </div>
-      <p className="help">Search by server id, server name, username, or user id</p>
-      <br/> */}
-      { error && <p>{error}</p> }
-      <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
-        <p className="space-between">
-          <span>{ !showGuilds && 'Show guilds' }</span>
-          <i className={`${showGuilds ? 'delete' : 'dropdown-icon'}`}
-            onClick={showGuilds ? this.show('showGuilds', false) : null}/>
-        </p>
-        { showGuilds && guilds && <><br/>{guilds.map(SharedItem(false, this.share))}</> }
-      </div>
-      <div className="box is-clickable" onClick={!showFriends ? this.show('showFriends', true) : null}>
-        <p className="space-between">
-          <span>{ !showFriends && 'Show friends' }</span>
-          <i className={`${showFriends ? 'delete' : 'dropdown-icon'}`}
-            onClick={showFriends ? this.show('showFriends', false) : null}/>
-        </p>
-        { showFriends && <p>TBD</p> /* friends && <><br/>{friends.map(SharedItem(false, this.share))}</> */}
-      </div>
-    </>;
-  }
-}
-
-export default class Share extends React.Component {
 
   unshare = (id) => () => {
     this.props.meta.update({
@@ -101,6 +88,7 @@ export default class Share extends React.Component {
   };
 
   render() {
+    const { showGuilds, showFriends, guilds, friends, error } = this.state;
     const { metaData: { name, share } } = this.props;
     const shareArray = share && Object.values(share);
 
@@ -122,7 +110,36 @@ export default class Share extends React.Component {
       </div>
       <h2 className="has-text-centered is-size-4">Share</h2>
       <br/>
-      <AddShared meta={this.props.meta} shared={this.props.metaData}/>
+      {/* <div className="field has-addons is-marginless">
+        <p className="control is-expanded">
+          <input type="text" className="input" value={searchField} onChange={this.changeSearch}/>
+        </p>
+        <div className="control">
+          <button className="button is-link">Search</button>
+        </div>
+      </div>
+      <p className="help">Search by server id, server name, username, or user id</p>
+      <br/> */}
+      { error && <p>{error}</p> }
+      <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
+        <p className="space-between">
+          <span>{ !showGuilds && 'Show guilds' }</span>
+          <i className={`${showGuilds ? 'delete' : 'dropdown-icon'}`}
+            onClick={showGuilds ? this.show('showGuilds', false) : null}/>
+        </p>
+        { showGuilds && guilds && <><br/>{guilds.length ?
+          guilds.map(SharedItem(false, this.share)) :
+          <p className="has-text-danger has-text-centered">No guilds</p>
+        }</> }
+      </div>
+      <div className="box is-clickable" onClick={!showFriends ? this.show('showFriends', true) : null}>
+        <p className="space-between">
+          <span>{ !showFriends && 'Show friends' }</span>
+          <i className={`${showFriends ? 'delete' : 'dropdown-icon'}`}
+            onClick={showFriends ? this.show('showFriends', false) : null}/>
+        </p>
+        { showFriends && <p>TBD</p> /* friends && <><br/>{friends.map(SharedItem(false, this.share))}</> */}
+      </div>
     </>;
   }
 }

@@ -85,7 +85,7 @@ class MediaList extends React.Component {
 
       return (
         <div className="columns">
-          <aside className="column is-3-touch is-2"> {/* TODO: fix (when collapsed) */}
+          <aside className="column is-2 fixed-column"> {/* TODO: fix (when collapsed) */}
             <section className="section">
               <ul className="menu-list">
                 <li>
@@ -111,7 +111,7 @@ class MediaList extends React.Component {
               </ul>
             </section>
           </aside>
-          <div className="container column">
+          <div className="container column is-offset-2">
             <section className="section">
               <LiveSwitch location={this.props.location} match={this.props.match} routes={[
                 { exact: true, path: prev, element: <ListView searchResults={searchResults}
