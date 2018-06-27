@@ -34,6 +34,8 @@ export const Helpers = firebase.firestore;
 export const users = firestore.collection('users');
 export const lists = firestore.collection('lists');
 
+export const userDoc = () => auth.currentUser ? users.doc(auth.currentUser.uid) : Promise.reject();
+
 const updateUser = (data) => {
   currentUser = Object.assign(currentUser || {}, data);
   localStorage.setItem('profile', JSON.stringify(currentUser));

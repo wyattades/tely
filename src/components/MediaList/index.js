@@ -111,7 +111,7 @@ class MediaList extends React.Component {
               </ul>
             </section>
           </aside>
-          <div className="container column is-offset-2">
+          <div className="column is-offset-2">
             <section className="section">
               <LiveSwitch location={this.props.location} match={this.props.match} routes={[
                 { exact: true, path: prev, element: <ListView searchResults={searchResults}

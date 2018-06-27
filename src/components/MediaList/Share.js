@@ -1,7 +1,7 @@
 import React from 'react';
 
 import * as discord from '../../discord';
-import { Helpers } from '../../db';
+import * as db from '../../db';
 
 const sameSet = (A, B) => {
   if (A !== B) return false;
@@ -73,23 +73,32 @@ export default class Share extends React.Component {
   //   });
   // };
 
-  share = (id, data) => () => {
+  togglePublic = (e) => {
     this.props.meta.update({
-      [`share.${id}`]: data,
+      is_public: e.target.checked,
     })
+    .catch(console.error);
+  };
+
+  share = (id) => () => {
+    discord.getGuildMembers(id)
+    .then((members) => members.map((memberId) => db.users
+    .doc(memberId).collection('permissions').update({ [id]: true })))
+    .then(Promise.all)
+    .then(() => console.log('success!'))
     .catch(console.error);
   };
 
   unshare = (id) => () => {
     this.props.meta.update({
-      [`share.${id}`]: Helpers.FieldValue.delete(),
+      [`share.${id}`]: db.Helpers.FieldValue.delete(),
     })
     .catch(console.error);
   };
 
   render() {
     const { showGuilds, showFriends, guilds, friends, error } = this.state;
-    const { metaData: { name, share } } = this.props;
+    const { metaData: { name, share, is_public, owner } } = this.props;
     const shareArray = share && Object.values(share);
 
     return <>
@@ -98,48 +107,56 @@ export default class Share extends React.Component {
       <br/>
       <p className="content">
         Tely was built to create collaborative lists between friends.
-        You can share this list with an entire discord server, specific
-        users, or no one at all!
+        You can make this list public or share it with an entire discord server,
+        specific users, or no one at all!
       </p>
-      <h2 className="has-text-centered is-size-4">Currently shared with:</h2>
-      <br/>
-      <div className="box">
-        { share && (shareArray.length ?
-          shareArray.map(SharedItem(true, this.unshare)) :
-          <p className="has-text-centered has-text-danger">No one!</p>) }
-      </div>
-      <h2 className="has-text-centered is-size-4">Share</h2>
-      <br/>
-      {/* <div className="field has-addons is-marginless">
-        <p className="control is-expanded">
-          <input type="text" className="input" value={searchField} onChange={this.changeSearch}/>
-        </p>
-        <div className="control">
-          <button className="button is-link">Search</button>
+      <label className="checkbox is-size-4">
+        <input type="checkbox" onChange={this.togglePublic} defaultChecked={is_public}/>
+        &nbsp;Make this list public?
+      </label>
+      <p>Everyone in the world could see it</p>
+      {!is_public && <>
+        <br/>
+        <h2 className="has-text-centered is-size-4">Currently shared with:</h2>
+        <br/>
+        <div className="box">
+          { share && (shareArray.length ?
+            shareArray.map(SharedItem(true, this.unshare)) :
+            <p className="has-text-centered has-text-danger">No one!</p>) }
         </div>
-      </div>
-      <p className="help">Search by server id, server name, username, or user id</p>
-      <br/> */}
-      { error && <p>{error}</p> }
-      <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
-        <p className="space-between">
-          <span>{ !showGuilds && 'Show guilds' }</span>
-          <i className={`${showGuilds ? 'delete' : 'dropdown-icon'}`}
-            onClick={showGuilds ? this.show('showGuilds', false) : null}/>
-        </p>
-        { showGuilds && guilds && <><br/>{guilds.length ?
-          guilds.map(SharedItem(false, this.share)) :
-          <p className="has-text-danger has-text-centered">No guilds</p>
-        }</> }
-      </div>
-      <div className="box is-clickable" onClick={!showFriends ? this.show('showFriends', true) : null}>
-        <p className="space-between">
-          <span>{ !showFriends && 'Show friends' }</span>
-          <i className={`${showFriends ? 'delete' : 'dropdown-icon'}`}
-            onClick={showFriends ? this.show('showFriends', false) : null}/>
-        </p>
-        { showFriends && <p>TBD</p> /* friends && <><br/>{friends.map(SharedItem(false, this.share))}</> */}
-      </div>
+        <h2 className="has-text-centered is-size-4">Share</h2>
+        <br/>
+        {/* <div className="field has-addons is-marginless">
+          <p className="control is-expanded">
+            <input type="text" className="input" value={searchField} onChange={this.changeSearch}/>
+          </p>
+          <div className="control">
+            <button className="button is-link">Search</button>
+          </div>
+        </div>
+        <p className="help">Search by server id, server name, username, or user id</p>
+        <br/> */}
+        { error && <p>{error}</p> }
+        <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
+          <p className="space-between">
+            <span>{ !showGuilds && 'Show guilds' }</span>
+            <i className={`${showGuilds ? 'delete' : 'dropdown-icon'}`}
+              onClick={showGuilds ? this.show('showGuilds', false) : null}/>
+          </p>
+          { showGuilds && guilds && <><br/>{guilds.length ?
+            guilds.map(SharedItem(false, this.share)) :
+            <p className="has-text-danger has-text-centered">No guilds</p>
+          }</> }
+        </div>
+        <div className="box is-clickable" onClick={!showFriends ? this.show('showFriends', true) : null}>
+          <p className="space-between">
+            <span>{ !showFriends && 'Show friends' }</span>
+            <i className={`${showFriends ? 'delete' : 'dropdown-icon'}`}
+              onClick={showFriends ? this.show('showFriends', false) : null}/>
+          </p>
+          { showFriends && <p>TBD</p> /* friends && <><br/>{friends.map(SharedItem(false, this.share))}</> */}
+        </div>
+      </>}
     </>;
   }
 }

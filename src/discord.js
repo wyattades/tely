@@ -39,3 +39,8 @@ export const getGuild = (id) => getGuilds()
   }
   throw { code: 400 };
 });
+
+export const MAX_GUILD_MEMBERS = 50; // TODO
+
+export const getGuildMembers = (id) => api(`/guild/${id}/members?limit=${MAX_GUILD_MEMBERS}`)
+.then((members) => members.map((member) => member.user.id));

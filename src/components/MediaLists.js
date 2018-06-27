@@ -47,24 +47,29 @@ class MediaLists extends React.Component {
       this.setState({ err: err.code });
     });
 
-    // this.unsubscribeShared = db.lists
-    // .where('shared', 'has', uid)
-    // .onSnapshot((snap) => {
-    //   const sharedLists = [];
-    //   snap.forEach((item) => {
-    //     const itemData = item.data();
-    //     itemData.id = item.id;
-    //     sharedLists.push(itemData);
-    //   });
-    //   this.setState({ sharedLists });
-    // }, (err) => {
-    //   this.setState({ err: err.code });
-    // });
+    this.unsubscribeShared = db.userDoc().collection('permissions')
+    .onSnapshot((snap) => {
+      const getLists = [];
+      snap.forEach((item) => {
+        getLists.push(db.lists.doc(item.id).get());
+      });
+
+      Promise.all(getLists)
+      .then((items) => {
+        const sharedLists = items.map((item) => {
+          const itemData = item.data();
+          itemData.id = item.id;
+          return itemData;
+        });
+        this.setState({ sharedLists });
+      })
+      .catch((err) => this.setState({ err: err.code }));
+    }, (err) => this.setState({ err: err.code }));
   }
 
   componentWillUnmount() {
     this.unsubscribe();
-    // this.unsubscribeShared();
+    this.unsubscribeShared();
   }
 
   render() {
