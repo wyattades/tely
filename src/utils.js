@@ -21,7 +21,7 @@ export const decodeQuery = (str) => {
   return obj;
 };
 
-// Curtosy of https://stackoverflow.com/a/16861050/6656308
+// Courtosy of https://stackoverflow.com/a/16861050/6656308
 // Handles multiple monitors
 export const popupCenter = (url, w, h) => {
   const dualScreenLeft = window.screenLeft !== undefined ?

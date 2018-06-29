@@ -32,6 +32,7 @@ const auth = firebase.auth();
 const firestore = firebase.firestore();
 export const Helpers = firebase.firestore;
 export const users = firestore.collection('users');
+export const sharedGuilds = firestore.collection('shared_guilds');
 export const lists = firestore.collection('lists');
 
 export const userDoc = () => auth.currentUser ? users.doc(auth.currentUser.uid) : Promise.reject();

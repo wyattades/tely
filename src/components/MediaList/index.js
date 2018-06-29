@@ -76,6 +76,9 @@ class MediaList extends React.Component {
   render() {
     const { meta, list, err, searchResults } = this.state;
 
+    // TODO don't display settings and share pages if not owner
+    // const isOwner = metaData
+
     if (err) throw err;
 
     if (!meta || !list) {
@@ -85,7 +88,7 @@ class MediaList extends React.Component {
 
       return (
         <div className="columns">
-          <aside className="column is-2 fixed-column"> {/* TODO: fix (when collapsed) */}
+          <aside className="column is-narrow fixed-column">
             <section className="section">
               <ul className="menu-list">
                 <li>
@@ -111,7 +114,7 @@ class MediaList extends React.Component {
               </ul>
             </section>
           </aside>
-          <div className="column is-offset-2">
+          <div className="column is-offset-3">
             <section className="section">
               <LiveSwitch location={this.props.location} match={this.props.match} routes={[
                 { exact: true, path: prev, element: <ListView searchResults={searchResults}

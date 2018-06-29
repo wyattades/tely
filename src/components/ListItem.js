@@ -1,8 +1,15 @@
 import React from 'react';
 
+import * as db from '../db';
+
 export default ({ id, title, type, desc, created, image, listRef }) => {
   const deleteItem = () => {
     listRef.doc(id).delete();
+  };
+
+  const favoriteItem = () => {
+    // db.favoriteList.add()
+    alert('TBD');
   };
 
   return (
@@ -23,13 +30,13 @@ export default ({ id, title, type, desc, created, image, listRef }) => {
           </div>
           <nav className="level is-mobile">
             <div className="level-left">
-              <a className="level-item" onClick={deleteItem}>
+              <a className="level-item" onClick={deleteItem} title="Delete from List">
                 <span className="icon is-small"><i className="fas fa-trash" /></span>
               </a>
-              <a className="level-item">
+              {/* <a className="level-item">
                 <span className="icon is-small"><i className="fas fa-plus" /></span>
-              </a>
-              <a className="level-item">
+              </a> */}
+              <a className="level-item" onClick={favoriteItem} title="Add to Favorites">
                 <span className="icon is-small"><i className="fas fa-heart" /></span>
               </a>
             </div>

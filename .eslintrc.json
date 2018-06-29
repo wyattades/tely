@@ -55,6 +55,7 @@
       }
     ],
     "no-console": 0,
+    "no-continue": 0,
     "no-trailing-spaces": [2, { "skipBlankLines": true, "ignoreComments": false }],
     "import/no-mutable-exports": 0,
     "no-restricted-syntax": 0,

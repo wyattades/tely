@@ -4,6 +4,7 @@ import { SmallSection, Spinner } from './misc';
 import services from '../services';
 
 import * as db from '../db';
+import * as discord from '../discord';
 
 const ListView = ({ id, type, name }) => {
 
@@ -27,7 +28,7 @@ class MediaLists extends React.Component {
 
   state = {
     lists: null,
-    sharedLists: [],
+    sharedLists: null,
   }
 
   componentDidMount() {
@@ -43,33 +44,44 @@ class MediaLists extends React.Component {
         lists.push(itemData);
       });
       this.setState({ lists });
-    }, (err) => {
-      this.setState({ err: err.code });
-    });
-
-    this.unsubscribeShared = db.userDoc().collection('permissions')
-    .onSnapshot((snap) => {
-      const getLists = [];
-      snap.forEach((item) => {
-        getLists.push(db.lists.doc(item.id).get());
-      });
-
-      Promise.all(getLists)
-      .then((items) => {
-        const sharedLists = items.map((item) => {
-          const itemData = item.data();
-          itemData.id = item.id;
-          return itemData;
-        });
-        this.setState({ sharedLists });
-      })
-      .catch((err) => this.setState({ err: err.code }));
     }, (err) => this.setState({ err: err.code }));
+
+    // TODO: best way to manage list access may be to use user/permissions
+    discord.getGuilds()
+    .then((guilds) => Promise.all(guilds.map((guild) =>
+      db.sharedGuilds
+      .doc(guild.id)
+      .get()
+      .then((guildData) => {
+        if (!guildData.exists) return [];
+        const getLists = [];
+        for (const listId in guildData.data().shared) {
+          getLists.push(db.lists.doc(listId).get());
+        }
+        return Promise.all(getLists);
+      }))))
+    .then((snapArrays) => {
+      const sharedLists = [];
+      for (const arr of snapArrays) {
+        for (const snap of arr) {
+          if (snap.exists) {
+            const itemData = snap.data();
+            if (itemData.owner === db.getProfile().id) continue;
+            itemData.id = snap.id;
+            sharedLists.push(itemData);
+          }
+        }
+      }
+      
+      if (!this.unmounted) this.setState({ sharedLists });
+    })
+    .catch((err) => this.setState({ err: err.code }));
   }
 
   componentWillUnmount() {
     this.unsubscribe();
-    this.unsubscribeShared();
+    // this.unsubscribeShared();
+    this.unmounted = true;
   }
 
   render() {

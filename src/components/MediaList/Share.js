@@ -26,17 +26,17 @@ const SharedItem = (shared, onClick) => (guild) => (
       <button className="button is-medium is-discordmain is-marginless" onClick={onClick(guild.id, guild)}>
         {shared ? 'Unshare' : 'Share'}
       </button>
-    </div>  
+    </div>
   </div>
 );
 
 export default class Share extends React.Component {
 
   state = {
-    // searchField: '',
     showGuilds: false,
     showFriends: false,
     guilds: null,
+    sharedGuilds: null,
     error: null,
   }
 
@@ -55,9 +55,21 @@ export default class Share extends React.Component {
     }
   }
 
-  filterGuilds = (share) => this.setState({
-    guilds: this.guilds.filter((guild) => !(guild.id in share)),
-  });
+  filterGuilds = (share) => {
+    const guilds = [],
+          sharedGuilds = [];
+    for (const guild of this.guilds) {
+      if (guild.id in share) sharedGuilds.push(guild);
+      else guilds.push(guild);
+    }
+    this.setState({
+      guilds,
+      sharedGuilds,
+    });
+    // this.setState({
+    //   guilds: this.guilds.filter((guild) => !(guild.id in share)),
+    // });
+  }
 
   toggleShowGuilds = () => this.setState({
     showGuilds: !this.state.showGuilds,
@@ -67,12 +79,6 @@ export default class Share extends React.Component {
     [state]: toggle,
   });
 
-  // changeSearch = (e) => {
-  //   this.setState({
-  //     searchField: e.target.value,
-  //   });
-  // };
-
   togglePublic = (e) => {
     this.props.meta.update({
       is_public: e.target.checked,
@@ -80,26 +86,47 @@ export default class Share extends React.Component {
     .catch(console.error);
   };
 
-  share = (id) => () => {
-    discord.getGuildMembers(id)
-    .then((members) => members.map((memberId) => db.users
-    .doc(memberId).collection('permissions').update({ [id]: true })))
-    .then(Promise.all)
-    .then(() => console.log('success!'))
-    .catch(console.error);
+  share = (id, meta) => () => {
+
+    const guildRef = db.sharedGuilds.doc(id);
+
+    // if (guildRef.isEqual(db.Firestore.Values.Empty))
+    // guildRef.get((snap) => {
+    //   snap.
+    // });
+    guildRef.set({
+      meta,
+      shared: {
+        [this.props.meta.id]: true,
+      },
+    }, { merge: true });
+
+    this.props.meta.update({
+      [`share.${id}`]: true,
+    });
+
+    // db.sharedGuilds.doc(`${id}/shared/${this.props.meta.id}`).set(true);
+
+    // discord.getGuildMembers(id)
+    // .then((members) => members.map((memberId) => db.users
+    // .doc(memberId).collection('permissions').update({ [id]: true })))
+    // .then(Promise.all)
+    // .then(() => console.log('success!'))
+    // .catch(console.error);
   };
 
   unshare = (id) => () => {
     this.props.meta.update({
       [`share.${id}`]: db.Helpers.FieldValue.delete(),
-    })
-    .catch(console.error);
+    });
+    // .catch(console.error);
+    // db.sharedGuilds.doc(id).collection('shared').doc(this.props.meta.id).delete();
+    db.sharedGuilds.doc(`${id}/shared/${this.props.meta.id}`).delete();
   };
 
   render() {
-    const { showGuilds, showFriends, guilds, friends, error } = this.state;
+    const { showGuilds, showFriends, guilds, sharedGuilds, friends, error } = this.state;
     const { metaData: { name, share, is_public, owner } } = this.props;
-    const shareArray = share && Object.values(share);
 
     return <>
       <p className="is-size-5 has-text-grey">Share:</p>
@@ -120,8 +147,8 @@ export default class Share extends React.Component {
         <h2 className="has-text-centered is-size-4">Currently shared with:</h2>
         <br/>
         <div className="box">
-          { share && (shareArray.length ?
-            shareArray.map(SharedItem(true, this.unshare)) :
+          { sharedGuilds && (sharedGuilds.length ?
+            sharedGuilds.map(SharedItem(true, this.unshare)) :
             <p className="has-text-centered has-text-danger">No one!</p>) }
         </div>
         <h2 className="has-text-centered is-size-4">Share</h2>
