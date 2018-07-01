@@ -24,10 +24,6 @@ html {
   border-radius: 50%;
 }
 
-.image.is-3by4 { // TODO just make a custom class
-  max-width: 120px;
-}
-
 // is-fullheight but account for header
 .hero.is-fullheight-flex {
   min-height: calc(100vh - 60px);
