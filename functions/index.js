@@ -3,16 +3,16 @@ const admin = require('firebase-admin');
 const express = require('express');
 const passport = require('passport');
 const DiscordStrategy = require('passport-discord').Strategy;
+const SpotifyStrategy = require('passport-spotify').Strategy;
 const refresh = require('passport-oauth2-refresh');
 const Query = require('querystring');
+
 
 const config = functions.config();
 
 const SERVER_URL = config.admin.mode === 'development' ?
   'http://localhost:5000/tely-db/us-central1/widgets' :
   'https://us-central1-tely-db.cloudfunctions.net/widgets';
-const CALLBACK_URL = `${SERVER_URL}/auth/discord/callback`;
-const SCOPES = [ 'identify', 'email', 'guilds' ];
 const ORIGIN = config.admin.mode === 'development' ?
   'http://localhost:8080' :
   'https://wyattades.github.io';
@@ -34,10 +34,10 @@ passport.deserializeUser((obj, done) => done(null, obj));
 const discordStrat = new DiscordStrategy({
   clientID: config.discord.client_id,
   clientSecret: config.discord.client_secret,
-  callbackURL: CALLBACK_URL,
-  scope: SCOPES,
+  callbackURL: `${SERVER_URL}/auth/discord/callback`,
+  scope: [ 'identify', 'email', 'guilds' ],
 }, (accessToken, refreshToken, profile, cb) => {
-
+  // accessToken already included in profile?
   if (refreshToken) profile.refreshToken = refreshToken;
 
   admin.auth().createCustomToken(profile.id)
@@ -48,8 +48,21 @@ const discordStrat = new DiscordStrategy({
   .catch(cb);
 });
 
+const spotifyStrat = new SpotifyStrategy({
+  clientID: config.spotify.client_id,
+  clientSecret: config.spotify.client_secret,
+  callbackURL: `${SERVER_URL}/auth/spotify/callback`,
+}, (accessToken, refreshToken, expires_in, profile, cb) => {
+  if (accessToken) profile.accessToken = accessToken;
+  if (refreshToken) profile.refreshToken = refreshToken;
+  if (expires_in) profile.expires_in = expires_in;
+  cb(null, profile);
+});
+
 passport.use(discordStrat);
+passport.use(spotifyStrat);
 refresh.use(discordStrat);
+refresh.use(spotifyStrat);
 
 const app = express();
 app.use(passport.initialize());
@@ -63,6 +76,7 @@ app.use((req, res, next) => {
 });
 
 // build multiple CRUD interfaces:
+// TODO: abstractify authenticators
 
 app.get('/auth/discord', passport.authenticate('discord'));
 
@@ -81,6 +95,29 @@ app.post('/auth/discord/refresh', (req, res) => {
   }
 
   refresh.requestNewAccessToken('discord', refreshToken, (err, accessToken) => {
+    if (err) res.status((err && err.status) || 500).send(err);
+    else res.send({ token: accessToken });
+  });
+});
+
+
+app.get('/auth/spotify', passport.authenticate('spotify'));
+
+app.get('/auth/spotify/callback', passport.authenticate('spotify', {
+  failureRedirect: `${ORIGIN_URL}?error`,
+}), (req, res) => {
+  res.redirect(`${ORIGIN_URL}?${Query.stringify(req.user)}`);
+});
+
+app.post('/auth/spotify/refresh', (req, res) => {
+
+  const refreshToken = req.body.token;
+  if (!refreshToken) {
+    res.status(400).end();
+    return;
+  }
+
+  refresh.requestNewAccessToken('spotify', refreshToken, (err, accessToken) => {
     if (err) res.status((err && err.status) || 500).send(err);
     else res.send({ token: accessToken });
   });

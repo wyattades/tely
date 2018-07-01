@@ -2,13 +2,9 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import { decodeQuery, popupCenter } from './utils';
 import { getMe } from './discord';
+import * as API from './api';
 
-const SERVER_URL = process.env.NODE_ENV === 'development' ?
-  'http://localhost:5000/tely-db/us-central1/widgets' :
-  'https://us-central1-tely-db.cloudfunctions.net/widgets';
-const AUTH_URL = `${SERVER_URL}/auth/discord`;
 
 firebase.initializeApp({
   apiKey: 'AIzaSyBXbBg-6gZx7eehLHUC4GzPbAQVPgpZqp8',
@@ -19,49 +15,17 @@ firebase.initializeApp({
   messagingSenderId: '591385205122',
 });
 
-// Potentially load current user from storage
-let currentUser = null;
-try {
-  const str = localStorage.getItem('profile');
-  currentUser = JSON.parse(str);
-} catch (_) {
-  // Someone put bad data in my localStorage!
-}
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 export const Helpers = firebase.firestore;
-export const users = firestore.collection('users');
+// export const users = firestore.collection('users');
 export const sharedGuilds = firestore.collection('shared_guilds');
 export const lists = firestore.collection('lists');
 
-export const userDoc = () => auth.currentUser ? users.doc(auth.currentUser.uid) : Promise.reject();
-
-const updateUser = (data) => {
-  currentUser = Object.assign(currentUser || {}, data);
-  localStorage.setItem('profile', JSON.stringify(currentUser));
-};
-
-const refreshToken = () => fetch(`${AUTH_URL}/refresh`, {
-  method: 'POST',
-  body: JSON.stringify({ token: currentUser.refreshToken }),
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  mode: 'cors',
-})
-.then((res) => {
-  if (!res.ok) throw res.statusText;
-  return res.json();
-})
-.then(({ token }) => updateUser({ accessToken: token }))
-.catch((err) => {
-  // Redirect back to login when redirect token expires
-  console.error('refreshToken error', err);
-});
+// export const userDoc = () => auth.currentUser ? users.doc(auth.currentUser.uid) : Promise.reject();
 
 export const init = () => new Promise((resolve) => {
-  // auth = firebase.auth(); // maybe necessary
 
   const unsubscribe = auth.onAuthStateChanged(() => {
     console.log('Signed in status:', !!auth.currentUser);
@@ -72,7 +36,7 @@ export const init = () => new Promise((resolve) => {
       .then((profile) => console.log('init profile', profile))
       .catch((err) => {
         if (err.code === 401) {
-          return refreshToken();
+          return API.refreshToken('discord');
         } else {
           console.error('getMe error', err);
           return Promise.resolve();
@@ -90,44 +54,11 @@ export const init = () => new Promise((resolve) => {
   });
 });
 
-export const signOut = () => auth.signOut();
+export const signOut = () => API.clearProfile('discord') || auth.signOut();
 
 export const getUser = () => auth.currentUser;
 
-export const getProfile = () => currentUser;
+export const getProfile = () => API.profiles.discord;
 
-export const signIn = () => new Promise((resolve, reject) => {
-
-  // window.location.href = authUrl;
-  const popup = popupCenter(AUTH_URL, 500, 600);
-  if (!popup) throw null;
-
-  const intervalId = window.setInterval(() => {
-    if (!popup) {
-      window.clearInterval(intervalId);
-      throw 'Window closed unexpectedly!';
-    }
-    
-    let arrived = false;
-    try {
-      if (popup.location.hostname === window.location.hostname) arrived = true;
-    } catch (_) {
-      // Do nothing
-    }
-
-    if (arrived) {
-      window.clearInterval(intervalId);
-      const { error, ...profile } = decodeQuery(popup.location.search);
-      popup.close();
-
-      if (profile.accessToken && !error) resolve(profile);
-      else reject(error);
-    }
-  }, 300);
-
-})
-.then((profile) => {
-  console.log(profile);
-  updateUser(profile);
-  return auth.signInWithCustomToken(profile.token);
-});
+export const signIn = () => API.signIn('discord')
+.then((profile) => auth.signInWithCustomToken(profile.token));

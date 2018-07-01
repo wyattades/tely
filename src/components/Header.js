@@ -21,7 +21,7 @@ class Header extends React.Component {
 
   render() {
 
-    const loggedIn = !!db.getUser();
+    const loggedIn = !!db.getProfile();
     const username = loggedIn && db.getProfile().username;
 
     return (

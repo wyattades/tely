@@ -53,9 +53,9 @@ export default class Browse extends React.Component {
 
     let amount = null;
     if (lists) {
-      if (lists.length === 0) amount = 'No Public Lists';
-      else if (lists.length === 1) amount = '1 Public List';
-      else amount = `${lists.length} Public Lists`;
+      if (lists.length === 0) amount = 'No Results Found';
+      else if (lists.length === 1) amount = '1 Result Found';
+      else amount = `${lists.length} Results Found`;
     }
 
     return (

@@ -56,14 +56,13 @@ class MediaList extends React.Component {
 
     if (searchResults) {
       // Check is search item is in the current list
-      // TODO: optimize nested for loop
-      const list = this.state.list;
+      const listMap = {};
+      for (const listItem of this.state.list) listMap[listItem.media_id] = listItem;
+
       for (const searchItem of searchResults) {
-        for (const listItem of list) {
-          if (listItem.media_id === searchItem.media_id) {
-            searchItem.id = listItem.id;
-            break;
-          }
+        const listItem = listMap[searchItem.media_id];
+        if (listItem) {
+          searchItem.id = listItem.id;
         }
       }
     }
@@ -76,15 +75,14 @@ class MediaList extends React.Component {
   render() {
     const { meta, list, err, searchResults } = this.state;
 
-    // TODO don't display settings and share pages if not owner
-    // const isOwner = metaData
-
     if (err) throw err;
 
     if (!meta || !list) {
       return <Spinner fullPage/>;
     } else {
       const prev = this.props.match.url;
+
+      const isOwner = meta.owner === db.getProfile().id;
 
       return (
         <div className="columns">
@@ -97,20 +95,22 @@ class MediaList extends React.Component {
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink exact to={`/list/${this.listid}/share`}>
-                    <span className="icon"><i className="fa fa-share-alt"/></span> Share
-                  </NavLink>
-                </li>
-                <li>
                   <NavLink exact to={`/list/${this.listid}/suggest`}>
-                    <span className="icon"><i className="fa fa-gift"/></span> Suggested
+                    <span className="icon"><i className="fa fa-gift"/></span> Suggested&nbsp;
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink exact to={`/list/${this.listid}/settings`}>
-                    <span className="icon"><i className="fa fa-cog"/></span> Settings
-                  </NavLink>
-                </li>
+                { isOwner && <>
+                  <li>
+                    <NavLink exact to={`/list/${this.listid}/share`}>
+                      <span className="icon"><i className="fa fa-share-alt"/></span> Share
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink exact to={`/list/${this.listid}/settings`}>
+                      <span className="icon"><i className="fa fa-cog"/></span> Settings
+                    </NavLink>
+                  </li>
+                </> }
               </ul>
             </section>
           </aside>
@@ -120,7 +120,7 @@ class MediaList extends React.Component {
                 { exact: true, path: prev, element: <ListView searchResults={searchResults}
                   meta={meta} contents={this.contents} list={list} id={this.listid} onSearch={this.onSearch}/> },
                 { exact: true, path: `${prev}/share`, element: <ListShare metaData={meta} meta={this.meta}/> },
-                { exact: true, path: `${prev}/suggest`, element: <ListSuggest meta={meta}/> },
+                { exact: true, path: `${prev}/suggest`, element: <ListSuggest meta={meta} list={list} contents={this.contents}/> },
                 { exact: true, path: `${prev}/settings`, element: <ListSettings metaData={meta}
                   meta={this.meta} history={this.props.history}/> },
               ]}/>

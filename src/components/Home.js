@@ -17,7 +17,7 @@ export default ({ history }) => {
         </div>
       </div>
       <div className="hero-footer">
-        {db.getUser() && (
+        {db.getProfile() && (
           <div className="container has-text-centered">
             <Link className="button" to="/list">Continue as {db.getProfile().username}</Link>
             <br/><br/>

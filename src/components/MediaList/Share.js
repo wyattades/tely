@@ -142,48 +142,46 @@ export default class Share extends React.Component {
         &nbsp;Make this list public?
       </label>
       <p>Everyone in the world could see it</p>
-      {!is_public && <>
-        <br/>
-        <h2 className="has-text-centered is-size-4">Currently shared with:</h2>
-        <br/>
-        <div className="box">
-          { sharedGuilds && (sharedGuilds.length ?
-            sharedGuilds.map(SharedItem(true, this.unshare)) :
-            <p className="has-text-centered has-text-danger">No one!</p>) }
+      <br/>
+      <h2 className="has-text-centered is-size-4">Currently shared with:</h2>
+      <br/>
+      <div className="box">
+        { sharedGuilds && (sharedGuilds.length ?
+          sharedGuilds.map(SharedItem(true, this.unshare)) :
+          <p className="has-text-centered has-text-danger">No one!</p>) }
+      </div>
+      <h2 className="has-text-centered is-size-4">Share</h2>
+      <br/>
+      {/* <div className="field has-addons is-marginless">
+        <p className="control is-expanded">
+          <input type="text" className="input" value={searchField} onChange={this.changeSearch}/>
+        </p>
+        <div className="control">
+          <button className="button is-link">Search</button>
         </div>
-        <h2 className="has-text-centered is-size-4">Share</h2>
-        <br/>
-        {/* <div className="field has-addons is-marginless">
-          <p className="control is-expanded">
-            <input type="text" className="input" value={searchField} onChange={this.changeSearch}/>
-          </p>
-          <div className="control">
-            <button className="button is-link">Search</button>
-          </div>
-        </div>
-        <p className="help">Search by server id, server name, username, or user id</p>
-        <br/> */}
-        { error && <p>{error}</p> }
-        <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
-          <p className="space-between">
-            <span>{ !showGuilds && 'Show guilds' }</span>
-            <i className={`${showGuilds ? 'delete' : 'dropdown-icon'}`}
-              onClick={showGuilds ? this.show('showGuilds', false) : null}/>
-          </p>
-          { showGuilds && guilds && <><br/>{guilds.length ?
-            guilds.map(SharedItem(false, this.share)) :
-            <p className="has-text-danger has-text-centered">No guilds</p>
-          }</> }
-        </div>
-        <div className="box is-clickable" onClick={!showFriends ? this.show('showFriends', true) : null}>
-          <p className="space-between">
-            <span>{ !showFriends && 'Show friends' }</span>
-            <i className={`${showFriends ? 'delete' : 'dropdown-icon'}`}
-              onClick={showFriends ? this.show('showFriends', false) : null}/>
-          </p>
-          { showFriends && <p>TBD</p> /* friends && <><br/>{friends.map(SharedItem(false, this.share))}</> */}
-        </div>
-      </>}
+      </div>
+      <p className="help">Search by server id, server name, username, or user id</p>
+      <br/> */}
+      { error && <p>{error}</p> }
+      <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
+        <p className="space-between">
+          <span>{ !showGuilds && 'Show guilds' }</span>
+          <i className={`${showGuilds ? 'delete' : 'dropdown-icon'}`}
+            onClick={showGuilds ? this.show('showGuilds', false) : null}/>
+        </p>
+        { showGuilds && guilds && <><br/>{guilds.length ?
+          guilds.map(SharedItem(false, this.share)) :
+          <p className="has-text-danger has-text-centered">No guilds</p>
+        }</> }
+      </div>
+      <div className="box is-clickable" onClick={!showFriends ? this.show('showFriends', true) : null}>
+        <p className="space-between">
+          <span>{ !showFriends && 'Show friends' }</span>
+          <i className={`${showFriends ? 'delete' : 'dropdown-icon'}`}
+            onClick={showFriends ? this.show('showFriends', false) : null}/>
+        </p>
+        { showFriends && <p>TBD</p> /* friends && <><br/>{friends.map(SharedItem(false, this.share))}</> */}
+      </div>
     </>;
   }
 }

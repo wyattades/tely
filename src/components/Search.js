@@ -63,7 +63,7 @@ export class SearchItem extends React.Component {
           <div className="content">
             <p>
               <a href={link}><strong>{title}</strong></a>&nbsp;
-              <small>{released}</small>&nbsp;
+              <small>{released && new Date(released).toLocaleDateString()}</small>&nbsp;
               <strong><small>{type}</small></strong>
               <br/>
               <TruncateText text={desc}/>

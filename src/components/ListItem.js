@@ -2,7 +2,7 @@ import React from 'react';
 
 import * as db from '../db';
 
-export default ({ id, title, type, desc, created, image, listRef }) => {
+export default ({ id, media_id, title, link, type, desc, created, image, listRef }) => {
   const deleteItem = () => {
     listRef.doc(id).delete();
   };
@@ -16,14 +16,20 @@ export default ({ id, title, type, desc, created, image, listRef }) => {
     <div className="box">
       <article className="media">
         <div className="media-left">
-          <figure className="image is-3by4">
-            <img src={image} alt="" />
-          </figure>
+          { type === 'Song' ?
+            <iframe title={`Play ${title}`} src={`https://open.spotify.com/embed?uri=spotify:track:${media_id}`}
+              width="80" height="80" frameBorder="0" allowTransparency="true" allow="encrypted-media"/>
+            :
+            <figure className="image is-3by4">
+              <img src={image} alt="" />
+            </figure>
+          }
         </div>
         <div className="media-content">
           <div className="content">
             <p>
-              <strong>{title}</strong> <small><i>{type}</i></small> &nbsp;<small>{new Date(created).toLocaleDateString()}</small>
+              <strong><a href={link}>{title}</a></strong> <small><i>{type}</i></small>
+              &nbsp;<small>{new Date(created).toLocaleDateString()}</small>
               <br />
               {desc}
             </p>

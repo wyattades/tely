@@ -1,4 +1,29 @@
 
+export const randInt = (a, b) => Math.floor(Math.random() * (b - a) + a);
+
+export const arrSample = (arr, n, clone = false) => {
+  const sample = clone ? arr.slice(0) : arr;
+
+  n = Math.min(arr.length, n);
+
+  const last = arr.length - 1;
+  for (let index = 0; index < n; index++) {
+    const rand = randInt(index, last);
+    const temp = sample[index];
+    sample[index] = sample[rand];
+    sample[rand] = temp;
+  }
+  return sample.slice(0, n);
+};
+
+export const shuffle = (arr) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
 export const encodeQuery = (obj) => {
   const str = [];
   for (const key in obj) {
