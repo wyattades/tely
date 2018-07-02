@@ -18,7 +18,7 @@ const mapResponse = ({ external_urls, artists, id, name, album }) => ({
   media_id: id,
   link: external_urls.spotify,
   released: album.release_date ? new Date(album.release_date).getTime() : null,
-  desc: `𝑏𝑦 ${artists[0].name}`,
+  desc: `by ${artists[0].name}`,
 });
 
 export const search = (str, page = 1) => {

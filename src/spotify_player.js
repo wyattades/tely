@@ -1,8 +1,6 @@
-/* global Spotify */
+// import React from 'react';
 
-import React from 'react';
-
-import { apiFactory, profiles, signIn } from './api';
+import { apiFactory, profiles, refreshToken } from './api';
 
 const API_URL = 'https://api.spotify.com/v1';
 const api = apiFactory('spotify', API_URL, true);
@@ -15,16 +13,17 @@ let initialized = false,
 
 const loadPlayer = () => new Promise((resolve, reject) => {
 
-  player = new Spotify.Player({
+  player = new window.Spotify.Player({
     name: 'Tely Online Playback',
     volume: 0.7,
     getOAuthToken: cb => { cb(profiles.spotify.accessToken); },
   });
 
-  player.addListener('player_state_changed', console.log);
-
   player.addListener('initialization_error', reject);
-  player.addListener('authentication_error', reject);
+  player.addListener('authentication_error', (err) => {
+    profiles.spotify.accessToken = null; // Nullify accessToken
+    reject(err);
+  });
   player.addListener('account_error', reject);
   player.addListener('not_ready', reject);
 
@@ -34,8 +33,8 @@ const loadPlayer = () => new Promise((resolve, reject) => {
     resolve();
   });
 
-  // Connect to the player!
-  player.connect().then((connected) => console.log('Connected =', connected));
+  // Connect to the player
+  player.connect();
 });
 
 export const initPlayer = () => {
@@ -49,45 +48,51 @@ export const initPlayer = () => {
     window.onSpotifyWebPlaybackSDKReady = () => {
       loaded = true;
       if (profiles.spotify) {
-        loadPlayer().catch(console.error);
+        loadPlayer().catch((err) => {
+          player.disconnect();
+          player = null;
+          console.error(err);
+        });
       }
     };
   }
 };
 
-// If not authenticated, sign in and load web player
+// If not authenticated, signIn/refreshToken then load web player
 export const playTrack = (id) => {
   if (loaded)
-    (!profiles.spotify ? signIn('spotify').then(loadPlayer) : Promise.resolve())
+    (!profiles.spotify ? signIn('spotify') : Promise.resolve())
+    .then(() => !profiles.spotify.accessToken ? refreshToken('spotify') : Promise.resolve())
+    .then(() => !player ? loadPlayer() : Promise.resolve())
     .then(() => playerId ? api(`/me/player/play?device_id=${playerId}`, 'PUT', {
       uris: [ `spotify:track:${id}` ],
     }) : Promise.resolve())
     .catch(console.error);
 };
 
-export class SpotifyPlayer extends React.Component {
+// export class SpotifyPlayer extends React.Component {
 
-  componentWillMount() {
-    player.addListener('player_state_changed', this.onStateChange);
-  }
+//   componentWillMount() {
+//     player.addListener('player_state_changed', this.onStateChange);
+//   }
 
-  componentWillUnmount() {
-    player.removeListener('player_state_changed', this.onStateChange);
-  }
+//   componentWillUnmount() {
+//     player.removeListener('player_state_changed', this.onStateChange);
+//   }
 
-  onStateChange = ({ paused }) => {
-    this.setState({
-      paused,
-    });
-  }
+//   onStateChange = ({ paused }) => {
+//     this.setState({
+//       paused,
+//     });
+//   }
 
-  render() {
-    const { paused } = this.state;
+//   render() {
+//     const { paused } = this.state;
 
-    return (
-      <div>
-        {paused}
-      </div>
-    );
-  }
-}
+//     return (
+//       <div>
+//         {paused}
+//       </div>
+//     );
+//   }
+// }

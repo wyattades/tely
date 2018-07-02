@@ -18,6 +18,10 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 const firestore = firebase.firestore();
+
+// TEMP?
+firestore.settings({ timestampsInSnapshots: true });
+
 export const Helpers = firebase.firestore;
 // export const users = firestore.collection('users');
 export const sharedGuilds = firestore.collection('shared_guilds');
@@ -32,7 +36,7 @@ export const init = () => new Promise((resolve) => {
     unsubscribe();
 
     if (auth.currentUser) {
-      getMe()
+      getMe() // Check if logged in
       .then((profile) => console.log('init profile', profile))
       .catch((err) => {
         if (err.code === 401) {
