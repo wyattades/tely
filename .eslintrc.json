@@ -7,6 +7,11 @@
     "node": true
   },
   "rules": {
+    "nonblock-statement-body-position": 0,
+    "lines-between-class-members": 0,
+    "react/button-has-type": 0,
+    "react/jsx-one-expression-per-line": 0,
+    "react/destructuring-assignment": 0,
     "jsx-a11y/no-static-element-interactions": 1,
     "jsx-a11y/click-events-have-key-events": 0,
     "quotes": 0,
@@ -32,6 +37,14 @@
     "react/jsx-tag-spacing": 0,
     "react/forbid-prop-types": 0,
     "no-underscore-dangle": 0,
+    "react/sort-comp": [1, {
+      "order": [
+        "lifecycle",
+        "everything-else",
+        "static-methods",
+        "render"
+      ]
+    }],
     "indent": [
       "error",
       2,
