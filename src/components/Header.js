@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, withRouter } from 'react-router-dom';
 
 import * as db from '../db';
 
@@ -15,6 +15,17 @@ class Header extends React.Component {
 
   state = {
     open: false,
+  }
+
+  componentDidMount() {
+    // Close header if history changes
+    this.unlisten = this.props.history.listen(() => {
+      this.setState({ open: false });
+    })
+  }
+
+  componentWillUnmount() {
+    this.unlisten();
   }
 
   toggle = () => this.setState({ open: !this.state.open })
@@ -75,4 +86,4 @@ class Header extends React.Component {
   }
 }
 
-export default Header;
+export default withRouter(Header);

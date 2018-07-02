@@ -191,13 +191,13 @@ export class Search extends React.Component {
       <form onSubmit={this.handleSubmit}>
         <div className="field has-addons">
           <div className="control has-icons-right is-expanded">
-            <input className={`input is-large ${resultCount === 0 && 'is-danger'}`} value={searchQuery}
+            <input className={`input ${resultCount === 0 && 'is-danger'}`} value={searchQuery}
               type="text" onChange={this.handleChange}
               placeholder={`Add ${this.media.LABEL}`}/>
             {Side}
           </div>
           <div className="control">
-            <button type="submit" className="button is-info is-large">Search</button>
+            <button type="submit" className="button is-info">Search</button>
           </div>
         </div>
       </form>

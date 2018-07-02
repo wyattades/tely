@@ -90,50 +90,50 @@ class MediaList extends React.Component {
       const isOwner = meta.owner === db.getProfile().id;
 
       return (
-        <div className="columns">
-          <aside className="column is-narrow fixed-column">
-            <section className="section">
-              <ul className="menu-list">
-                <li>
-                  <NavLink exact to={`/list/${this.listid}`}>
-                    <span className="icon"><i className="fa fa-th-list"/></span> View
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink exact to={`/list/${this.listid}/suggest`}>
-                    <span className="icon"><i className="fa fa-gift"/></span> Suggested&nbsp;
-                  </NavLink>
-                </li>
-                { isOwner && <>
+        <section className="section">
+          <div className="container">
+            <div className="columns">
+              <aside className="column is-narrow fixed-column">
+                <ul className="menu-list">
                   <li>
-                    <NavLink exact to={`/list/${this.listid}/share`}>
-                      <span className="icon"><i className="fa fa-share-alt"/></span> Share
+                    <NavLink exact to={`/list/${this.listid}`}>
+                      <span className="icon"><i className="fa fa-th-list"/></span> <span>View</span>
                     </NavLink>
                   </li>
                   <li>
-                    <NavLink exact to={`/list/${this.listid}/settings`}>
-                      <span className="icon"><i className="fa fa-cog"/></span> Settings
+                    <NavLink exact to={`/list/${this.listid}/suggest`}>
+                      <span className="icon"><i className="fa fa-gift"/></span> <span>Suggested</span>
                     </NavLink>
                   </li>
-                </> }
-              </ul>
-            </section>
-          </aside>
-          <div className="column is-offset-3">
-            <section className="section">
-              <LiveSwitch location={this.props.location} match={this.props.match} routes={[
-                { exact: true, path: prev, element: <ListView searchResults={searchResults}
-                  meta={meta} contents={this.contents} list={list} id={this.listid} onSearch={this.onSearch}/> },
-                { exact: true, path: `${prev}/share`, element: <ListShare metaData={meta} meta={this.meta}/> },
-                { exact: true, path: `${prev}/suggest`, element: <ListSuggest meta={meta}
-                  list={list} contents={this.contents}/> },
-                { exact: true, path: `${prev}/settings`, element: <ListSettings metaData={meta}
-                  meta={this.meta} history={this.props.history}/> },
-              ]}/>
-            </section>
+                  { isOwner && <>
+                    <li>
+                      <NavLink exact to={`/list/${this.listid}/share`}>
+                        <span className="icon"><i className="fa fa-share-alt"/></span> <span>Share</span>
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink exact to={`/list/${this.listid}/settings`}>
+                        <span className="icon"><i className="fa fa-cog"/></span> <span>Settings</span>
+                      </NavLink>
+                    </li>
+                  </> }
+                </ul>
+              </aside>
+              <div className="column is-offset-3 is-8-desktop">
+                <LiveSwitch location={this.props.location} match={this.props.match} routes={[
+                  { exact: true, path: prev, element: <ListView searchResults={searchResults}
+                    meta={meta} contents={this.contents} list={list} id={this.listid} onSearch={this.onSearch}/> },
+                  { exact: true, path: `${prev}/share`, element: <ListShare metaData={meta} meta={this.meta}/> },
+                  { exact: true, path: `${prev}/suggest`, element: <ListSuggest meta={meta}
+                    list={list} contents={this.contents}/> },
+                  { exact: true, path: `${prev}/settings`, element: <ListSettings metaData={meta}
+                    meta={this.meta} history={this.props.history}/> },
+                ]}/>
+              </div>
+              {/* <div className="column is-2 is-hidden-touch"/> */}
+            </div>
           </div>
-          <div className="column is-2 is-hidden-touch"/>
-        </div>
+        </section>
       );
     }
   }
