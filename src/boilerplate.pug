@@ -45,6 +45,9 @@ html(lang=options.lang)
 
     title= options.title
 
+    if (options.manifest)
+      link(href=options.manifest rel='manifest')
+
     if (files.favicon || options.faviconExternal)
       link(href=files.favicon || options.faviconExternal rel='shortcut icon')
 
