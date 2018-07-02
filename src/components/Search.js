@@ -43,7 +43,7 @@ export class SearchItem extends React.Component {
 
   render() {
     const { item, toggle } = this.props;
-    const { id, title, desc, image, released, type, link } = item;
+    const { id, title, desc, image, released, type, link, media_id } = item;
     const { hovered } = this.state;
 
     const hover = (val) => () => this.setState({
@@ -52,13 +52,11 @@ export class SearchItem extends React.Component {
 
     return (
       <article className="media">
-        <figure className="media-left">
-          <p className="image is-3by4">
-            { image &&
-              <img src={image} alt={title}/>
-            }
-          </p>
-        </figure>
+        <div className="media-left">
+          <figure className="image media-image">
+            <img src={image} alt=""/>
+          </figure>
+        </div>
         <div className="media-content">
           <div className="content">
             <p>

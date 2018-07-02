@@ -5,6 +5,8 @@ import { Search, SearchItem } from '../Search';
 
 export default ({ meta, contents, searchResults, list, onSearch }) => {
 
+  let grid = false;
+
   let Content = null;
   if (searchResults) {
     const toggle = (item) => () => {
@@ -25,7 +27,8 @@ export default ({ meta, contents, searchResults, list, onSearch }) => {
 
     Content = searchResults.map((item) => <SearchItem item={item} key={item.media_id} toggle={toggle(item)}/>);
   } else if (list.length) {
-    Content = list.map((item) => <ListItem {...item} key={item.id} listRef={contents}/>);
+    // grid = true;
+    Content = list.map((item) => <ListItem {...item} key={item.id} className={grid && "column is-4"} listRef={contents}/>);
   } else {
     Content = <p className="is-size-4 has-text-centered">Empty List!</p>;
   }
@@ -36,7 +39,23 @@ export default ({ meta, contents, searchResults, list, onSearch }) => {
     <br/>
     <Search type={meta.type} setResults={onSearch}/>
     <br/>
-    <div>
+    {/* <div className="field has-addons">
+      <div className="control">
+        <button className="button is-dark">
+          <span className="icon">
+            <i className="fas fa-th-list fa-lg"/>
+          </span>
+        </button>
+      </div>
+      <div className="control">
+        <button className="button">
+          <span className="icon">
+            <i className="fas fa-th-large"/>
+          </span>
+        </button>
+      </div>
+    </div> */}
+    <div className={grid ? 'columns is-multiline' : ''}>
       {Content}
     </div>
   </>;

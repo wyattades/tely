@@ -137,8 +137,8 @@ export default class Share extends React.Component {
         You can make this list public or share it with an entire discord server,
         specific users, or no one at all!
       </p>
-      <label className="checkbox is-size-4">
-        <input type="checkbox" onChange={this.togglePublic} defaultChecked={is_public}/>
+      <label className="checkbox is-size-4" htmlFor="public">
+        <input id="public" type="checkbox" onChange={this.togglePublic} defaultChecked={is_public}/>
         &nbsp;Make this list public?
       </label>
       <p>Everyone in the world could see it</p>
@@ -152,16 +152,6 @@ export default class Share extends React.Component {
       </div>
       <h2 className="has-text-centered is-size-4">Share</h2>
       <br/>
-      {/* <div className="field has-addons is-marginless">
-        <p className="control is-expanded">
-          <input type="text" className="input" value={searchField} onChange={this.changeSearch}/>
-        </p>
-        <div className="control">
-          <button className="button is-link">Search</button>
-        </div>
-      </div>
-      <p className="help">Search by server id, server name, username, or user id</p>
-      <br/> */}
       { error && <p>{error}</p> }
       <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
         <p className="space-between">

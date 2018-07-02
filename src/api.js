@@ -96,7 +96,7 @@ const apiFetch = (api_url, profile, path, method, body) => fetch(`${api_url}${pa
   mode: 'cors',
 })
 .then((res) => {
-  if (res.status === 200) return res.json();
+  if (res.ok) return res.status === 204 ? {} : res.json();
   return res.json()
   .then((data) => {
     console.error(res, data);

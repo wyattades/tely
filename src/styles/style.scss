@@ -4,6 +4,7 @@
 @import '~@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
 @import 'bulma';
 @import 'spinner';
+@import 'spotify';
 
 // Main containers
 
@@ -22,6 +23,19 @@ html {
 
 .image.is-rounded {
   border-radius: 50%;
+}
+
+.media-image {
+  max-width: 120px;
+  position: relative;
+  button {
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
 }
 
 // is-fullheight but account for header

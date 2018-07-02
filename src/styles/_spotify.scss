@@ -1,0 +1,31 @@
+
+.playpause {
+  $size: 50px;
+  $color: rgba(197, 197, 197, 0.75);
+  $hover: rgba(216, 216, 216, 0.75);
+
+  outline: none;
+  border: 0;
+  background: transparent;
+  box-sizing: border-box;
+  width: 0;
+  height: $size;
+
+  border-color: transparent transparent transparent $color;
+  transition: 100ms all ease;
+  cursor: pointer;
+
+  // play state
+  border-style: solid;
+  border-width: $size/2 0 $size/2 $size - 15;
+
+  &.paused {
+    border-style: double;
+    border-width: 0 0 0 60px;
+  }
+
+  &:hover {
+    border-color: transparent transparent transparent $hover;
+  }
+}
+

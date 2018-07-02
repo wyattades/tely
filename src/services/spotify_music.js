@@ -10,14 +10,15 @@ export const ICON = 'music';
 const API_URL = 'https://api.spotify.com/v1';
 const api = apiFactory('spotify', API_URL, true);
 
+
 const mapResponse = ({ external_urls, artists, id, name, album }) => ({
   type: 'Song',
   title: name,
   image: album.images[1].url,
   media_id: id,
   link: external_urls.spotify,
-  released: new Date(album.release_date).getTime(),
-  desc: `Artist: ${artists[0].name}`,
+  released: album.release_date ? new Date(album.release_date).getTime() : null,
+  desc: `𝑏𝑦 ${artists[0].name}`,
 });
 
 export const search = (str, page = 1) => {

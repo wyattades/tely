@@ -50,9 +50,10 @@ export default class Settings extends React.Component {
       <h1 className="is-size-1">{this.state.name || metaData.name}</h1>
       <br/>
       <div className="field">
-        <label className="label">List Name</label>
+        <label className="label" htmlFor="name">List Name</label>
         <div className="control">
-          <input className="input" value={this.state.name} placeholder="Name cannot be empty" onChange={this.onChangeName}/>
+          <input id="name" type="text" className="input" value={this.state.name}
+            placeholder="Name cannot be empty" onChange={this.onChangeName}/>
         </div>
       </div>
       <br/>

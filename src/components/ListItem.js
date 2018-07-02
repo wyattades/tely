@@ -2,7 +2,9 @@ import React from 'react';
 
 import * as db from '../db';
 
-export default ({ id, media_id, title, link, type, desc, created, image, listRef }) => {
+import { playTrack } from '../spotify_player';
+
+export default ({ id, media_id, title, link, type, desc, created, image, listRef, className }) => {
   const deleteItem = () => {
     listRef.doc(id).delete();
   };
@@ -13,17 +15,13 @@ export default ({ id, media_id, title, link, type, desc, created, image, listRef
   };
 
   return (
-    <div className="box">
+    <div className={`box ${className}`}>
       <article className="media">
         <div className="media-left">
-          { type === 'Song' ?
-            <iframe title={`Play ${title}`} src={`https://open.spotify.com/embed?uri=spotify:track:${media_id}`}
-              width="80" height="80" frameBorder="0" allowTransparency="true" allow="encrypted-media"/>
-            :
-            <figure className="image is-3by4">
-              <img src={image} alt="" />
-            </figure>
-          }
+          <figure className="image media-image">
+            <img src={image} alt="" />
+            { type === 'Song' && <button className={`playpause ${''}`} onClick={() => playTrack(media_id)}/> }
+          </figure>
         </div>
         <div className="media-content">
           <div className="content">

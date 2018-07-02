@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
+import { initPlayer } from '../../spotify_player';
 import * as db from '../../db';
 import { Spinner, LiveSwitch } from '../misc';
 import ListView from './View';
@@ -32,6 +33,10 @@ class MediaList extends React.Component {
       if (!snap.exists) throw { code: 404 };
 
       const meta = snap.data();
+
+      // Load spotify player
+      if (meta.type === 'spotify_music') initPlayer();
+
       this.setState({ meta });
     }, (err) => this.setState({ err }));
 
@@ -120,7 +125,8 @@ class MediaList extends React.Component {
                 { exact: true, path: prev, element: <ListView searchResults={searchResults}
                   meta={meta} contents={this.contents} list={list} id={this.listid} onSearch={this.onSearch}/> },
                 { exact: true, path: `${prev}/share`, element: <ListShare metaData={meta} meta={this.meta}/> },
-                { exact: true, path: `${prev}/suggest`, element: <ListSuggest meta={meta} list={list} contents={this.contents}/> },
+                { exact: true, path: `${prev}/suggest`, element: <ListSuggest meta={meta}
+                  list={list} contents={this.contents}/> },
                 { exact: true, path: `${prev}/settings`, element: <ListSettings metaData={meta}
                   meta={this.meta} history={this.props.history}/> },
               ]}/>

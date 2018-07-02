@@ -61,16 +61,6 @@ export const suggest = (list) => {
     // sort_by: 'popularity.desc',
   });
 
-  // const fetchMovies = fetch(`${API_URL}/discover/movie?${query}`)
-  // .then((res) => res.json())
-  // .then((res) => console.log(res) || res)
-  // .then((res) => res.results.map(mapResponse('movie')));
-
-  // const fetchTV = fetch(`${API_URL}/discover/tv?${query}`)
-  // .then((res) => res.json())
-  // .then((res) => console.log(res) || res)
-  // .then((res) => res.results.map(mapResponse('tv')));
-
   return Promise.all([ tmdbFetch('movie', 'discover', query), tmdbFetch('tv', 'discover', query) ])
   .then(([ l1, l2 ]) => shuffle(l1.concat(l2)));
 };

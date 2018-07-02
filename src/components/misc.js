@@ -31,24 +31,59 @@ export const ContainerSection = ({ children }) => (
   </section>
 );
 
-// Similar to react-router Switch component, but keeps routes rendered in background
-export const LiveSwitch = ({ location, match: prevMatch, routes }) => {
-  let routeFound = false;
+// Similar to react-router Switch component, but keeps routes
+// rendered in background after they have been visited
+export class LiveSwitch extends React.Component {
 
-  const children = routes.map(({ element, path, exact, strict, sensitive }) => {
-    const match = matchPath(
-      location.pathname,
-      { path, exact, strict, sensitive },
-      prevMatch,
-    );
+  constructor(props) {
+    super(props);
+    this.state = this.updateRoutes(props);
+  }
 
-    let style;
-    if (match) routeFound = true;
-    else style = { display: 'none' };
+  componentWillReceiveProps(nextProps) {
+    if (this.props.location.pathname !== nextProps.location.pathname) {
+      this.setState(this.updateRoutes(nextProps));
+    }
+  }
 
-    return <div key={path} style={style}>{element}</div>;
-  });
+  UNVISITED = 0;
+  VISITED = 1;
+  CURRENT = 2;
 
-  if (routeFound) return children;
-  else throw { code: 404 };
-};
+  updateRoutes = ({ routes, match: prevMatch, location }) => {
+
+    let routeFound = false;
+    const routeStates = routes.map(({ path, exact, strict, sensitive }, i) => {
+      const match = !routeFound && matchPath(
+        location.pathname,
+        { path, exact, strict, sensitive },
+        prevMatch,
+      );
+
+      if (match) {
+        routeFound = true;
+        return this.CURRENT;
+      } else if (this.state && this.state.routeStates[i] !== this.UNVISITED) return this.VISITED;
+      else return this.UNVISITED;
+
+    });
+
+    return {
+      routeStates,
+      routeFound,
+    };
+  }
+
+  render() {
+    const { routeStates, routeFound } = this.state;
+
+    if (!routeFound) throw { code: 404 };
+
+    return this.props.routes.map(({ element }, i) => {
+      const status = routeStates[i];
+      const style = status !== this.CURRENT ? { display: 'none' } : {};
+
+      return status !== this.UNVISITED ? <div key={i} style={style}>{element}</div> : null;
+    });
+  }
+}
