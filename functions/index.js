@@ -10,12 +10,12 @@ const Query = require('querystring');
 
 const config = functions.config();
 
-const SERVER_URL = config.admin.mode === 'development' ?
-  'http://localhost:5000/tely-db/us-central1/widgets' :
-  'https://us-central1-tely-db.cloudfunctions.net/widgets';
-const ORIGIN = config.admin.mode === 'development' ?
-  'http://localhost:8080' :
-  'https://wyattades.github.io';
+const SERVER_URL = config.admin.mode === 'development'
+  ? 'http://localhost:5000/tely-db/us-central1/widgets'
+  : 'https://us-central1-tely-db.cloudfunctions.net/widgets';
+const ORIGIN = config.admin.mode === 'development'
+  ? 'http://localhost:8080'
+  : 'https://wyattades.github.io';
 const ORIGIN_URL = `${ORIGIN}/tely`;
 
 // Store service account credentials in base64 to simplify env variables
@@ -23,7 +23,6 @@ const SERVICE_ACCOUNT = JSON.parse(Buffer.from(config.admin.account, 'base64').t
 
 // Enable database access
 admin.initializeApp({
-  databaseURL: config.firebase.databaseURL,
   credential: admin.credential.cert(SERVICE_ACCOUNT),
 });
 
