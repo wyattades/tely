@@ -8,7 +8,7 @@ export default () => (
     <h1 className="is-size-1">About</h1>
     <br/>
     <div className="content">
-      <h3>Find movies! Share songs! Discord servers! Clicking things!</h3>
+      <h3>Finding movies! Sharing songs! Discord servers! The internet!</h3>
       <p>
         If any of the above exclamations interest you, then you are in the
         right place. Tely is a media aggregation platform that integrates with your
@@ -25,7 +25,8 @@ export default () => (
       </ul>
       <h4>With the following media types:</h4>
       <ul>
-        {services.asArray.map(({ ID, LABEL, DESCRIPTION }) => <li key={ID}><strong>{LABEL}:</strong> {DESCRIPTION}</li>)}
+        {services.asArray.map(({ ID, LABEL, DESCRIPTION }) =>
+          <li key={ID}><strong>{LABEL}:</strong> {DESCRIPTION}</li>)}
       </ul>
       <br/>
       <p>
