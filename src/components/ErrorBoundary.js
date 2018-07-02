@@ -1,12 +1,10 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 
-import Header from './Header';
-
 const getMessage = (code) => {
   switch (code) {
     case 'permission-denied':
-    case 401: return [401, 'You don\'t have access to this list!'];
+    case 403: return [403, 'You don\'t have access to this list!'];
     case 404: return [404, 'Sorry, the thing you want isn\'t here.'];
     case 501: return [501, 'Unimplemented! This feature will be available soon.'];
     default: return [500, 'Something unexpected occurred... Please try again'];
@@ -22,7 +20,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error) {
-    console.log('Caught Error:', error.toString());
+    console.log('Caught Error:', error);
 
     let message,
         code = 500;
@@ -47,7 +45,7 @@ class ErrorBoundary extends React.Component {
   }
 
   goBack = () => {
-    // Somehow check if error is a result of navigating
+    // TODO: Somehow check if error is a result of navigating
     // this.props.history.goBack();
     this.props.history.push('/list');
 

@@ -1,6 +1,8 @@
 import React from 'react';
 
+import { roleClick } from '../utils';
 import * as db from '../db';
+import { TruncateText } from './misc'; // TODO
 
 import { playTrack } from '../spotify_player';
 
@@ -34,13 +36,15 @@ export default ({ id, media_id, title, link, type, desc, created, image, listRef
           </div>
           <nav className="level is-mobile">
             <div className="level-left">
-              <a className="level-item" onClick={deleteItem} title="Delete from List">
+              <a className="level-item" onClick={deleteItem} title="Delete from List"
+                role="button" tabIndex="0" onKeyPress={roleClick}>
                 <span className="icon is-small"><i className="fas fa-trash" /></span>
               </a>
               {/* <a className="level-item">
                 <span className="icon is-small"><i className="fas fa-plus" /></span>
               </a> */}
-              <a className="level-item" onClick={favoriteItem} title="Add to Favorites">
+              <a className="level-item" onClick={favoriteItem} title="Add to Favorites"
+                role="button" tabIndex="0" onKeyPress={roleClick}>
                 <span className="icon is-small"><i className="fas fa-heart" /></span>
               </a>
             </div>

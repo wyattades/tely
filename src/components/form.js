@@ -6,16 +6,16 @@ export const TextInput = ({ leftIcon, rightIcon, placeholder }) => (
     <label htmlFor="sad" className="label">Username</label>
     <div className="control has-icons-left has-icons-right">
       <input id="sad" className="input is-success" type="text" placeholder={placeholder}/>
-      { leftIcon &&
+      { leftIcon && (
         <span className="icon is-small is-left">
           <i className={`fas fa-${leftIcon}`} />
         </span>
-      }
-      { rightIcon &&
+      )}
+      { rightIcon && (
         <span className="icon is-small is-right">
           <i className={`fas fa-${rightIcon}`} />
         </span>
-      }
+      )}
     </div>
     <p className="help is-success">This username is available</p>
   </div>

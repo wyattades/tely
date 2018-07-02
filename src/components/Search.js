@@ -1,39 +1,8 @@
 import React from 'react';
 
+import { roleClick } from '../utils';
 import services from '../services';
-
-class TruncateText extends React.Component {
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      truncated: props.text.length > props.maxLength,
-    };
-  }
-
-  open = () => this.setState({
-    truncated: false,
-  })
-  
-  render() {
-    if (this.state.truncated) {
-      return (
-        <span>
-          {this.props.text.substring(0, this.props.maxLength - 3)}...
-          <br/>
-          <a onClick={this.open}>Show More</a>
-        </span>
-      );
-    } else {
-      return this.props.text;
-    }
-  }
-}
-
-TruncateText.defaultProps = {
-  maxLength: 200,
-};
+import { TruncateText } from './misc';
 
 export class SearchItem extends React.Component {
 
@@ -83,13 +52,13 @@ export class SearchItem extends React.Component {
         </div>
         <div className="media-right">
           {!id ? (
-            <a className="icon" onClick={toggle}>
+            <a className="icon" onClick={toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
               <i className="fas fa-plus"/>
             </a>
           ) : (
             <a className={`icon has-text-${hovered ? 'danger' : 'success'}`}
               onMouseEnter={hover(true)} onMouseLeave={hover(false)}
-              onClick={toggle}>
+              onClick={toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
               <i className={`fas ${hovered ? 'fa-times' : 'fa-check'}`}/>
             </a>
           )}
@@ -182,7 +151,8 @@ export class Search extends React.Component {
       </span>
     );
     else if (resultCount !== null) Side = (
-      <span className="icon is-large is-right icon-clickable" onClick={this.clearSearch}>
+      <span className="icon is-large is-right icon-clickable" onClick={this.clearSearch}
+        role="button" tabIndex="0" onKeyPress={roleClick}>
         <i className="fas fa-times-circle"/>
       </span>
     );

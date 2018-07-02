@@ -1,4 +1,6 @@
 
+export const roleClick = (e) => (e.which || e.charCode || e.keyCode) === 13 && e.target.click();
+
 export const randInt = (a, b) => Math.floor(Math.random() * (b - a) + a);
 
 export const arrSample = (arr, n, clone = false) => {
@@ -49,10 +51,10 @@ export const decodeQuery = (str) => {
 // Courtosy of https://stackoverflow.com/a/16861050/6656308
 // Handles multiple monitors
 export const popupCenter = (url, w, h) => {
-  const dualScreenLeft = window.screenLeft !== undefined ?
-    window.screenLeft : window.screenX;
-  const dualScreenTop = window.screenTop !== undefined ?
-    window.screenTop : window.screenY;
+  const dualScreenLeft = window.screenLeft !== undefined
+    ? window.screenLeft : window.screenX;
+  const dualScreenTop = window.screenTop !== undefined
+    ? window.screenTop : window.screenY;
 
   const { width, height } = window.screen;
 

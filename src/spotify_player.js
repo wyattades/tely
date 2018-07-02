@@ -1,6 +1,6 @@
 // import React from 'react';
 
-import { apiFactory, profiles, refreshToken } from './api';
+import { signIn, apiFactory, profiles, refreshToken } from './api';
 
 const API_URL = 'https://api.spotify.com/v1';
 const api = apiFactory('spotify', API_URL, true);

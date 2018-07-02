@@ -21,14 +21,14 @@ export default class Suggest extends React.Component {
     .then(() => {
       item.id = null;
       // Rerender suggested
-      this.setState({ suggested: [ ...this.state.suggested ] });
+      this.setState(({ suggested }) => ({ suggested: [ ...suggested ] }));
     });
     else {
       item.created = Date.now();
       return contents.add(item)
       .then((snap) => {
         item.id = snap.id;
-        this.setState({ suggested: [ ...this.state.suggested ] });
+        this.setState(({ suggested }) => ({ suggested: [ ...suggested ] }));
       });
     }
   };
@@ -66,8 +66,9 @@ export default class Suggest extends React.Component {
     let Content = null;
     if (err) Content = <p className="has-text-danger has-text-centered">An error occurred while fetching content</p>;
     else if (suggested) {
-      if (suggested.length) Content = suggested.map((item) =>
-        <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)}/>);
+      if (suggested.length) Content = suggested.map((item) => (
+        <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)}/>
+      ));
       else Content = <p className="has-text-centered">No Suggestions at this Time!</p>;
     }
 

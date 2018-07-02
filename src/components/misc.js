@@ -1,6 +1,8 @@
 import React from 'react';
 import { matchPath } from 'react-router-dom';
 
+import { roleClick } from '../utils';
+
 export const Spinner = ({ fullPage, centered }) => (
   <div className={`${fullPage && 'full-page'} ${centered && 'buttons is-centered'}`}>
     <div className="spinner">
@@ -85,5 +87,38 @@ export class LiveSwitch extends React.Component {
 
       return status !== this.UNVISITED ? <div key={i} style={style}>{element}</div> : null;
     });
+  }
+}
+
+export class TruncateText extends React.Component {
+
+  static defaultProps = {
+    maxLength: 200,
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      truncated: props.text.length > props.maxLength,
+    };
+  }
+
+  open = () => this.setState({
+    truncated: false,
+  })
+  
+  render() {
+    if (this.state.truncated) {
+      return (
+        <span>
+          {this.props.text.substring(0, this.props.maxLength - 3)}...
+          <br/>
+          <a onClick={this.open} role="button" tabIndex="0" onKeyPress={roleClick}>Show More</a>
+        </span>
+      );
+    } else {
+      return this.props.text;
+    }
   }
 }

@@ -24,14 +24,12 @@ import * as db from '../db';
 NavLink.defaultProps.activeClassName = 'is-active';
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) =>
-    db.getUser() ? <Component {...props}/> : (
-      <Redirect to={{
-        pathname: '/',
-        state: { from: props.location },
-      }}/>
-    )
-  }/>
+  <Route {...rest} render={(props) => db.getUser() ? <Component {...props}/> : (
+    <Redirect to={{
+      pathname: '/',
+      state: { from: props.location },
+    }}/>
+  )}/>
 );
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -49,7 +47,7 @@ class App extends React.Component {
               <PrivateRoute exact path="/account" component={Account}/>
               <PrivateRoute exact path="/list" component={MediaLists}/>
               <PrivateRoute exact path="/list/new" component={NewMediaList}/>
-              <PrivateRoute path="/list/:listid" component={MediaList}/>
+              <Route path="/list/:listid" component={MediaList}/>
               <Route render={() => { throw { code: 404 }; }}/>
             </Switch>
           </ErrorBoundary>

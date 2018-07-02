@@ -25,6 +25,8 @@ class MediaList extends React.Component {
       list: null,
       meta: null,
       err: null,
+      canRead: null,
+      canWrite: null,
     };
   }
 
@@ -37,7 +39,13 @@ class MediaList extends React.Component {
       // Load spotify player
       if (meta.type === 'spotify_music') initPlayer();
 
-      this.setState({ meta });
+      const canWrite = meta.owner === (db.getProfile() && db.getProfile().id);
+
+      this.setState({
+        meta,
+        canWrite,
+        canRead: canWrite || meta.is_public,
+      });
     }, (err) => this.setState({ err }));
 
     this.unsubscribeContent = this.contents.orderBy('created')
@@ -78,7 +86,7 @@ class MediaList extends React.Component {
   }
 
   render() {
-    const { meta, list, err, searchResults } = this.state;
+    const { meta, list, err, searchResults, canRead, canWrite } = this.state;
 
     if (err) throw err;
 
@@ -87,7 +95,7 @@ class MediaList extends React.Component {
     } else {
       const prev = this.props.match.url;
 
-      const isOwner = meta.owner === db.getProfile().id;
+      if (!canRead) throw { code: 403 };
 
       return (
         <section className="section">
@@ -102,10 +110,10 @@ class MediaList extends React.Component {
                   </li>
                   <li>
                     <NavLink exact to={`/list/${this.listid}/suggest`}>
-                      <span className="icon"><i className="fa fa-gift"/></span> <span>Suggested</span>
+                      <span className="icon"><i className="fa fa-gift"/></span><span>Suggested</span>
                     </NavLink>
                   </li>
-                  { isOwner && <>
+                  { canWrite && <>
                     <li>
                       <NavLink exact to={`/list/${this.listid}/share`}>
                         <span className="icon"><i className="fa fa-share-alt"/></span> <span>Share</span>

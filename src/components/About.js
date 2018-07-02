@@ -25,8 +25,9 @@ export default () => (
       </ul>
       <h4>With the following media types:</h4>
       <ul>
-        {services.asArray.map(({ ID, LABEL, DESCRIPTION }) =>
-          <li key={ID}><strong>{LABEL}:</strong> {DESCRIPTION}</li>)}
+        {services.asArray.map(({ ID, LABEL, DESCRIPTION }) => (
+          <li key={ID}><strong>{LABEL}:</strong> {DESCRIPTION}</li>
+        ))}
       </ul>
       <br/>
       <p>
@@ -35,6 +36,7 @@ export default () => (
       </p>
       <br/>
       <pre>
+        {/* eslint-disable-next-line max-len */}
         Tely is an <a href="https://github.com/wyattades/tely">Open Source</a> app created by <a href="https://wyattades.com">Wyatt Ades</a>
         <br/>
         Copyright © 2018

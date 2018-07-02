@@ -25,21 +25,22 @@ class NewMediaList extends React.Component {
     submitting: false,
   };
 
-  createList = (name, type, optionalGuild) =>
-    (optionalGuild ? discord.getGuild(optionalGuild) : Promise.resolve())
-    .then((guild) => db.lists.add({
-      owner: db.getUser().uid, // = db.getProfile().id
-      created: Date.now(),
-      name,
-      type,
-      share: guild ? { [guild.id]: guild } : {},
-    }))
-    .then((ref) => {
-      this.props.history.push(`/list/${ref.id}`);
-    })
-    .catch((err) => {
-      this.setState({ submitting: false, err: { submit: `Failed to create list. Error: ${err.code}` } });
-    });
+  createList = (name, type, optionalGuild) => (
+    optionalGuild ? discord.getGuild(optionalGuild) : Promise.resolve()
+  )
+  .then((guild) => db.lists.add({
+    owner: db.getUser().uid, // = db.getProfile().id
+    created: Date.now(),
+    name,
+    type,
+    share: guild ? { [guild.id]: guild } : {},
+  }))
+  .then((ref) => {
+    this.props.history.push(`/list/${ref.id}`);
+  })
+  .catch((err) => {
+    this.setState({ submitting: false, err: { submit: `Failed to create list. Error: ${err.code}` } });
+  });
 
   handleSubmit = (event) => {
     event.preventDefault();
@@ -119,9 +120,9 @@ class NewMediaList extends React.Component {
               <input type="text" className="input" id="list-name" value={listName}
                 maxLength={48} onChange={this.listNameChange}/>
             </div>
-            { err.listName &&
+            { err.listName && (
               <p className="help is-danger">This is a required field</p>
-            }
+            )}
           </div>
           <div className="field">
             <label className="label" htmlFor="list-type">Select a List Type</label>
@@ -129,9 +130,9 @@ class NewMediaList extends React.Component {
               <MultiSelect required options={types} name="list-type" value={type}
                 onChange={this.typeChange}/>
             </div>
-            { err.type &&
+            { err.type && (
               <p className="help is-danger">This is a required field</p>
-            }
+            )}
           </div>
           <div className="field">
             <label className="label optional" htmlFor="share-discord">Share with a Discord Server ID</label>
@@ -139,21 +140,21 @@ class NewMediaList extends React.Component {
               <input type="text" className="input" id="share-discord" value={shareDiscord}
                 onChange={this.shareDiscordChange}/>
             </div>
-            { err.shareDiscord &&
+            { err.shareDiscord && (
               <p className="help is-danger">{err.shareDiscord}</p>
-            }
+            )}
             <p className="help">To get your server's ID, right click the server's icon and select `Copy ID`</p>
           </div>
           <div className="field">
             <div className="control">
-              <button className={`button is-primary is-medium ${submitting && 'is-loading'}`} 
+              <button className={`button is-primary is-medium ${submitting && 'is-loading'}`}
                 type="submit" disabled={this.state.checking}>
                 Create
               </button>
             </div>
-            { err.submit &&
+            { err.submit && (
               <p className="help is-danger">{err.submit}</p>
-            }
+            )}
           </div>
         </form>
       </SmallSection>

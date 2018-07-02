@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, NavLink, withRouter } from 'react-router-dom';
 
+import { roleClick } from '../utils';
 import * as db from '../db';
 
 const logout = () => db.signOut()
@@ -21,19 +22,23 @@ class Header extends React.Component {
     // Close header if history changes
     this.unlisten = this.props.history.listen(() => {
       this.setState({ open: false });
-    })
+    });
   }
 
   componentWillUnmount() {
     this.unlisten();
   }
 
-  toggle = () => this.setState({ open: !this.state.open })
+  toggle = () => this.setState(({ open }) => ({ open: !open }))
 
   render() {
 
     const loggedIn = !!db.getProfile();
     const username = loggedIn && db.getProfile().username;
+
+    const signIn = () => db.signIn()
+    .then(() => this.props.history.push('/list'))
+    .catch((err) => console.error(err));
 
     return (
       <nav className="navbar is-transparent has-shadow is-fixed-top">
@@ -43,7 +48,7 @@ class Header extends React.Component {
               <h1 className="is-size-4 has-text-primary">Tely</h1>
             </Link>
             <div className={`navbar-burger burger ${this.state.open ? 'is-active' : ''}`}
-              onClick={this.toggle} role="button" tabIndex="0">
+              onClick={this.toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
               <span/>
               <span/>
               <span/>
@@ -71,13 +76,18 @@ class Header extends React.Component {
                     <Link className="navbar-item" to="/account">
                       Account
                     </Link>
-                    <hr className="navbar-divider" />
-                    <a className="navbar-item" onClick={logout}>
+                    <hr className="navbar-divider"/>
+                    <a className="navbar-item" onClick={logout}
+                      role="button" tabIndex="0" onKeyPress={roleClick}>
                       Logout
                     </a>
                   </div>
                 </div>
-              </> : null}
+              </> : (
+                <a className="navbar-item">
+                  <button className="button is-discord" onClick={signIn}>Sign In</button>
+                </a>
+              )}
             </div>
           </div>
         </div>

@@ -48,8 +48,8 @@ class MediaLists extends React.Component {
 
     // TODO: best way to manage list access may be to use user/permissions
     discord.getGuilds()
-    .then((guilds) => Promise.all(guilds.map((guild) =>
-      db.sharedGuilds
+    .then((guilds) => Promise.all(guilds.map(
+      (guild) => db.sharedGuilds
       .doc(guild.id)
       .get()
       .then((guildData) => {
@@ -59,7 +59,8 @@ class MediaLists extends React.Component {
           getLists.push(db.lists.doc(listId).get());
         }
         return Promise.all(getLists);
-      }))))
+      }),
+    )))
     .then((snapArrays) => {
       const sharedLists = [];
       for (const arr of snapArrays) {
@@ -127,9 +128,9 @@ class MediaLists extends React.Component {
             </div>
           </div>
         </div>
-        { this.state.err &&
+        { this.state.err && (
           <div className="has-text-error">{this.state.err}</div>
-        }
+        )}
         <hr/>
         {MyLists}
         <br/><br/><br/>

@@ -1,8 +1,8 @@
 import { decodeQuery, popupCenter } from './utils';
 
-const SERVER_URL = process.env.NODE_ENV === 'development' ?
-  'http://localhost:5000/tely-db/us-central1/widgets' :
-  'https://us-central1-tely-db.cloudfunctions.net/widgets';
+const SERVER_URL = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:5000/tely-db/us-central1/widgets'
+  : 'https://us-central1-tely-db.cloudfunctions.net/widgets';
 
 export const profiles = {
   spotify: null,
