@@ -26,7 +26,9 @@ html {
 }
 
 .media-image {
-  max-width: 120px;
+  box-shadow: 0 0 10px 0 rgba(#000, 0.1);
+  width: 92px;
+  min-height: 92px;
   position: relative;
   button {
     position: absolute;
@@ -145,6 +147,7 @@ html {
   }
 }
 
+// TEMP
 .is-discord {
   @include mobile {
     .image {

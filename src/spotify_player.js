@@ -1,4 +1,4 @@
-// import React from 'react';
+import React from 'react';
 
 import { signIn, apiFactory, profiles, refreshToken } from './api';
 
@@ -59,40 +59,71 @@ export const initPlayer = () => {
 };
 
 // If not authenticated, signIn/refreshToken then load web player
-export const playTrack = (id) => {
+const playTrack = (id, play = true) => {
   if (loaded)
-    (!profiles.spotify ? signIn('spotify') : Promise.resolve())
+    return (!profiles.spotify ? signIn('spotify') : Promise.resolve())
     .then(() => !profiles.spotify.accessToken ? refreshToken('spotify') : Promise.resolve())
     .then(() => !player ? loadPlayer() : Promise.resolve())
-    .then(() => playerId ? api(`/me/player/play?device_id=${playerId}`, 'PUT', {
+    .then(() => playerId ? api(`/me/player/${play ? 'play' : 'pause'}?device_id=${playerId}`, 'PUT', play && {
       uris: [ `spotify:track:${id}` ],
-    }) : Promise.resolve())
-    .catch(console.error);
+    }) : Promise.reject('No playerId'))
+  return Promise.reject('Not loaded');
 };
 
-// export class SpotifyPlayer extends React.Component {
+export class SpotifyPlayer extends React.Component {
 
-//   componentWillMount() {
-//     player.addListener('player_state_changed', this.onStateChange);
-//   }
+  state = {
+    playing: false,
+    error: false,
+  }
 
-//   componentWillUnmount() {
-//     player.removeListener('player_state_changed', this.onStateChange);
-//   }
+  componentWillUnmount() {
+    if (this.listener)
+      player.removeListener('player_state_changed', this.onStateChange);
+  }
 
-//   onStateChange = ({ paused }) => {
-//     this.setState({
-//       paused,
-//     });
-//   }
+  onStateChange = (state) => {
+    console.log('NewState:', state);
 
-//   render() {
-//     const { paused } = this.state;
+    this.setState({
+      playing: !state.paused && this.props.id === state.track_window.current_track.id,
+    });
+  }
 
-//     return (
-//       <div>
-//         {paused}
-//       </div>
-//     );
-//   }
-// }
+  onClick = () => {
+    if (!this.state.playing)
+      playTrack(this.props.id)
+      .then(() => {
+        if (!this.listener)
+          this.listener = player.addListener('player_state_changed', this.onStateChange);
+      })
+      .catch((err) => {
+        console.error('playTrack', err);
+        this.setState({ error: true });
+        setTimeout(() => this.setState({ error: false }), 1000);
+      });
+    else
+      playTrack(this.props.id, false)
+      .catch((err) => {
+        console.error('pauseTrack', err);
+        this.setState({ error: true });
+        setTimeout(() => this.setState({ error: false }), 1000);
+      });
+  }
+
+  render() {
+    const { playing, error } = this.state;
+
+    return (
+      <a className={`play-button ${playing ? 'playing' : ''} ${error ? 'error' : ''}`} onClick={this.onClick}>
+        <svg version="1.1"
+          xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+          x="0px" y="0px" width="100%" height="100%" viewBox="0 0 213.7 213.7"
+          enableBackground="new 0 0 213.7 213.7" xmlSpace="preserve">
+          <polygon points="73.5,62.5 148.5,105.8 73.5,149.1 "/>
+          <circle cx="106.8" cy="106.8" r="103.3"/>
+        </svg>
+      </a>
+    );
+  }
+}

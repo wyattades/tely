@@ -4,7 +4,7 @@ import { roleClick } from '../utils';
 import * as db from '../db';
 import { TruncateText } from './misc'; // TODO
 
-import { playTrack } from '../spotify_player';
+import { SpotifyPlayer } from '../spotify_player';
 
 export default ({ id, media_id, title, link, type, desc, created, image, listRef, className }) => {
   const deleteItem = () => {
@@ -22,7 +22,8 @@ export default ({ id, media_id, title, link, type, desc, created, image, listRef
         <div className="media-left">
           <figure className="image media-image">
             <img src={image} alt="" />
-            { type === 'Song' && <button className={`playpause ${''}`} onClick={() => playTrack(media_id)}/> }
+            { type === 'Song' && <SpotifyPlayer id={media_id}/> }
+            {/* { type === 'Song' && <button className={`playpause ${''}`} onClick={() => playTrack(media_id)}/> } */}
           </figure>
         </div>
         <div className="media-content">
