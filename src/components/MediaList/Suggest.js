@@ -35,28 +35,8 @@ export default class Suggest extends React.Component {
 
   fetchSuggested = () => {
     services.asObject[this.props.meta.type].suggest(this.props.list)
-    .then((suggested) => {
-
-      if (suggested) {
-
-        // Show 5 items that are not already in this list
-
-        const listMap = {};
-        for (const listItem of this.props.list) listMap[listItem.media_id] = true;
-        
-        const old = suggested;
-        suggested = [];
-        for (const item of old) {
-          if (!(item.media_id in listMap)) {
-            suggested.push(item);
-            if (suggested.length >= 5) break;
-          }
-        }
-      }
-
-      this.setState({ suggested });
-    })
-    .catch(() => this.setState({ err: 502 }));
+    .then((suggested) => this.setState({ suggested }))
+    .catch((err) => console.error(err) || this.setState({ err: 502 }));
   }
 
   render() {

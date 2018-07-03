@@ -1,4 +1,4 @@
-import { encodeQuery, shuffle } from '../utils';
+import { encodeQuery, shuffle, randInt } from '../utils';
 
 // TODO: hide API key?
 const API_KEY = 'e516ac54480a35fac52c1c9c8af54200';
@@ -34,7 +34,7 @@ const mapResponse = (type) => ({ id, title, name, poster_path, overview, release
   released: type === 'tv' ? first_air_date : release_date,
 });
 
-const tmdbFetch = (type, method, query) => fetch(`${API_URL}/${method}/${type}?${query}`)
+const tmdbFetch = (type, path, query) => fetch(`${API_URL}${path}?${query}`)
 .then((res) => {
   if (!res.ok) return Promise.reject(res);
   return res;
@@ -50,17 +50,52 @@ export const search = (str, page = 1) => {
     include_adult: false,
   });
 
-  return Promise.all([ tmdbFetch('movie', 'search', query), tmdbFetch('tv', 'search', query) ])
+  return Promise.all([ tmdbFetch('movie', '/search/movie', query), tmdbFetch('tv', '/search/tv', query) ])
   .then(([ l1, l2 ]) => l1.concat(l2));
 };
 
 export const suggest = (list) => {
 
+  const listMap = {};
+  for (const listItem of list) listMap[listItem.media_id] = true;
+
+  let sample = [ ...list ];
+
+  const resultMap = {};
+  const results = [];
+
   const query = encodeQuery({
     api_key: API_KEY,
-    // sort_by: 'popularity.desc',
   });
 
-  return Promise.all([ tmdbFetch('movie', 'discover', query), tmdbFetch('tv', 'discover', query) ])
-  .then(([ l1, l2 ]) => shuffle(l1.concat(l2)));
+  const getMore = () => {
+    if (sample.length === 0) return Promise.resolve(results);
+
+    const randIndex = randInt(0, sample.length);
+    const randItem = sample[randIndex];
+    const type = randItem.type.toLowerCase();
+  
+    return tmdbFetch(type, `/${type}/${randItem.media_id}/recommendations`, query)
+    .then((recommendations) => {
+
+      // TODO: show user which items recommendations are based on
+
+      sample.splice(randIndex, 1);
+      let counter = 0;
+      for (const item of recommendations) {
+        if (!(item.media_id in listMap) && !(item.media_id in resultMap)) {
+          results.push(item);
+          resultMap[item.media_id] = true;
+          if (results.length >= 6) {
+            return results;
+          }
+          counter++;
+          if (counter >= 2) break;
+        }
+      }
+      return getMore();
+    })
+  };
+
+  return getMore();
 };

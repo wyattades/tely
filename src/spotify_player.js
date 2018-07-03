@@ -78,24 +78,25 @@ export class SpotifyPlayer extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.listener)
+    if (this.listener) {
       player.removeListener('player_state_changed', this.onStateChange);
+
+      if (this.state.playing) playTrack(this.props.id, false).catch(() => {});
+    }
   }
 
-  onStateChange = (state) => {
-    console.log('NewState:', state);
-
-    this.setState({
-      playing: !state.paused && this.props.id === state.track_window.current_track.id,
-    });
-  }
+  onStateChange = ({ paused, track_window }) => this.setState({
+    playing: !paused && this.props.id === track_window.current_track.id,
+  });
 
   onClick = () => {
     if (!this.state.playing)
       playTrack(this.props.id)
       .then(() => {
-        if (!this.listener)
-          this.listener = player.addListener('player_state_changed', this.onStateChange);
+        if (!this.listener) {
+          this.listener = true;
+          player.addListener('player_state_changed', this.onStateChange);
+        }
       })
       .catch((err) => {
         console.error('playTrack', err);
@@ -115,7 +116,8 @@ export class SpotifyPlayer extends React.Component {
     const { playing, error } = this.state;
 
     return (
-      <a className={`play-button ${playing ? 'playing' : ''} ${error ? 'error' : ''}`} onClick={this.onClick}>
+      <a className={`play-button ${playing ? 'playing' : ''} ${error ? 'error' : ''}`}
+        onClick={this.onClick} title={playing ? 'Pause' : 'Play'}>
         <svg version="1.1"
           xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
           x="0px" y="0px" width="100%" height="100%" viewBox="0 0 213.7 213.7"

@@ -41,10 +41,25 @@ export const suggest = (list) => {
   const query = encodeQuery({
     seed_tracks: samples.join(','),
     type: 'track',
-    limit: 5,
+    limit: 10,
     // market: 'US',
   });
 
   return api(`/recommendations?${query}`)
-  .then((res) => res.tracks.map(mapResponse));
+  .then((res) => {
+    const listMap = {};
+    for (const listItem of list) listMap[listItem.media_id] = true;
+
+    const results = [];
+    for (const item of res.tracks) {
+      if (!(item.id in listMap)) {
+        results.push(mapResponse(item));
+        if (results.length >= 6) {
+          break;
+        }
+      }
+    }
+
+    return results;
+  });
 };

@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { roleClick } from '../utils';
-import * as db from '../db';
-import { TruncateText } from './misc'; // TODO
+// import * as db from '../db';
+// import { TruncateText } from './misc'; // TODO
 
 import { SpotifyPlayer } from '../spotify_player';
 
@@ -21,9 +21,8 @@ export default ({ id, media_id, title, link, type, desc, created, image, listRef
       <article className="media">
         <div className="media-left">
           <figure className="image media-image">
-            <img src={image} alt="" />
+            <img src={image} alt={title} />
             { type === 'Song' && <SpotifyPlayer id={media_id}/> }
-            {/* { type === 'Song' && <button className={`playpause ${''}`} onClick={() => playTrack(media_id)}/> } */}
           </figure>
         </div>
         <div className="media-content">
