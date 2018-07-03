@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { signIn, apiFactory, profiles, refreshToken } from './api';
+import { signIn, apiFactory, profiles, refreshToken, expired } from './api';
 
 const API_URL = 'https://api.spotify.com/v1';
 const api = apiFactory('spotify', API_URL, true);
@@ -20,10 +20,7 @@ const loadPlayer = () => new Promise((resolve, reject) => {
   });
 
   player.addListener('initialization_error', reject);
-  player.addListener('authentication_error', (err) => {
-    profiles.spotify.accessToken = null; // Nullify accessToken
-    reject(err);
-  });
+  player.addListener('authentication_error', reject);
   player.addListener('account_error', reject);
   player.addListener('not_ready', reject);
 
@@ -48,7 +45,9 @@ export const initPlayer = () => {
     window.onSpotifyWebPlaybackSDKReady = () => {
       loaded = true;
       if (profiles.spotify) {
-        loadPlayer().catch((err) => {
+        (expired('spotify') ? refreshToken('spotify') : Promise.resolve())
+        .then(loadPlayer)
+        .catch((err) => {
           player.disconnect();
           player = null;
           console.error(err);
@@ -62,7 +61,7 @@ export const initPlayer = () => {
 const playTrack = (id, play = true) => {
   if (loaded)
     return (!profiles.spotify ? signIn('spotify') : Promise.resolve())
-    .then(() => !profiles.spotify.accessToken ? refreshToken('spotify') : Promise.resolve())
+    .then(() => expired('spotify') ? refreshToken('spotify') : Promise.resolve())
     .then(() => !player ? loadPlayer() : Promise.resolve())
     .then(() => playerId ? api(`/me/player/${play ? 'play' : 'pause'}?device_id=${playerId}`, 'PUT', play && {
       uris: [ `spotify:track:${id}` ],

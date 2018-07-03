@@ -35,9 +35,10 @@ const discordStrat = new DiscordStrategy({
   clientSecret: config.discord.client_secret,
   callbackURL: `${SERVER_URL}/auth/discord/callback`,
   scope: [ 'identify', 'email', 'guilds' ],
-}, (accessToken, refreshToken, profile, cb) => {
-  // accessToken already included in profile?
+}, (accessToken, refreshToken, res, profile, cb) => {
+  // accessToken already included in profile
   if (refreshToken) profile.refreshToken = refreshToken;
+  if (res && res.expires_in) profile.expires_on = Date.now() + res.expires_in;
 
   admin.auth().createCustomToken(profile.id)
   .then((token) => {
@@ -55,7 +56,7 @@ const spotifyStrat = new SpotifyStrategy({
 }, (accessToken, refreshToken, expires_in, profile, cb) => {
   if (accessToken) profile.accessToken = accessToken;
   if (refreshToken) profile.refreshToken = refreshToken;
-  if (expires_in) profile.expires_in = expires_in;
+  if (expires_in) profile.expires_on = Date.now() + expires_in;
   cb(null, profile);
 });
 

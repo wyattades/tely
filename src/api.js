@@ -30,6 +30,11 @@ export const clearProfile = (service) => {
   profiles[service] = null;
 };
 
+export const expired = (service) => {
+  const expires_on = Number.parseInt(profiles[service].expires_on, 10);
+  return Number.isNaN(expires_on) || Date.now() > expires_on;
+};
+
 export const signIn = (service) => new Promise((resolve, reject) => {
 
   // window.location.href = authUrl;
@@ -73,6 +78,7 @@ export const refreshToken = (service) => fetch(`${SERVER_URL}/auth/${service}/re
   body: JSON.stringify({ token: profiles[service].refreshToken }),
   headers: {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
   mode: 'cors',
 })
@@ -112,7 +118,8 @@ export const apiFactory = (service, api_url, autoSignIn) => (path, method = 'GET
     else return Promise.reject({ code: 403 });
   }
 
-  return apiFetch(api_url, profile, path, method, body)
+  return (expired(service) ? refreshToken(service) : Promise.resolve())
+  .then(() => apiFetch(api_url, profile, path, method, body))
   .catch((res) => {
 
     if (autoSignIn && res.code === 401) {
