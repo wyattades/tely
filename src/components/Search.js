@@ -3,6 +3,7 @@ import React from 'react';
 import { roleClick } from '../utils';
 import services from '../services';
 import { TruncateText } from './misc';
+import { SpotifyPlayer } from '../spotify_player';
 
 export class SearchItem extends React.Component {
 
@@ -23,7 +24,8 @@ export class SearchItem extends React.Component {
       <article className="media">
         <div className="media-left">
           <figure className="image media-image">
-            <img src={image} alt=""/>
+            <img src={image} alt={title}/>
+            { type === 'Song' && <SpotifyPlayer id={media_id}/> }
           </figure>
         </div>
         <div className="media-content">
