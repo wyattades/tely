@@ -2,11 +2,10 @@ import React from 'react';
 
 import { roleClick } from '../utils';
 // import * as db from '../db';
-// import { TruncateText } from './misc'; // TODO
-
+import services from '../services';
 import { SpotifyPlayer } from '../spotify_player';
 
-export default ({ id, media_id, title, link, type, desc, created, image, listRef, className }) => {
+export default ({ id, media_id, title, link, type, label, created, image, listRef, className, ...body }) => {
   const deleteItem = () => {
     listRef.doc(id).delete();
   };
@@ -21,17 +20,21 @@ export default ({ id, media_id, title, link, type, desc, created, image, listRef
       <article className="media">
         <div className="media-left">
           <figure className="image media-image">
-            <img src={image} alt={title} />
-            { type === 'Song' && <SpotifyPlayer id={media_id}/> }
+            {/* TODO: use abstracted renderer */}
+            { type === 'spotify_music'
+              ? <SpotifyPlayer id={media_id} image={image} title={title}/>
+              : (image && <img src={image} alt={title}/>)
+            }
           </figure>
         </div>
         <div className="media-content">
           <div className="content">
             <p>
-              <strong><a href={link}>{title}</a></strong> <small><i>{type}</i></small>
-              &nbsp;<small>{new Date(created).toLocaleDateString()}</small>
-              <br />
-              {desc}
+              <strong><a href={link}>{title}</a></strong>&nbsp;
+              <strong><small>{label}</small></strong>&nbsp;
+              <small>Added {new Date(created).toLocaleDateString()}</small>
+              <br/>
+              {services.asObject[type].renderBody(body)}
             </p>
           </div>
           <nav className="level is-mobile">

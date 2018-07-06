@@ -1,27 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import { ContainerSection } from './misc';
 import * as db from '../db';
+import { ListView } from './MediaLists';
 import services from '../services';
 
-const ListView = ({ id, type, name }) => {
-
-  const service = services.asObject[type];
-
-  return (
-    <div key={id} className="column is-one-third">
-      <Link to={`/list/${id}`} className="button multiline space-between
-      has-text-left is-large is-fullwidth">
-        <span>
-          <p className="is-size-4">{name}</p>
-          <p className="help">{service.LABEL}</p>
-        </span>
-        <span className="icon"><i className={`fa fa-${service && service.ICON}`}/></span>
-      </Link>
-    </div>
-  );
-};
+const _ListView = (props) => (
+  <div key={props.id} className="column is-one-third">
+    <ListView {...props}/>
+  </div>
+);
 
 export default class Browse extends React.Component {
 
@@ -80,8 +68,9 @@ export default class Browse extends React.Component {
                   <div className="select">
                     <select>
                       <option>-</option>
-                      <option>Spotify Music</option>
-                      <option>Music & TV</option>
+                      {services.asArray.map(({ ID, LABEL }) => (
+                        <option key={ID}>{LABEL}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -106,7 +95,7 @@ export default class Browse extends React.Component {
           </div>
         </div>
         <div className="columns is-multiline">
-          { lists && lists.length && lists.map(ListView) }
+          { lists && lists.length && lists.map(_ListView) }
         </div>
       </ContainerSection>
     );

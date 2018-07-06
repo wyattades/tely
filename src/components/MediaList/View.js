@@ -25,11 +25,14 @@ export default ({ meta, contents, searchResults, list, onSearch }) => {
       }
     };
 
-    Content = searchResults.map((item) => <SearchItem item={item} key={item.media_id} toggle={toggle(item)}/>);
+    Content = searchResults.map((item) => (
+      <SearchItem item={item} key={item.media_id}
+        toggle={toggle(item)} type={meta.type}/>
+    ));
   } else if (list.length) {
     // grid = true;
     Content = list.map((item) => (
-      <ListItem {...item} key={item.id} className={grid && "column is-4"} listRef={contents}/>
+      <ListItem {...item} type={meta.type} key={item.id} className={grid && "column is-4"} listRef={contents}/>
     ));
   } else {
     Content = <p className="is-size-4 has-text-centered">Empty List!</p>;

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { SearchItem } from '../Search';
 import services from '../../services';
+import { Spinner } from '../misc';
+
 
 export default class Suggest extends React.Component {
 
@@ -43,14 +45,13 @@ export default class Suggest extends React.Component {
     const { meta } = this.props;
     const { suggested, err } = this.state;
 
-    let Content = null;
+    let Content;
     if (err) Content = <p className="has-text-danger has-text-centered">An error occurred while fetching content</p>;
-    else if (suggested) {
-      if (suggested.length) Content = suggested.map((item) => (
-        <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)}/>
-      ));
-      else Content = <p className="has-text-centered">No Suggestions at this Time!</p>;
-    }
+    else if (!suggested) Content = <><br/><br/><Spinner centered/></>;
+    else if (suggested.length) Content = suggested.map((item) => (
+      <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)} type={meta.type}/>
+    ));
+    else Content = <p className="is-size-4 has-text-centered">No Suggestions!</p>;
 
     return <>
       <p className="is-size-5 has-text-grey">Suggested:</p>

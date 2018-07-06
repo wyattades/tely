@@ -1,5 +1,8 @@
+import React from 'react';
+
 import { encodeQuery, arrSample } from '../utils';
 import { apiFactory } from '../api';
+import { initPlayer } from '../spotify_player';
 
 export const ID = 'spotify_music';
 export const LABEL = 'Spotify Music';
@@ -10,15 +13,26 @@ export const ICON = 'music';
 const API_URL = 'https://api.spotify.com/v1';
 const api = apiFactory('spotify', API_URL, true);
 
+export const init = () => initPlayer();
+
+export const renderBody = ({ artist, artist_id, album, album_id }) => <>
+  By <a href={`https://open.spotify.com/artist/${artist_id}`}>{artist}</a><br/>
+  <small><a href={`https://open.spotify.com/album/${album_id}`}>{album}</a></small>
+</>;
+
 
 const mapResponse = ({ external_urls, artists, id, name, album }) => ({
-  type: 'Song',
+  type: ID,
+  label: 'Song',
   title: name,
   image: album.images[1].url,
   media_id: id,
   link: external_urls.spotify,
   released: album.release_date ? new Date(album.release_date).getTime() : null,
-  desc: `by ${artists[0].name}`,
+  artist: artists[0].name,
+  artist_id: artists[0].id,
+  album: album.name,
+  album_id: album.id,
 });
 
 export const search = (str, page = 1) => {
@@ -31,10 +45,13 @@ export const search = (str, page = 1) => {
   });
 
   return api(`/search?${query}`)
+  .then((res) => console.log(res.tracks.items) || res)
   .then((res) => res.tracks.items.map(mapResponse));
 };
 
 export const suggest = (list) => {
+
+  if (list.length === 0) return Promise.resolve([]);
 
   const samples = arrSample(list, 5, true).map((item) => item.media_id);
 

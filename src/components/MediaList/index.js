@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { initPlayer } from '../../spotify_player';
+import services from '../../services';
 import * as db from '../../db';
 import { Spinner, LiveSwitch } from '../misc';
 import ListView from './View';
@@ -36,8 +36,8 @@ class MediaList extends React.Component {
 
       const meta = snap.data();
 
-      // Load spotify player
-      if (meta.type === 'spotify_music') initPlayer();
+      // Call init function for this type of list
+      services.asObject[meta.type].init(meta);
 
       const canWrite = meta.owner === (db.getProfile() && db.getProfile().id);
 

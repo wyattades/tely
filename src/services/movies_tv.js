@@ -1,4 +1,8 @@
-import { encodeQuery, shuffle, randInt } from '../utils';
+import React from 'react';
+
+import { encodeQuery, randInt } from '../utils';
+import { TruncateText } from '../components/misc'; // TODO
+
 
 // TODO: hide API key?
 const API_KEY = 'e516ac54480a35fac52c1c9c8af54200';
@@ -24,8 +28,18 @@ export const DESCRIPTION = 'Select from a large database of movies and televisio
 export const CLASS = 'is-warning';
 export const ICON = 'tv';
 
+export const init = () => {};
+
+export const renderBody = ({ desc }) => <TruncateText text={desc}/>;
+
+const LABELS = {
+  tv: 'TV',
+  movie: 'Movie',
+};
+
 const mapResponse = (type) => ({ id, title, name, poster_path, overview, release_date, first_air_date }) => ({
-  type: type === 'tv' ? 'TV' : 'Movie',
+  type: ID,
+  label: type === 'tv' ? 'TV' : 'Movie',
   title: type === 'tv' ? name : title,
   image: poster_path && `${IMAGE_SRC}/${poster_path}`,
   desc: overview,
@@ -73,7 +87,8 @@ export const suggest = (list) => {
 
     const randIndex = randInt(0, sample.length);
     const randItem = sample[randIndex];
-    const type = randItem.type.toLowerCase();
+    if (!(randItem.label in { TV: 0, Movie: 0 })) return Promise.reject('Invalid item label');
+    const type = randItem.label.toLowerCase();
   
     return tmdbFetch(type, `/${type}/${randItem.media_id}/recommendations`, query)
     .then((recommendations) => {
@@ -94,7 +109,7 @@ export const suggest = (list) => {
         }
       }
       return getMore();
-    })
+    });
   };
 
   return getMore();

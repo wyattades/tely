@@ -1,28 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { SmallSection, Spinner } from './misc';
+import { ContainerSection, Spinner } from './misc';
 import services from '../services';
 
 import * as db from '../db';
 import * as discord from '../discord';
 
-const ListView = ({ id, type, name }) => {
+export const ListView = ({ id, type, name }) => {
 
   const service = services.asObject[type];
 
   return (
-    <div key={id} className="buttons">
-      <Link to={`/list/${id}`} className="button multiline space-between
+    <Link to={`/list/${id}`} className="button space-between
       has-text-left is-large is-fullwidth">
-        <span>
-          <p className="is-size-4">{name}</p>
-          <p className="help">{service.LABEL}</p>
-        </span>
-        <span className="icon"><i className={`fa fa-${service && service.ICON}`}/></span>
-      </Link>
-    </div>
+      <div style={{ minWidth: 0 }}>
+        <p className="is-size-4 is-clipped">{name}</p>
+        <p className="help">{service.LABEL}</p>
+      </div>
+      <div className="icon"><i className={`fa fa-${service && service.ICON}`}/></div>
+    </Link>
   );
 };
+
+const _ListView = (props) => (
+  <div key={props.id} className="buttons">
+    <ListView {...props}/>
+  </div>
+);
 
 class MediaLists extends React.Component {
 
@@ -90,7 +94,7 @@ class MediaLists extends React.Component {
     let MyLists;
     if (this.state.lists) {
       if (this.state.lists.length) {
-        MyLists = <ul>{this.state.lists.map(ListView)}</ul>;
+        MyLists = <ul>{this.state.lists.map(_ListView)}</ul>;
       } else {
         MyLists = <p className="has-text-centered">No Lists!</p>;
       }
@@ -101,7 +105,7 @@ class MediaLists extends React.Component {
     let SharedLists;
     if (this.state.sharedLists) {
       if (this.state.sharedLists.length) {
-        SharedLists = <ul>{this.state.sharedLists.map(ListView)}</ul>;
+        SharedLists = <ul>{this.state.sharedLists.map(_ListView)}</ul>;
       } else {
         SharedLists = <p className="has-text-centered">No Shared Lists!</p>;
       }
@@ -110,34 +114,42 @@ class MediaLists extends React.Component {
     }
 
     return (
-      <SmallSection>
-        <div className="level">
-          <div className="level-left">
-            <div className="level-item">
-              <h1 className="is-size-1">Your Lists</h1>
+      <ContainerSection>
+        <div className="columns">
+          <div className="column">
+            <div className="level">
+              <div className="level-left">
+                <div className="level-item">
+                  <h1 className="is-size-1">Your Lists</h1>
+                </div>
+              </div>
+              <div className="level-right">
+                <div className="level-item">
+                  <Link to="/list/new" className="button is-success">
+                    <span className="icon is-small is-left">
+                      <i className="fas fa-plus"/>
+                    </span>
+                    <span>Create New List</span>
+                  </Link>
+                </div>
+              </div>
             </div>
+            { this.state.err && (
+              <div className="has-text-error">{this.state.err}</div>
+            )}
+            <hr/>
+            {MyLists}
           </div>
-          <div className="level-right">
-            <div className="level-item">
-              <Link to="/list/new" className="button is-success">
-                <span className="icon is-small is-left">
-                  <i className="fas fa-plus"/>
-                </span>
-                <span>Create New List</span>
-              </Link>
-            </div>
+          <div className="column">
+            <h1 className="is-size-1">Shared With You</h1>
+            <hr/>
+            {SharedLists}
           </div>
         </div>
-        { this.state.err && (
-          <div className="has-text-error">{this.state.err}</div>
-        )}
-        <hr/>
-        {MyLists}
+        
         <br/><br/><br/>
-        <h1 className="is-size-1">Shared With You</h1>
-        <hr/>
-        {SharedLists}
-      </SmallSection>
+        
+      </ContainerSection>
     );
   }
 }

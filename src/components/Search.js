@@ -2,9 +2,9 @@ import React from 'react';
 
 import { roleClick } from '../utils';
 import services from '../services';
-import { TruncateText } from './misc';
 import { SpotifyPlayer } from '../spotify_player';
 
+// TODO: move to ./ListItem.js
 export class SearchItem extends React.Component {
 
   state = {
@@ -12,8 +12,8 @@ export class SearchItem extends React.Component {
   }
 
   render() {
-    const { item, toggle } = this.props;
-    const { id, title, desc, image, released, type, link, media_id } = item;
+    const { item, toggle, type } = this.props;
+    const { id, title, image, released, label, link, media_id, ...body } = item;
     const { hovered } = this.state;
 
     const hover = (val) => () => this.setState({
@@ -24,18 +24,21 @@ export class SearchItem extends React.Component {
       <article className="media">
         <div className="media-left">
           <figure className="image media-image">
-            <img src={image} alt={title}/>
-            { type === 'Song' && <SpotifyPlayer id={media_id}/> }
+            {/* TODO: use abstracted renderer */}
+            { type === 'spotify_music'
+              ? <SpotifyPlayer id={media_id} image={image} title={title}/>
+              : (image && <img src={image} alt={title}/>)
+            }
           </figure>
         </div>
         <div className="media-content">
           <div className="content">
             <p>
               <a href={link}><strong>{title}</strong></a>&nbsp;
-              <small>{released && new Date(released).toLocaleDateString()}</small>&nbsp;
-              <strong><small>{type}</small></strong>
+              <strong><small>{label}</small></strong>&nbsp;
+              <small>{released && `Released ${new Date(released).toLocaleDateString()}`}</small>
               <br/>
-              <TruncateText text={desc}/>
+              {services.asObject[type].renderBody(body)}
             </p>
           </div>
           {/* <nav className="level is-mobile">
