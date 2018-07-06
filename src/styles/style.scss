@@ -53,6 +53,7 @@ html {
   }
 }
 
+// Must be direct child of flex-direction: row OR min-width: 0
 .is-clipped {
   text-overflow: ellipsis;
 }

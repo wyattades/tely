@@ -81,3 +81,13 @@
     }
   }
 }
+
+.scale-box {
+  display: block;
+  width: 100%;
+  height: 100%;
+  iframe {
+    transform-origin: top left;
+    transform: scale(1.15, 1.15); // 92 / 80
+  }
+}
