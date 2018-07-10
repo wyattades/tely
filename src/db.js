@@ -35,6 +35,7 @@ export const init = () => new Promise((resolve) => {
     console.log('Signed in status:', !!auth.currentUser);
     unsubscribe();
 
+    // TODO: better way to do this (user expires_in???)
     if (auth.currentUser) {
       getMe() // Check if logged in
       .then((profile) => console.log('init profile', profile))

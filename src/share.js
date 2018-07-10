@@ -19,14 +19,13 @@ export const setPermission = (userId, listId, canRead, canWrite, serverId) => {
 
 // TODO: convert to batch write
 export const setPermissionMembers = (serverId, listId, canRead, canWrite) => {
-
   const p1 = db.lists.doc(listId).update({
     shared_servers: {
-      [listId]: canRead ? { can_write: !!canWrite } : db.Helpers.FieldValue.delete(),
+      [serverId]: canRead ? { can_write: !!canWrite } : null, // db.Helpers.FieldValue.delete(),
     },
   });
 
-  const p2 = db.users.where(`servers.${serverId}`, '==', true).get()
+  const p2 = db.users.where(`guilds.${serverId}.id`, '>', '').get()
   .then((snap) => Promise.all(snap.docs.map(({ id }) => setPermission(id, listId, canRead, canWrite, serverId))));
 
   return Promise.all([ p1, p2 ]);
@@ -64,5 +63,3 @@ export const getSharedLists = (cb) => perms.where('user_id', '==', db.getProfile
 export const getListSharedUsers = (listId, cb) => perms.where('list_id', '==', listId).onSnapshot((snap) => {
   cb(snap.docs.map((doc) => doc.data().user_id));
 });
-
-const t = (listId) => db.users.where(`servers.${listId}`, '==', true)

@@ -44,7 +44,6 @@ export const search = (str, page = 1) => {
   });
 
   return api(`/search?${query}`)
-  .then((res) => console.log(res.tracks.items) || res)
   .then((res) => res.tracks.items.map(mapResponse));
 };
 
@@ -58,7 +57,6 @@ export const suggest = (list) => {
     seed_tracks: samples.join(','),
     type: 'track',
     limit: 10,
-    // market: 'US',
   });
 
   return api(`/recommendations?${query}`)

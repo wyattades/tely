@@ -48,6 +48,17 @@ export const decodeQuery = (str) => {
   return obj;
 };
 
+export const sameSet = (A, B) => {
+  if (A !== B || typeof A !== 'object' || typeof B !== 'object') return false;
+  const keysA = Object.keys(A).sort(),
+        keysB = Object.keys(B).sort();
+  if (keysA.length !== keysB.length) return false;
+  for (let i = 0; i < keysA.length; i++) {
+    if (keysA[i] !== keysB[i]) return false;
+  }
+  return true;
+};
+
 // Courtosy of https://stackoverflow.com/a/16861050/6656308
 // Handles multiple monitors
 export const popupCenter = (url, w, h) => {

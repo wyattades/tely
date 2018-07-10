@@ -1,21 +1,11 @@
 import React from 'react';
 
-import { roleClick } from '../../utils';
+import { roleClick, sameSet } from '../../utils';
 import * as discord from '../../discord';
 import * as share from '../../share';
 import MultiInput from '../MultiInput';
 import { Spinner } from '../misc';
 
-const sameSet = (A, B) => {
-  if (A !== B) return false;
-  const keysA = Object.keys(A).sort(),
-        keysB = Object.keys(B).sort();
-  if (keysA.length !== keysB.length) return false;
-  for (let i = 0; i < keysA.length; i++) {
-    if (keysA[i] !== keysB[i]) return false;
-  }
-  return true;
-};
 
 const ICON_URL = 'https://cdn.discordapp.com/icons';
 
@@ -30,7 +20,7 @@ class SharedItem extends React.Component {
 
     this.setState({ waiting: true });
 
-    share.setPermissionMembers(id, listId, !shared)
+    share.setPermissionMembers(id, listId, !shared, !shared)
     .then(() => this.setState({ waiting: false }))
     .catch((err) => console.error(err) || this.setState({ waiting: false }));
   }
@@ -61,7 +51,6 @@ export default class Share extends React.Component {
 
   state = {
     showGuilds: false,
-    // showFriends: false,
     guilds: null,
     sharedUsers: null,
     sharedGuilds: null,
@@ -126,7 +115,7 @@ export default class Share extends React.Component {
     <SharedItem key={guild.id} shared={shared} listId={this.props.meta.id} guild={guild}/>
   )
 
-  shareUser = (id) => share.setPermission(id, this.props.meta.id, true);
+  shareUser = (id) => share.setPermission(id, this.props.meta.id, true, true);
   unshareUser = (id) => share.setPermission(id, this.props.meta.id, false);
 
   render() {
@@ -150,9 +139,11 @@ export default class Share extends React.Component {
       <br/>
       <h4 className="is-size-4 has-text-centered">Share with Discord Users</h4>
       <br/>
-      { sharedUsers
-        ? <MultiInput items={sharedUsers} onAddItem={this.shareUser} onRemoveItem={this.unshareUser}/>
-        : <Spinner centered/>
+      {
+        sharedUsers ? (
+          <MultiInput items={sharedUsers} onAddItem={this.shareUser} onRemoveItem={this.unshareUser}
+            placeholder="User ID" minLength={6} maxLength={20} type="number"/>
+        ) : <Spinner centered/>
       }
       <p className="help">
         A user's ID can be retrieved by right clicking his

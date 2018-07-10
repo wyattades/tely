@@ -26,7 +26,10 @@ export default class MultiInput extends React.Component {
   addItem = (e) => {
     e.preventDefault();
 
-    if (this.state.addValue.length < 6 || this.props.items.includes(this.state.addValue)) return;
+    if (this.props.items.includes(this.state.addValue)) {
+      this.setState({ addValue: '' });
+      return;
+    }
 
     this.setState({ adding: true });
     this.props.onAddItem(this.state.addValue);
@@ -40,9 +43,13 @@ export default class MultiInput extends React.Component {
     this.props.onRemoveItem(value);
   }
 
-  addItemChange = (e) => /^\d*$/.test(e.target.value) && this.setState({ addValue: e.target.value })
+  addItemChange = (e) => {
+    if (this.props.type !== 'number' || /^\d*$/.test(e.target.value))
+      this.setState({ addValue: e.target.value });
+  }
 
   render() {
+    const { placeholder, minLength, maxLength, type } = this.props;
     const { items, addValue, adding } = this.state;
 
     return <>
@@ -53,20 +60,24 @@ export default class MultiInput extends React.Component {
           </div>
           <div className="control">
             <button className="button is-danger" onClick={this.removeItem(value)}
-              title="Unshare"><i className="fas fa-minus"/></button>
+              title="Remove">
+              <i className="fas fa-minus"/>
+            </button>
           </div>
         </div>
       ))}
-      {/* <MultiInput items={webhooks}/> */}
       <form onSubmit={this.addItem}>
         <div className="field has-addons">
           <div className="control is-expanded">
-            <input className="input has-text-mono" type="text" value={addValue} onChange={this.addItemChange}
-              disabled={adding} placeholder="User ID" maxLength={20}/>
+            <input className="input has-text-mono" type={(!type || type === 'number') ? 'text' : type}
+              value={addValue} onChange={this.addItemChange} required minLength={minLength}
+              disabled={adding} placeholder={placeholder} maxLength={maxLength}/>
           </div>
           <div className="control">
             <button type="submit" className={`button is-success ${adding ? 'is-loading' : ''}`}
-              disabled={adding} title="Share"><i className="fas fa-plus"/></button>
+              disabled={adding} title="Add">
+              <i className="fas fa-plus"/>
+            </button>
           </div>
         </div>
       </form>

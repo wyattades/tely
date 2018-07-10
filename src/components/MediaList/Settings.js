@@ -1,6 +1,7 @@
 import React from 'react';
 
 import * as db from '../../db';
+import MultiInput from '../MultiInput';
 
 export default class Settings extends React.Component {
 
@@ -46,6 +47,7 @@ export default class Settings extends React.Component {
 
   render() {
     const { metaData } = this.props;
+    const webhooks = [];
       
     return <>
       <p className="is-size-5 has-text-grey">Settings:</p>
@@ -58,7 +60,21 @@ export default class Settings extends React.Component {
             maxLength={48} placeholder="Name cannot be empty" onChange={this.onChangeName}/>
         </div>
       </div>
+      {/* <div className="field">
+        <label className="label">
+          Webhooks&nbsp;
+          <span className="has-text-weight-normal has-text-grey">
+            Any additions to this list will be posted to these Discord server webhooks:
+          </span>
+        </label>
+        <MultiInput items={webhooks} placeholder="Webhook URL" type="url"
+          onAddItem={console.log} onRemoveItem={console.log}/>
+        <p className="help">
+          Go to your Discord server's settings to fetch a new webhook (must have role Server Manager)
+        </p>
+      </div> */}
       <br/>
+      <hr/>
       <div className="columns">
         <div className="column">
           <p>Put this list out of its misery. Remember that it cannot come back from the dead!</p>

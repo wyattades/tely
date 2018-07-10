@@ -43,15 +43,21 @@ class MediaLists extends React.Component {
     .where('owner', '==', uid)
     .onSnapshot((snap) => {
       const lists = [];
+      this.listMap = {};
       snap.forEach((item) => {
         const itemData = item.data();
         itemData.id = item.id;
         lists.push(itemData);
+        this.listMap[item.id] = true;
       });
       this.setState({ lists });
     }, (err) => this.setState({ err: err.code }));
 
-    this.unsubscribeShared = getSharedLists((sharedLists) => this.setState({ sharedLists }));
+    this.unsubscribeShared = getSharedLists((sharedLists) => {
+      this.setState({
+        sharedLists: this.listMap ? sharedLists.filter((list) => !(list.id in this.listMap)) : sharedLists,
+      });
+    });
   }
 
   componentWillUnmount() {

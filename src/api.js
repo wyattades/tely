@@ -60,6 +60,7 @@ export const signIn = (service) => new Promise((resolve, reject) => {
       popup.close();
 
       if (profile.accessToken && !error) {
+        // TODO: fetch guilds and other profile info from db instead?
         console.log('profile', service, profile);
         updateProfile(service, profile);
         resolve(profile);
