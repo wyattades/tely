@@ -53,6 +53,10 @@ html {
   }
 }
 
+.has-text-mono {
+  font-family: $family-monospace;
+}
+
 // Must be direct child of flex-direction: row OR min-width: 0
 .is-clipped {
   text-overflow: ellipsis;

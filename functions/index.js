@@ -26,6 +26,9 @@ admin.initializeApp({
   credential: admin.credential.cert(SERVICE_ACCOUNT),
 });
 
+const firestore = admin.firestore();
+
+
 // TODO: necessary?
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
@@ -40,6 +43,20 @@ const discordStrat = new DiscordStrategy({
   if (refreshToken) profile.refreshToken = refreshToken;
   if (res && res.expires_in) profile.expires_on = Date.now() + res.expires_in;
 
+  if (Array.isArray(profile.guilds)) {
+    const guilds = {};
+    for (const guild of profile.guilds) guilds[guild.id] = guild;
+    profile.guilds = guilds;
+  } else {
+    cb('Failed to fetch guilds');
+  }
+
+  console.log(profile);
+  
+  // Create user in database
+  firestore.doc(`/users/${profile.id}`).set(profile)
+  .catch(console.error);
+
   admin.auth().createCustomToken(profile.id)
   .then((token) => {
     profile.token = token;
@@ -52,7 +69,7 @@ const spotifyStrat = new SpotifyStrategy({
   clientID: config.spotify.client_id,
   clientSecret: config.spotify.client_secret,
   callbackURL: `${SERVER_URL}/auth/spotify/callback`,
-  scope: ['streaming', 'user-read-birthdate', 'user-read-email', 'user-read-private'],
+  scope: [ 'streaming', 'user-read-birthdate', 'user-read-email', 'user-read-private' ],
 }, (accessToken, refreshToken, expires_in, profile, cb) => {
   if (accessToken) profile.accessToken = accessToken;
   if (refreshToken) profile.refreshToken = refreshToken;

@@ -22,7 +22,6 @@ export const renderBody = ({ artist, artist_id, album, album_id }) => <>
 
 
 const mapResponse = ({ external_urls, artists, id, name, album }) => ({
-  type: ID,
   label: 'Song',
   title: name,
   image: album.images[1].url,

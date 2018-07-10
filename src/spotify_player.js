@@ -135,7 +135,7 @@ class SpotifyPlayerWorker extends React.Component {
 const SpotifyPlayerEmbed = ({ id, title }) => (
   <a className="scale-box" onClick={() => console.log(id)}>
     <iframe src={`https://open.spotify.com/embed?uri=spotify:track:${id}`} width="80" height="80"
-      frameBorder="0" allowtransparency="true" allow="encrypted-media" title={title}/>
+      frameBorder="0" allowTransparency allow="encrypted-media" title={title}/>
   </a>
 );
 

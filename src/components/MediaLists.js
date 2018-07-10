@@ -1,18 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ContainerSection, Spinner } from './misc';
+import { SmallSection, Spinner } from './misc';
 import services from '../services';
 
 import * as db from '../db';
-import * as discord from '../discord';
+import { getSharedLists } from '../share';
 
 export const ListView = ({ id, type, name }) => {
 
   const service = services.asObject[type];
+  if (!service) return <p>[Invalid List]</p>;
 
   return (
     <Link to={`/list/${id}`} className="button space-between
-      has-text-left is-large is-fullwidth">
+      has-text-left is-large is-fullwidth" title={name}>
       <div style={{ minWidth: 0 }}>
         <p className="is-size-4 is-clipped">{name}</p>
         <p className="help">{service.LABEL}</p>
@@ -50,43 +51,12 @@ class MediaLists extends React.Component {
       this.setState({ lists });
     }, (err) => this.setState({ err: err.code }));
 
-    // TODO: best way to manage list access may be to use user/permissions
-    discord.getGuilds()
-    .then((guilds) => Promise.all(guilds.map(
-      (guild) => db.sharedGuilds
-      .doc(guild.id)
-      .get()
-      .then((guildData) => {
-        if (!guildData.exists) return [];
-        const getLists = [];
-        for (const listId in guildData.data().shared) {
-          getLists.push(db.lists.doc(listId).get());
-        }
-        return Promise.all(getLists);
-      }),
-    )))
-    .then((snapArrays) => {
-      const sharedLists = [];
-      for (const arr of snapArrays) {
-        for (const snap of arr) {
-          if (snap.exists) {
-            const itemData = snap.data();
-            if (itemData.owner === db.getProfile().id) continue;
-            itemData.id = snap.id;
-            sharedLists.push(itemData);
-          }
-        }
-      }
-      
-      if (!this.unmounted) this.setState({ sharedLists });
-    })
-    .catch((err) => this.setState({ err: err.code }));
+    this.unsubscribeShared = getSharedLists((sharedLists) => this.setState({ sharedLists }));
   }
 
   componentWillUnmount() {
     this.unsubscribe();
-    // this.unsubscribeShared();
-    this.unmounted = true;
+    this.unsubscribeShared();
   }
 
   render() {
@@ -114,42 +84,35 @@ class MediaLists extends React.Component {
     }
 
     return (
-      <ContainerSection>
-        <div className="columns">
-          <div className="column">
-            <div className="level">
-              <div className="level-left">
-                <div className="level-item">
-                  <h1 className="is-size-1">Your Lists</h1>
-                </div>
-              </div>
-              <div className="level-right">
-                <div className="level-item">
-                  <Link to="/list/new" className="button is-success">
-                    <span className="icon is-small is-left">
-                      <i className="fas fa-plus"/>
-                    </span>
-                    <span>Create New List</span>
-                  </Link>
-                </div>
-              </div>
+      <SmallSection>
+        <div className="level">
+          <div className="level-left">
+            <div className="level-item">
+              <h1 className="is-size-1">Your Lists</h1>
             </div>
-            { this.state.err && (
-              <div className="has-text-error">{this.state.err}</div>
-            )}
-            <hr/>
-            {MyLists}
           </div>
-          <div className="column">
-            <h1 className="is-size-1">Shared With You</h1>
-            <hr/>
-            {SharedLists}
+          <div className="level-right">
+            <div className="level-item">
+              <Link to="/list/new" className="button is-success">
+                <span className="icon is-small is-left">
+                  <i className="fas fa-plus"/>
+                </span>
+                <span>Create New List</span>
+              </Link>
+            </div>
           </div>
         </div>
-        
+        { this.state.err && (
+          <div className="has-text-danger">Error: {this.state.err}</div>
+        )}
+        <hr/>
+        {MyLists}
+        <br/>
+        <h1 className="is-size-1">Shared With You</h1>
+        <hr/>
+        {SharedLists}
         <br/><br/><br/>
-        
-      </ContainerSection>
+      </SmallSection>
     );
   }
 }

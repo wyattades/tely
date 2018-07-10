@@ -7,8 +7,20 @@ import { SmallSection } from './misc';
 const AVATAR_URL = 'https://cdn.discordapp.com/avatars';
 
 const deleteAll = () => {
+  // const userId = db.getProfile().id;
+
   const afirm = window.confirm('Are your sure? This will delete all of your lists permanently.');
   if (afirm) window.alert('Too bad it\'s not implemeneted yet');
+
+  // db.lists.where('owner', '==', userId).get()
+  // .then((snap) => Promise.all(snap.docs.map((doc) => db.lists.doc(doc.id).delete())))
+  // .then(() => db.users.doc(userId).delete())
+  // .then(db.signOut)
+  // .then(() => {
+  //   window.location.href = '/tely';
+  //   alert('Successfully deleted profile. Goodbye!');
+  // })
+  // .catch(() => alert('An error occurred while deleting profile'));
 };
 
 export default class Account extends React.Component {

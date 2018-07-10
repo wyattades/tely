@@ -22,7 +22,7 @@ export default class Browse extends React.Component {
     // TODO: implement sort-by and filter-by-type
     this.unsubscribe = db.lists.where('is_public', '==', true)
     .onSnapshot((snap) => {
-      let lists = [];
+      const lists = [];
       snap.forEach((item) => {
         const itemData = item.data();
         itemData.id = item.id;

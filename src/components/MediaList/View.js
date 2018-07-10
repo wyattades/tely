@@ -1,7 +1,7 @@
 import React from 'react';
 
-import ListItem from '../ListItem';
-import { Search, SearchItem } from '../Search';
+import { ListItem, SearchItem } from '../ListItem';
+import { Search } from '../Search';
 
 export default ({ meta, contents, searchResults, list, onSearch }) => {
 

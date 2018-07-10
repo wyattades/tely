@@ -1,5 +1,7 @@
 import { apiFactory } from './api';
 
+export const MATCH_ID = /\d{6,20}/;
+
 const DISCORD_API = 'https://discordapp.com/api';
 
 const api = apiFactory('discord', DISCORD_API);
@@ -17,7 +19,9 @@ export const getGuild = (id) => getGuilds()
   throw { code: 400 };
 });
 
-export const MAX_GUILD_MEMBERS = 50; // TODO
+export const MAX_GUILD_MEMBERS = 64; // TODO
 
-export const getGuildMembers = (id) => api(`/guild/${id}/members?limit=${MAX_GUILD_MEMBERS}`)
+export const getGuildMembers = (id) => api(`/guilds/${id}/members?limit=${MAX_GUILD_MEMBERS}`)
 .then((members) => members.map((member) => member.user.id));
+
+export const getFriends = () => api('/users/@me/channels');

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SearchItem } from '../Search';
+import { SearchItem } from '../ListItem';
 import services from '../../services';
 import { Spinner } from '../misc';
 

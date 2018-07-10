@@ -7,6 +7,12 @@
     "node": true
   },
   "rules": {
+    "no-unused-prop-types": 0,
+    "react/jsx-no-bind": [1, {
+      "ignoreRefs": false,
+      "allowArrowFunctions": false,
+      "allowBind": false
+    }],
     "nonblock-statement-body-position": 0,
     "lines-between-class-members": 0,
     "react/button-has-type": 0,
@@ -61,12 +67,7 @@
     "react/jsx-closing-bracket-location": 0,
     "one-var": 0,
     "no-param-reassign": 0,
-    "max-len": [
-      "error",
-      {
-        "code": 120
-      }
-    ],
+    "max-len": [ 2, { "code": 120 }],
     "no-console": 0,
     "no-continue": 0,
     "no-trailing-spaces": [2, { "skipBlankLines": true, "ignoreComments": false }],
@@ -76,10 +77,10 @@
     "camelcase": 0,
     "no-plusplus": 0,
     "no-class-assign": 0,
-    "prefer-const": 0,
+    "prefer-const": 1,
     "react/no-unescaped-entities": 0,
     "no-else-return": 0,
-    "no-unused-expressions": 0,
+    "no-unused-expressions": 1,
     "react/jsx-pascal-case": 0,
     "no-unused-vars": 1,
     "no-confusing-arrow": 0,
