@@ -45,6 +45,12 @@ html(lang=options.lang)
 
     title= options.title
 
+    if (options.googleAnalytics)
+      script(async src=`https://www.googletagmanager.com/gtag/js?id=${options.googleAnalytics.trackingId}`)
+      script
+        | window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+        = `gtag('config', '${options.googleAnalytics.trackingId}');`
+
     if (options.manifest)
       link(href=options.manifest rel='manifest')
 
@@ -88,13 +94,3 @@ html(lang=options.lang)
 
     each key in Object.keys(files.chunks)
       script(src=files.chunks[key].entry type='text/javascript')
-
-    if (options.googleAnalytics)
-      script(type='text/javascript')
-        | window.GoogleAnalyticsObject='ga';window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
-        = `ga('create','${options.googleAnalytics.trackingId}','auto');`
-
-        if (options.googleAnalytics.pageViewOnLoad)
-          | ga('send','pageview')
-
-      script(async defer src='https://www.google-analytics.com/analytics.js' type='text/javascript')
