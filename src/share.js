@@ -1,65 +1,131 @@
 import * as db from './db';
 
 
-const perms = db.permissions;
+// TODO: use individual field updates instead of entires role object?
+// TODO: use transaction. Not a big deal if we are sure only one client modifies at a time
+// TODO: move to onWrite function OR make super robust db rules
+// TODO: probably can remove some redundant logic
 
-const getPermId = (userId, listId) => `${userId}_${listId}`;
 
-export const setPermission = (userId, listId, canRead, canWrite, serverId) => {
-  const permRef = perms.doc(getPermId(userId, listId));
-  if (!canRead) return permRef.delete();
+const getHighestRole = (listMeta, userId, excludeServer) => {
 
-  return permRef.set({
-    user_id: userId,
-    list_id: listId,
-    can_write: !!canWrite,
-    server_id: serverId || null,
+  let canRead = false;
+
+  const userRole = listMeta.shared_users[userId];
+  if (userRole === 'w') return 'w';
+  else if (userRole === 'r') canRead = true;
+
+  for (const serverId in listMeta.shared_servers) {
+    if (serverId !== excludeServer) {
+      const server = listMeta.shared_servers[serverId];
+      if (userId in server.members) {
+        if (server.role === 'w') return 'w';
+        else if (server.role === 'r') canRead = true;
+      }
+    }
+  }
+
+  return canRead ? 'r' : null;
+};
+
+export const shareUser = (userId, listMeta, canWrite) => {
+
+  const roles = Object.assign({}, listMeta.roles);
+  if (roles[userId] !== 'o' && roles[userId] !== 'w') roles[userId] = canWrite ? 'w' : 'r';
+
+  return db.lists.doc(listMeta.id).update({
+    [`shared_users.${userId}`]: canWrite ? 'w' : 'r',
+    roles,
   });
 };
 
-// TODO: convert to batch write
-export const setPermissionMembers = (serverId, listId, canRead, canWrite) => {
-  const p1 = db.lists.doc(listId).update({
-    shared_servers: {
-      [serverId]: canRead ? { can_write: !!canWrite } : null, // db.Helpers.FieldValue.delete(),
+export const unshareUser = (userId, listMeta) => {
+
+  const roles = Object.assign({}, listMeta.roles);
+  const thisRole = listMeta.shared_users[userId];
+
+  const otherRole = getHighestRole(listMeta, userId);
+
+  // if there's no other role and not owner, delete role
+  if (!otherRole && roles[userId] !== 'o') delete roles[userId];
+  // if server role is w and another role is r, change to r
+  else if (thisRole === 'w' && otherRole === 'r') roles[userId] = 'r';
+
+  return db.lists.doc(listMeta.id).update({
+    [`shared_users.${userId}`]: db.Helpers.FieldValue.delete(),
+    roles,
+  });
+};
+
+export const shareServer = (serverId, listMeta, canWrite) => db.users
+.where(`guilds.${serverId}.id`, '>', '').get() // This is a hack to query where guilds.${serverId} exists
+.then((snap) => {
+
+  const userIds = {};
+  const roles = Object.assign({}, listMeta.roles);
+
+  snap.forEach(({ id: userId }) => {
+    userIds[userId] = true;
+    console.log(roles[userId]);
+    if (roles[userId] !== 'o' && roles[userId] !== 'w') roles[userId] = canWrite ? 'w' : 'r';
+  });
+
+  return db.lists.doc(listMeta.id).update({
+    [`shared_servers.${serverId}`]: {
+      role: canWrite ? 'w' : 'r',
+      members: userIds,
     },
+    roles,
   });
+});
 
-  const p2 = db.users.where(`guilds.${serverId}.id`, '>', '').get()
-  .then((snap) => Promise.all(snap.docs.map(({ id }) => setPermission(id, listId, canRead, canWrite, serverId))));
+export const unshareServer = (serverId, listMeta) => {
 
-  return Promise.all([ p1, p2 ]);
-};
+  const roles = Object.assign({}, listMeta.roles);
+  const thisRole = listMeta.shared_servers[serverId].role;
 
-export const canRead = (listMeta) => {
-  const userId = db.getProfile().id;
+  for (const userId in listMeta.shared_servers[serverId].members) {
+    const otherRole = getHighestRole(listMeta, userId, serverId);
 
-  if (listMeta.owner === userId) return Promise.resolve(true);
+    // if there's no other role, delete role
+    if (!otherRole && roles[userId] !== 'o') delete roles[userId];
+    // if server role is w and another role is r, change to r
+    else if (thisRole === 'w' && otherRole === 'r') roles[userId] = 'r';
+  }
 
-  return perms.doc(getPermId(userId, listMeta.id)).get()
-  .then((doc) => doc.exists);
+  return db.lists.doc(listMeta.id).update({
+    [`shared_servers.${serverId}`]: db.Helpers.FieldValue.delete(),
+    roles,
+  });
 };
 
 export const canWrite = (listMeta) => {
-  const userId = db.getProfile().id;
-
-  if (listMeta.owner === userId) return Promise.resolve(true);
-
-  return perms.doc(getPermId(userId, listMeta.id)).get()
-  .then((doc) => doc.exists && doc.data().can_write === true);
+  const role = listMeta.roles[db.getProfile().id];
+  return role === 'w' || role === 'o';
 };
 
-// TODO: improve performance with `snap.docChanges`
-// TODO: somehow convert to single query?
-export const getSharedLists = (cb) => perms.where('user_id', '==', db.getProfile().id).onSnapshot((snap) => {
-  Promise.all(snap.docs.map((doc) => db.lists.doc(doc.data().list_id).get()))
-  .then((docs) => cb(docs.map((doc) => {
+export const isOwner = (listMeta) => listMeta.roles[db.getProfile().id] === 'o';
+
+// TODO: improve performance of onSnapshots with `snap.docChanges`
+
+export const getMyLists = (cb) => db.lists.where(`roles.${db.getProfile().id}`, '==', 'o')
+.onSnapshot((snap) => {
+  cb(null, snap.docs.map((doc) => {
     const data = doc.data();
     data.id = doc.id;
     return data;
-  })));
-});
+  }));
+}, cb);
 
-export const getListSharedUsers = (listId, cb) => perms.where('list_id', '==', listId).onSnapshot((snap) => {
-  cb(snap.docs.map((doc) => doc.data().user_id));
-});
+export const getSharedLists = (cb) => db.lists.where(`roles.${db.getProfile().id}`, '>', '')
+.onSnapshot((snap) => {
+  const userId = db.getProfile().id;
+  const lists = [];
+  snap.forEach((doc) => {
+    const data = doc.data();
+    data.id = doc.id;
+    if (data.roles[userId] !== 'o')
+      lists.push(data);
+  });
+  cb(null, lists);
+}, cb);

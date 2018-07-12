@@ -4,20 +4,14 @@ import React from 'react';
 
 export default class MultiInput extends React.Component {
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      items: props.items,
-      addValue: '',
-      adding: false,
-    };
+  state = {
+    addValue: '',
+    adding: false,
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.items !== this.props.items)
       this.setState({
-        items: nextProps.items,
         adding: false,
         addValue: '',
       });
@@ -49,8 +43,8 @@ export default class MultiInput extends React.Component {
   }
 
   render() {
-    const { placeholder, minLength, maxLength, type } = this.props;
-    const { items, addValue, adding } = this.state;
+    const { placeholder, minLength, maxLength, type, items } = this.props;
+    const { addValue, adding } = this.state;
 
     return <>
       {items.map((value) => (

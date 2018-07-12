@@ -23,7 +23,7 @@ export default class Settings extends React.Component {
 
     if (name) {
       this.timeout = window.setTimeout(() => {
-        db.lists.doc(this.props.meta.id).update({
+        this.props.meta.update({
           name,
         });
         this.timeout = null;
@@ -38,20 +38,25 @@ export default class Settings extends React.Component {
     if (window.confirm(`Are you sure you want to delete "${metaData.name}?"`)) {
       history.push('/list');
       meta.delete()
-      // .then(() => )
       .catch(console.error);
     }
   }
 
+  addOrRemoveWebhook = (add) => (url) => {
+    this.props.meta.update({
+      [`webhooks.${btoa(url)}`]: add ? url : db.Helpers.FieldValue.delete(),
+    })
+    .catch(console.error);
+  };
+
   timeout = null;
 
   render() {
-    const { metaData } = this.props;
-    const webhooks = [];
+    const { metaData: { name, webhooks } } = this.props;
       
     return <>
       <p className="is-size-5 has-text-grey">Settings:</p>
-      <h1 className="is-size-1">{this.state.name || metaData.name}</h1>
+      <h1 className="is-size-1">{this.state.name || name}</h1>
       <br/>
       <div className="field">
         <label className="label" htmlFor="name">List Name</label>
@@ -60,19 +65,19 @@ export default class Settings extends React.Component {
             maxLength={48} placeholder="Name cannot be empty" onChange={this.onChangeName}/>
         </div>
       </div>
-      {/* <div className="field">
-        <label className="label">
+      <div className="field">
+        <label className="label" htmlFor="webhooks">
           Webhooks&nbsp;
           <span className="has-text-weight-normal has-text-grey">
-            Any additions to this list will be posted to these Discord server webhooks:
+            Items added to the list will be posted to these Discord server webhooks:
           </span>
         </label>
-        <MultiInput items={webhooks} placeholder="Webhook URL" type="url"
-          onAddItem={console.log} onRemoveItem={console.log}/>
+        <MultiInput items={Object.values(webhooks)} placeholder="Webhook URL" type="url"
+          onAddItem={this.addOrRemoveWebhook(true)} onRemoveItem={this.addOrRemoveWebhook(false)}/>
         <p className="help">
           Go to your Discord server's settings to fetch a new webhook (must have role Server Manager)
         </p>
-      </div> */}
+      </div>
       <br/>
       <hr/>
       <div className="columns">

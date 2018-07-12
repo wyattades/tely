@@ -27,6 +27,9 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
+const users = firestore.collection('users');
+const lists = firestore.collection('lists');
+const perms = firestore.collection('permissions');
 
 
 // TODO: necessary?
@@ -43,15 +46,15 @@ const discordStrat = new DiscordStrategy({
   if (refreshToken) profile.refreshToken = refreshToken;
   if (res && res.expires_in) profile.expires_on = Date.now() + res.expires_in;
 
+  // Convert guilds array to object
   if (Array.isArray(profile.guilds)) {
     const guilds = {};
     for (const guild of profile.guilds) guilds[guild.id] = guild;
     profile.guilds = guilds;
   } else {
     cb('Failed to fetch guilds');
+    return;
   }
-
-  console.log(profile);
   
   // Create user in database
   firestore.doc(`/users/${profile.id}`).set(profile)
@@ -93,53 +96,32 @@ app.use((req, res, next) => {
   next();
 });
 
-// build multiple CRUD interfaces:
-// TODO: abstractify authenticators
+const oauthRoutes = (service) => {
+  app.get(`/auth/${service}`, passport.authenticate(service));
 
-app.get('/auth/discord', passport.authenticate('discord'));
-
-app.get('/auth/discord/callback', passport.authenticate('discord', {
-  failureRedirect: `${ORIGIN_URL}?error`,
-}), (req, res) => {
-  res.redirect(`${ORIGIN_URL}?${Query.stringify(req.user)}`);
-});
-
-app.post('/auth/discord/refresh', (req, res) => {
-
-  const refreshToken = req.body.token;
-  if (!refreshToken) {
-    res.status(400).end();
-    return;
-  }
-
-  refresh.requestNewAccessToken('discord', refreshToken, (err, accessToken) => {
-    if (err) res.status((err && err.status) || 500).send(err);
-    else res.send({ token: accessToken });
+  app.get(`/auth/${service}/callback`, passport.authenticate(service, {
+    failureRedirect: `${ORIGIN_URL}?error=auth_error`,
+  }), (req, res) => {
+    res.redirect(`${ORIGIN_URL}?${Query.stringify(req.user)}`);
   });
-});
-
-
-app.get('/auth/spotify', passport.authenticate('spotify'));
-
-app.get('/auth/spotify/callback', passport.authenticate('spotify', {
-  failureRedirect: `${ORIGIN_URL}?error`,
-}), (req, res) => {
-  res.redirect(`${ORIGIN_URL}?${Query.stringify(req.user)}`);
-});
-
-app.post('/auth/spotify/refresh', (req, res) => {
-
-  const refreshToken = req.body.token;
-  if (!refreshToken) {
-    res.status(400).end();
-    return;
-  }
-
-  refresh.requestNewAccessToken('spotify', refreshToken, (err, accessToken) => {
-    if (err) res.status((err && err.status) || 500).send(err);
-    else res.send({ token: accessToken });
+  
+  app.post(`/auth/${service}/refresh`, (req, res) => {
+  
+    const refreshToken = req.body.token;
+    if (!refreshToken) {
+      res.status(400).end();
+      return;
+    }
+  
+    refresh.requestNewAccessToken(service, refreshToken, (err, accessToken) => {
+      if (err) res.status((err && err.status) || 500).send(err);
+      else res.send({ token: accessToken });
+    });
   });
-});
+};
+
+oauthRoutes('discord');
+oauthRoutes('spotify');
 
 // Expose Express API as a single Cloud Function:
 exports.widgets = functions.https.onRequest(app);

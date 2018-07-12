@@ -1,4 +1,5 @@
 import { decodeQuery, popupCenter } from './utils';
+import { signOut } from './db';
 
 const SERVER_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000/tely-db/us-central1/widgets'
@@ -84,21 +85,22 @@ export const refreshToken = (service) => fetch(`${SERVER_URL}/auth/${service}/re
   mode: 'cors',
 })
 .then((res) => {
-  if (!res.ok) throw res.statusText;
+  if (!res.ok) throw res;
   return res.json();
 })
 .then(({ token }) => updateProfile(service, { accessToken: token }))
-.catch((err) => {
+.catch(() => {
   // Redirect back to login when redirect token expires
-  console.error('refreshToken error', err);
+  signOut()
+  .then(() => window.history.pushState({}, '', '/tely'));
 });
 
-const apiFetch = (api_url, profile, path, method, body) => fetch(`${api_url}${path}`, {
+export const apiFetch = (url, accessToken, method, body) => fetch(url, {
   method,
   body: body ? JSON.stringify(body) : undefined,
   headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${profile.accessToken}`,
+    ...accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
   },
   mode: 'cors',
 })
@@ -115,17 +117,17 @@ export const apiFactory = (service, api_url, autoSignIn) => (path, method = 'GET
   const profile = profiles[service];
 
   if (!profile) {
-    if (autoSignIn) return signIn(service).then(() => apiFetch(api_url, profile, path, method, body));
+    if (autoSignIn) return signIn(service).then(() => apiFetch(api_url + path, profile.accessToken, method, body));
     else return Promise.reject({ code: 403 });
   }
 
   return (expired(service) ? refreshToken(service) : Promise.resolve())
-  .then(() => apiFetch(api_url, profile, path, method, body))
+  .then(() => apiFetch(api_url + path, profile.accessToken, method, body))
   .catch((res) => {
 
     if (autoSignIn && res.code === 401) {
       return refreshToken(service)
-      .then(() => apiFetch(api_url, profile, path, method, body));
+      .then(() => apiFetch(api_url + path, profile.accessToken, method, body));
     }
 
     throw res;

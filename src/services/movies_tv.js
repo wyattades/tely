@@ -32,13 +32,6 @@ export const init = () => {};
 
 export const renderBody = ({ desc }) => <TruncateText text={desc}/>;
 
-// const LABELS = {
-//   tv: 'TV',
-//   movie: 'Movie',
-// };
-// const LABELS_R = {};
-// for (const key in LABELS) LABELS_R[LABELS[key]] = key;
-
 const mapResponse = (type) => ({ id, title, name, poster_path, overview, release_date, first_air_date }) => ({
   label: type === 'tv' ? 'TV' : 'Movie',
   title: type === 'tv' ? name : title,

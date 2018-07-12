@@ -4,10 +4,8 @@ import { roleClick, sameSet } from '../../utils';
 import * as discord from '../../discord';
 import * as share from '../../share';
 import MultiInput from '../MultiInput';
-import { Spinner } from '../misc';
+// import { Spinner } from '../misc';
 
-
-const ICON_URL = 'https://cdn.discordapp.com/icons';
 
 class SharedItem extends React.Component {
 
@@ -16,27 +14,27 @@ class SharedItem extends React.Component {
   }
 
   onClick = () => {
-    const { guild: { id }, listId, shared } = this.props;
+    const { guild, metaData, shared } = this.props;
 
     this.setState({ waiting: true });
 
-    share.setPermissionMembers(id, listId, !shared, !shared)
+    share[shared ? 'unshareServer' : 'shareServer'](guild.id, metaData, true)
     .then(() => this.setState({ waiting: false }))
     .catch((err) => console.error(err) || this.setState({ waiting: false }));
   }
   
   render() {
-    const { guild: { id, icon, name, canWrite }, shared } = this.props;
+    const { guild: { id, icon, name, role }, shared } = this.props;
 
     return (
       <div key={id} className="buttons">
         <div className="button is-discord is-fullwidth
           space-between is-medium has-text-left is-unclickable">
           { icon && (
-            <img style={{ marginRight: 16 }} src={`${ICON_URL}/${id}/${icon}.png`}
+            <img style={{ marginRight: 16 }} src={`${discord.ICON_URL}/${id}/${icon}.png`}
               alt={name} className="image is-48x48 is-rounded"/>
           )}
-          <span className="is-clipped" style={{ flex: 1 }}>{name}{canWrite ? ' canWrite' : ''}</span>
+          <span className="is-clipped" style={{ flex: 1 }}>{name}</span>
           <button className={`button is-medium is-discordmain is-marginless ${this.state.waiting ? 'is-loading' : ''}`}
             disabled={this.state.waiting} onClick={this.onClick}>
             {shared ? 'Unshare' : 'Share'}
@@ -52,7 +50,6 @@ export default class Share extends React.Component {
   state = {
     showGuilds: false,
     guilds: null,
-    sharedUsers: null,
     sharedGuilds: null,
     error: null,
   }
@@ -64,10 +61,6 @@ export default class Share extends React.Component {
       this.filterGuilds(this.props.metaData.shared_servers);
     })
     .catch((error) => this.setState({ error }));
-
-    this.unsubscribe = share.getListSharedUsers(this.props.meta.id, (sharedUsers) => {
-      this.setState({ sharedUsers });
-    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -76,17 +69,13 @@ export default class Share extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  filterGuilds = (permissions = {}) => {
+  filterGuilds = (sharedServers = {}) => {
     const guilds = [],
           sharedGuilds = [];
     for (const guild of this.guilds) {
-      const guildPermission = permissions[guild.id];
-      if (guildPermission) {
-        guild.canWrite = guildPermission.can_write;
+      const sharedServer = sharedServers[guild.id];
+      if (sharedServer) {
+        guild.role = sharedServer.role;
         sharedGuilds.push(guild);
       } else guilds.push(guild);
     }
@@ -112,15 +101,15 @@ export default class Share extends React.Component {
   };
 
   sharedItem = (shared) => (guild) => (
-    <SharedItem key={guild.id} shared={shared} listId={this.props.meta.id} guild={guild}/>
+    <SharedItem key={guild.id} shared={shared} metaData={this.props.metaData} guild={guild}/>
   )
 
-  shareUser = (id) => share.setPermission(id, this.props.meta.id, true, true);
-  unshareUser = (id) => share.setPermission(id, this.props.meta.id, false);
+  shareUser = (id) => share.shareUser(id, this.props.metaData, true);
+  unshareUser = (id) => share.unshareUser(id, this.props.metaData, true);
 
   render() {
-    const { showGuilds, guilds, sharedGuilds, error, sharedUsers } = this.state;
-    const { metaData: { name, is_public } } = this.props;
+    const { showGuilds, guilds, sharedGuilds, error } = this.state;
+    const { metaData: { name, is_public, shared_users } } = this.props;
 
     return <>
       <p className="is-size-5 has-text-grey">Share:</p>
@@ -140,10 +129,10 @@ export default class Share extends React.Component {
       <h4 className="is-size-4 has-text-centered">Share with Discord Users</h4>
       <br/>
       {
-        sharedUsers ? (
-          <MultiInput items={sharedUsers} onAddItem={this.shareUser} onRemoveItem={this.unshareUser}
+        shared_users && (
+          <MultiInput items={Object.keys(shared_users)} onAddItem={this.shareUser} onRemoveItem={this.unshareUser}
             placeholder="User ID" minLength={6} maxLength={20} type="number"/>
-        ) : <Spinner centered/>
+        )
       }
       <p className="help">
         A user's ID can be retrieved by right clicking his

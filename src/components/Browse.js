@@ -95,7 +95,7 @@ export default class Browse extends React.Component {
           </div>
         </div>
         <div className="columns is-multiline">
-          { lists && lists.length && lists.map(_ListView) }
+          { lists && lists.length ? lists.map(_ListView) : null }
         </div>
       </ContainerSection>
     );

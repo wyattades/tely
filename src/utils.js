@@ -1,6 +1,11 @@
 
 export const roleClick = (e) => (e.which || e.charCode || e.keyCode) === 13 && e.target.click();
 
+export const isEmpty = (obj) => {
+  for (const _ in obj) return false;
+  return true;
+};
+
 export const randInt = (a, b) => Math.floor(Math.random() * (b - a) + a);
 
 export const arrSample = (arr, n, clone = false) => {

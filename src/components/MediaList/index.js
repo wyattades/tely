@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import services from '../../services';
 import * as db from '../../db';
+import * as share from '../../share';
 import { Spinner, LiveSwitch } from '../misc';
 import ListView from './View';
 import ListSuggest from './Suggest';
@@ -15,46 +16,46 @@ class MediaList extends React.Component {
   constructor(props) {
     super(props);
 
-    this.listid = props.match.params.listid;
+    this.listId = props.match.params.listid;
 
     // Save firebase refs
-    this.meta = db.lists.doc(this.listid);
-    this.contents = this.meta.collection('contents');
+    this.listRef = db.lists.doc(this.listId);
+    this.contentsRef = this.listRef.collection('contents');
     
     this.state = {
       list: null,
       meta: null,
       err: null,
-      canRead: null,
+      isOwner: null,
       canWrite: null,
     };
   }
 
   componentDidMount() {
-    this.unsubscribeMeta = this.meta.onSnapshot((snap) => {
-      if (!snap.exists) throw { code: 404 };
+    this.unsubscribeMeta = this.listRef
+    .onSnapshot((snap) => {
+      if (!snap.exists) throw { code: 404 }; // TODO: does this work?
 
       const meta = snap.data();
+      meta.id = snap.id;
 
       // Call init function for this type of list
       services.asObject[meta.type].init(meta);
 
-      const canWrite = meta.owner === (db.getProfile() && db.getProfile().id);
-
       this.setState({
         meta,
-        canWrite,
-        canRead: canWrite || meta.is_public,
+        canWrite: share.canWrite(meta),
+        isOwner: share.isOwner(meta),
       });
     }, (err) => this.setState({ err }));
 
-    this.unsubscribeContent = this.contents.orderBy('created')
+    this.unsubscribeContent = this.contentsRef
+    .orderBy('created')
     .onSnapshot((snap) => {
-      const list = [];
-      snap.forEach((itemSnap) => {
-        const itemData = itemSnap.data();
-        itemData.id = itemSnap.id;
-        list.push(itemData);
+      const list = snap.docs.map((doc) => {
+        const itemData = doc.data();
+        itemData.id = doc.id;
+        return itemData;
       });
       this.setState({ list });
     }, (err) => this.setState({ err }));
@@ -86,7 +87,7 @@ class MediaList extends React.Component {
   }
 
   render() {
-    const { meta, list, err, searchResults, canRead, canWrite } = this.state;
+    const { meta, list, err, searchResults, canWrite, isOwner } = this.state;
 
     if (err) throw err;
 
@@ -95,8 +96,6 @@ class MediaList extends React.Component {
     } else {
       const prev = this.props.match.url;
 
-      if (!canRead) throw { code: 403 };
-
       return (
         <section className="section">
           <div className="container">
@@ -104,23 +103,23 @@ class MediaList extends React.Component {
               <aside className="column is-narrow fixed-column">
                 <ul className="menu-list">
                   <li>
-                    <NavLink exact to={`/list/${this.listid}`}>
+                    <NavLink exact to={`/list/${this.listId}`}>
                       <span className="icon"><i className="fa fa-th-list"/></span> <span>View</span>
                     </NavLink>
                   </li>
                   <li>
-                    <NavLink exact to={`/list/${this.listid}/suggest`}>
+                    <NavLink exact to={`/list/${this.listId}/suggest`}>
                       <span className="icon"><i className="fa fa-gift"/></span><span>Suggested</span>
                     </NavLink>
                   </li>
-                  { canWrite && <>
+                  { isOwner && <>
                     <li>
-                      <NavLink exact to={`/list/${this.listid}/share`}>
+                      <NavLink exact to={`/list/${this.listId}/share`}>
                         <span className="icon"><i className="fa fa-share-alt"/></span> <span>Share</span>
                       </NavLink>
                     </li>
                     <li>
-                      <NavLink exact to={`/list/${this.listid}/settings`}>
+                      <NavLink exact to={`/list/${this.listId}/settings`}>
                         <span className="icon"><i className="fa fa-cog"/></span> <span>Settings</span>
                       </NavLink>
                     </li>
@@ -129,16 +128,18 @@ class MediaList extends React.Component {
               </aside>
               <div className="column is-offset-3 is-8-desktop">
                 <LiveSwitch location={this.props.location} match={this.props.match} routes={[
-                  { exact: true, path: prev, element: <ListView searchResults={searchResults}
-                    meta={meta} contents={this.contents} list={list} id={this.listid} onSearch={this.onSearch}/> },
-                  { exact: true, path: `${prev}/share`, element: <ListShare metaData={meta} meta={this.meta}/> },
+                  { exact: true, path: prev, element: <ListView searchResults={searchResults} canWrite={canWrite}
+                    meta={meta} contents={this.contentsRef} list={list} id={this.listId} onSearch={this.onSearch}/> },
                   { exact: true, path: `${prev}/suggest`, element: <ListSuggest meta={meta}
-                    list={list} contents={this.contents}/> },
-                  { exact: true, path: `${prev}/settings`, element: <ListSettings metaData={meta}
-                    meta={this.meta} history={this.props.history}/> },
+                    list={list} contents={this.contentsRef}/> },
+                  ...(isOwner ? [
+                    { exact: true, path: `${prev}/share`, element: <ListShare metaData={meta}
+                      meta={this.listRef} canWrite={canWrite}/> },
+                    { exact: true, path: `${prev}/settings`, element: <ListSettings metaData={meta}
+                      meta={this.listRef} history={this.props.history}/> },
+                  ] : []),
                 ]}/>
               </div>
-              {/* <div className="column is-2 is-hidden-touch"/> */}
             </div>
           </div>
         </section>
