@@ -4,49 +4,39 @@ import { Link, NavLink, withRouter } from 'react-router-dom';
 import { roleClick } from '../utils';
 import * as db from '../db';
 
-const logout = () => db.signOut()
-.then(() => {
-  window.location.href = '/tely'; // Reloads page
-});
 
 // To support a fixed header, add this class to document head
 document.documentElement.classList.add('has-navbar-fixed-top');
 
-class Header extends React.Component {
+class Header extends React.PureComponent {
 
   state = {
     open: false,
     loggedIn: !!db.getProfile(),
   }
 
-  componentDidMount() {
-    // Close header if history changes
-    this.unlisten = this.props.history.listen(() => {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.location !== nextProps.location)
       this.setState({
         open: false,
         loggedIn: !!db.getProfile(), // HACK to check if loggedIn state changes
       });
-    });
-  }
-
-  shouldComponentUpdate(_, nextState) {
-    return this.state.open !== nextState.open || this.state.loggedIn !== nextState.loggedIn;
-  }
-
-  componentWillUnmount() {
-    this.unlisten();
   }
 
   toggle = () => this.setState(({ open }) => ({ open: !open }))
 
   signIn = () => db.signIn()
   .then(() => this.props.history.push('/list'))
-  .catch((err) => console.error(err));
+  .catch(console.error);
+
+  signOut = () => db.signOut()
+  .then(() => this.props.history.push('/'))
+  .catch(console.error);
 
   render() {
     const { open, loggedIn } = this.state;
 
-    const username = loggedIn && db.getProfile().username;
+    const username = db.getProfile() && db.getProfile().username;
 
     return (
       <nav className="navbar is-transparent has-shadow is-fixed-top">
@@ -85,7 +75,7 @@ class Header extends React.Component {
                       Account
                     </Link>
                     <hr className="navbar-divider"/>
-                    <a className="navbar-item" onClick={logout}
+                    <a className="navbar-item" onClick={this.signOut}
                       role="button" tabIndex="0" onKeyPress={roleClick}>
                       Logout
                     </a>
