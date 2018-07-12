@@ -113,9 +113,9 @@ const oauthRoutes = (service) => {
       return;
     }
   
-    refresh.requestNewAccessToken(service, refreshToken, (err, accessToken) => {
+    refresh.requestNewAccessToken(service, refreshToken, (err, token) => {
       if (err) res.status((err && err.status) || 500).send(err);
-      else res.send({ token: accessToken });
+      else res.send({ token });
     });
   });
 };

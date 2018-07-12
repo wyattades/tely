@@ -22,7 +22,8 @@ export class ListItem extends React.Component {
   };
 
   render() {
-    const { id, media_id, title, link, type, label, created, image, listRef, className, ...body } = this.props;
+    const { id, media_id, title, link, type, label,
+      created, image, listRef, className, ...body } = this.props;
 
     return (
       <div className={`box ${className}`}>

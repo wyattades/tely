@@ -33,7 +33,7 @@ export const sendWebhooks = (listMeta, item) => {
       title: `Added New ${serviceLabel} to __${listMeta.name}__`,
       url: `${CLIENT_URL}/list/${listMeta.id}`,
       timestamp: new Date().toISOString(),
-      color: 16762902,
+      color: 16762902, // TODO
       thumbnail: {
         url: item.image,
       },
@@ -52,6 +52,7 @@ export const sendWebhooks = (listMeta, item) => {
   };
 
   for (const key in listMeta.webhooks) {
-    apiFetch(listMeta.webhooks[key], null, 'post', payload);
+    apiFetch(listMeta.webhooks[key], null, 'post', payload)
+    .catch(() => console.log('Failed to webhook into:', listMeta.webhooks[key]));
   }
 };

@@ -13,7 +13,7 @@ export const profiles = {
 // Potentially load current profiles from storage
 for (const service in profiles) {
   try {
-    const str = localStorage.getItem(`profile.${service}`);
+    const str = localStorage.getItem(`profile:${service}`);
     profiles[service] = JSON.parse(str);
   } catch (_) {
     // Someone put bad data in my localStorage!
@@ -23,11 +23,11 @@ for (const service in profiles) {
 export const updateProfile = (service, data) => {
   if (!profiles[service]) profiles[service] = {};
   Object.assign(profiles[service], data);
-  localStorage.setItem(`profile.${service}`, JSON.stringify(profiles[service]));
+  localStorage.setItem(`profile:${service}`, JSON.stringify(profiles[service]));
 };
 
 export const clearProfile = (service) => {
-  localStorage.removeItem(`profile.${service}`);
+  localStorage.removeItem(`profile:${service}`);
   profiles[service] = null;
 };
 
@@ -38,7 +38,6 @@ export const expired = (service) => {
 
 export const signIn = (service) => new Promise((resolve, reject) => {
 
-  // window.location.href = authUrl;
   const popup = popupCenter(`${SERVER_URL}/auth/${service}`, 500, 600);
   if (!popup) throw null;
 
@@ -89,10 +88,11 @@ export const refreshToken = (service) => fetch(`${SERVER_URL}/auth/${service}/re
   return res.json();
 })
 .then(({ token }) => updateProfile(service, { accessToken: token }))
-.catch(() => {
+.catch((err) => {
+  console.error(err);
   // Redirect back to login when redirect token expires
-  signOut()
-  .then(() => window.history.pushState({}, '', '/tely'));
+  return signOut();
+  // .then(() => window.history.pushState({}, '', '/tely'));
 });
 
 export const apiFetch = (url, accessToken, method, body) => fetch(url, {

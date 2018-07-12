@@ -46,11 +46,16 @@ export default class MultiInput extends React.Component {
     const { placeholder, minLength, maxLength, type, items } = this.props;
     const { addValue, adding } = this.state;
 
+    const attrs = type === 'url' ? {
+      title: 'Url must use http or https protocol',
+      pattern: '^https?://.*',
+    } : {};
+
     return <>
       {items.map((value) => (
         <div className="field has-addons" key={value}>
           <div className="control is-expanded">
-            <input className="input has-text-mono" type="text" value={value} disabled/>
+            <input className="input has-text-smono" type="text" value={value} disabled/>
           </div>
           <div className="control">
             <button className="button is-danger" onClick={this.removeItem(value)}
@@ -63,9 +68,9 @@ export default class MultiInput extends React.Component {
       <form onSubmit={this.addItem}>
         <div className="field has-addons">
           <div className="control is-expanded">
-            <input className="input has-text-mono" type={(!type || type === 'number') ? 'text' : type}
+            <input className="input has-text-msono" type={(!type || type === 'number') ? 'text' : type}
               value={addValue} onChange={this.addItemChange} required minLength={minLength}
-              disabled={adding} placeholder={placeholder} maxLength={maxLength}/>
+              disabled={adding} placeholder={placeholder} maxLength={maxLength} {...attrs}/>
           </div>
           <div className="control">
             <button type="submit" className={`button is-success ${adding ? 'is-loading' : ''}`}

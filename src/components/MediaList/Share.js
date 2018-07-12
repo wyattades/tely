@@ -4,7 +4,6 @@ import { roleClick, sameSet } from '../../utils';
 import * as discord from '../../discord';
 import * as share from '../../share';
 import MultiInput from '../MultiInput';
-// import { Spinner } from '../misc';
 
 
 class SharedItem extends React.Component {
