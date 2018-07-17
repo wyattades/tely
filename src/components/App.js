@@ -7,7 +7,7 @@ import {
   Redirect,
   NavLink,
 } from 'react-router-dom';
-import { RouterToUrlQuery } from 'react-url-query';
+import RouterToUrlQuery from 'react-url-query/lib/react/RouterToUrlQuery';
 
 import Home from './Home';
 import About from './About';

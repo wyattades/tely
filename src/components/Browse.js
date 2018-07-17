@@ -1,5 +1,5 @@
 import React from 'react';
-import { addUrlProps, UrlQueryParamTypes } from 'react-url-query';
+import addUrlProps from 'react-url-query/lib/react/addUrlProps';
 
 import { ContainerSection, Spinner } from './misc';
 import * as db from '../db';

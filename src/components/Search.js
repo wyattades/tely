@@ -1,9 +1,14 @@
 import React from 'react';
+import addUrlProps from 'react-url-query/lib/react/addUrlProps';
 
 import { roleClick } from '../utils';
 import services from '../services';
 
-export class Search extends React.Component {
+const urlPropsQueryConfig = {
+  search: {},
+};
+
+class Search extends React.Component {
 
   constructor(props) {
     super(props);
@@ -11,15 +16,27 @@ export class Search extends React.Component {
     this.state = {
       resultCount: null,
       searching: false,
-      searchQuery: '',
+      searchQuery: props.search || '',
     };
     this.media = services.asObject[props.type];
   }
 
   SEARCH_DELAY = 1000;
 
+  componentDidMount() {
+    if (this.state.searchQuery)
+      this.search();
+  }
+
+  // componentWillReceiveProps(nextProps) {
+  //   if (this.props.search !== nextProps.search)
+  //     this.setState({ searchQuery: nextProps.search || '' }, this.search);
+  // }
+
   search = () => {
     const str = this.state.searchQuery;
+    this.props.onChangeSearch(str);
+    
     if (str) {
       this.setState({
         searching: true,
@@ -45,15 +62,16 @@ export class Search extends React.Component {
   handleChange = (event) => {
     const searchQuery = event.target.value;
 
-    this.setState({ searchQuery });
+    this.setState({ searchQuery }, () => {
 
-    if (this.searchDelayTimer)
-      window.clearTimeout(this.searchDelayTimer);
+      if (this.searchDelayTimer)
+        window.clearTimeout(this.searchDelayTimer);
 
-    this.searchDelayTimer = window.setTimeout(
-      this.search.bind(this, searchQuery),
-      this.SEARCH_DELAY,
-    );
+      this.searchDelayTimer = window.setTimeout(
+        this.search,
+        this.SEARCH_DELAY,
+      );
+    });
   }
 
   handleSubmit = (event) => {
@@ -62,10 +80,12 @@ export class Search extends React.Component {
     if (this.searchDelayTimer)
       window.clearInterval(this.searchDelayTimer);
 
-    this.search(this.state.searchQuery);
+    this.search();
   }
 
   clearSearch = () => {
+    this.props.onChangeSearch();
+
     this.setState({
       searchQuery: '',
       resultCount: null,
@@ -110,3 +130,5 @@ export class Search extends React.Component {
     </>;
   }
 }
+
+export default addUrlProps({ urlPropsQueryConfig })(Search);
