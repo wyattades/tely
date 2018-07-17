@@ -22,18 +22,7 @@ class NewMediaList extends React.Component {
     submitting: false,
   };
 
-  createList = (name, type) => db.lists
-  .add({
-    created: Date.now(),
-    name,
-    type,
-    popularity: 0,
-    is_public: false,
-    shared_servers: {},
-    shared_users: {},
-    roles: { [db.getProfile().id]: 'o' },
-    webhooks: {},
-  })
+  createList = (name, type) => db.createList(name, type)
   .then((ref) => {
     this.props.history.push(`/list/${ref.id}`);
   })

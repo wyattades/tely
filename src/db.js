@@ -4,6 +4,7 @@ import 'firebase/firestore';
 
 import { getMe } from './discord';
 import * as API from './api';
+import services from './services';
 
 
 firebase.initializeApp({
@@ -79,4 +80,37 @@ export const deleteAll = () => {
     for (const doc of snap.docs) batch.delete(doc.ref);
     return batch.commit();
   });
+};
+
+const newListMeta = (name, type) => {
+  const created = Date.now();
+  const userId = getProfile().id;
+
+  return {
+    created,
+    modified: created,
+    name,
+    type,
+    popularity: 0,
+    is_public: false,
+    shared_servers: {},
+    shared_users: {},
+    roles: { [userId]: 'o' },
+    webhooks: {},
+  };
+};
+
+export const createList = (name, type) => lists.add(newListMeta(name, type));
+
+export const createFavorite = (type) => {
+  const userId = getProfile().id;
+  const favRef = lists.doc(`fav_${userId}_${type}`);
+
+  return favRef.get()
+  .then((doc) => doc.exists)
+  .catch((err) => Promise.resolve(err.code !== 'permission-denied'))
+  .then((exists) => exists
+    ? Promise.resolve()
+    : favRef.set(newListMeta(`${services.asObject[type].LABEL} Favorites`, type)))
+  .then(() => favRef);
 };

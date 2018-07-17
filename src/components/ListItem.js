@@ -7,8 +7,12 @@ import * as db from '../db';
 
 export class ListItem extends React.Component {
 
-  shouldComponentUpdate() {
-    return false;
+  state = {
+    favorite: false,
+  }
+
+  shouldComponentUpdate(_, nextState) {
+    return this.state.favorite !== nextState.favorite;
   }
 
   delete = () => {
@@ -17,41 +21,14 @@ export class ListItem extends React.Component {
   };
 
   favorite = () => {
-    const userId = db.getProfile().id;
-    const favRef = db.lists.doc(`fav_${userId}_${this.props.type}`);
-
-    let name;
-
-    favRef.get()
-    .then((doc) => {
-      if (doc.exists) name = doc.data().name;
-      return doc.exists;
-    })
-    .catch((err) => Promise.resolve(err.code !== 'permission-denied'))
-    .then((exists) => {
-      if (exists) return Promise.resolve();
-      
-      name = `${services.asObject[this.props.type].LABEL} Favorites`;
-
-      return favRef.set({
-        created: Date.now(),
-        name,
-        type: this.props.type,
-        popularity: 0,
-        is_public: false,
-        shared_servers: {},
-        shared_users: {},
-        roles: { [userId]: 'o' },
-        webhooks: {},
-      });
-    })
-    .then(() => {
+    db.createFavorite(this.props.type)
+    .then((listRef) => {
       const itemData = Object.assign({}, this.props);
       for (const key of ['listRef', 'className', 'canWrite']) delete itemData[key];
 
-      return favRef.collection('contents').add(itemData);
+      return listRef.collection('contents').add(itemData);
     })
-    .then(() => window.alert(`Item added to list: ${name}`))
+    .then(() => this.setState({ favorite: true }))
     .catch(console.error);
   };
 
@@ -68,6 +45,7 @@ export class ListItem extends React.Component {
   render() {
     const { id, media_id, title, link, type, label, canWrite,
       created, image, listRef, className, ...body } = this.props;
+    const { favorite } = this.state;
 
     return (
       <div className={`box ${className}`}>
@@ -98,9 +76,11 @@ export class ListItem extends React.Component {
                     role="button" tabIndex="0" onKeyPress={roleClick}>
                     <span className="icon is-small"><i className="fas fa-trash" /></span>
                   </a>
-                  <a className="level-item" onClick={this.favorite} title="Add to Favorites"
-                    role="button" tabIndex="0" onKeyPress={roleClick}>
-                    <span className="icon is-small"><i className="fas fa-heart" /></span>
+                  <a className={`level-item ${favorite ? 'is-unclickable' : ''}`} onClick={this.favorite}
+                    role="button" tabIndex="0" onKeyPress={roleClick} title="Add to Favorites">
+                    <span className={`icon is-small ${favorite ? 'has-text-success' : ''}`}>
+                      <i className="fas fa-heart"/>
+                    </span>
                   </a>
                 </> }
                 { (window.navigator && window.navigator.share) ? (
