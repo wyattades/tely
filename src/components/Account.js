@@ -4,24 +4,8 @@ import * as db from '../db';
 import { profiles, clearProfile } from '../api';
 import { SmallSection } from './misc';
 
+
 const AVATAR_URL = 'https://cdn.discordapp.com/avatars';
-
-const deleteAll = () => {
-  // const userId = db.getProfile().id;
-
-  const afirm = window.confirm('Are your sure? This will delete all of your lists permanently.');
-  if (afirm) window.alert('Too bad it\'s not implemeneted yet');
-
-  // db.lists.where('owner', '==', userId).get()
-  // .then((snap) => Promise.all(snap.docs.map((doc) => db.lists.doc(doc.id).delete())))
-  // .then(() => db.users.doc(userId).delete())
-  // .then(db.signOut)
-  // .then(() => {
-  //   window.location.href = '/tely';
-  //   alert('Successfully deleted profile. Goodbye!');
-  // })
-  // .catch(() => alert('An error occurred while deleting profile'));
-};
 
 export default class Account extends React.Component {
 
@@ -29,10 +13,26 @@ export default class Account extends React.Component {
     spotify: !!profiles.spotify,
   }
 
-  disconnect = (service) => {
+  disconnect = (service) => () => {
     clearProfile(service);
     this.setState({ [service]: false });
   }
+
+  deleteAll = () => {
+    const afirm = window.confirm('Are your sure? This will delete all of your lists permanently.');
+    if (!afirm) return;
+  
+    db.deleteAll()
+    .then(db.signOut)
+    .then(() => {
+      this.props.history.push('/');
+      window.alert('Successfully deleted profile. Goodbye!');
+    })
+    .catch((err) => {
+      console.error(err);
+      window.alert('An error occurred while deleting profile');
+    });
+  };
 
   render() {
     const { discord } = profiles;
@@ -58,21 +58,21 @@ export default class Account extends React.Component {
           Id: {discord.id}
         </pre>
         <br/>
-        <p className="label">Connected Accounts</p>
+        <p className="label">Connected Services</p>
         { spotify ? (
           <div className="notification is-success space-between">
             <div>
               <strong>Spotify</strong>
               <p>{profiles.spotify.username}</p>
             </div>
-            <button className="button" onClick={() => this.disconnect('spotify')}>Disconnect</button>
+            <button className="button" onClick={this.disconnect('spotify')}>Disconnect</button>
           </div>
         ) : <p>None</p>}
         <br/>
         <p className="label">Account Created</p>
         <p>{new Date(user.metadata.creationTime).toLocaleString()}</p>
         <br/>
-        <button className="button is-danger" onClick={deleteAll}>Delete Everything</button>
+        <button className="button is-danger" onClick={this.deleteAll}>Delete Everything</button>
       </SmallSection>
     );
   }

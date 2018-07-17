@@ -67,3 +67,16 @@ export const getProfile = () => API.profiles.discord;
 
 export const signIn = () => API.signIn('discord')
 .then((profile) => auth.signInWithCustomToken(profile.token));
+
+export const deleteAll = () => {
+  const userId = getProfile().id;
+  const batch = firestore.batch();
+
+  batch.delete(users.doc(userId));
+
+  return lists.where(`roles.${userId}`, '==', 'o').get()
+  .then((snap) => {
+    for (const doc of snap.docs) batch.delete(doc.ref);
+    return batch.commit();
+  });
+};
