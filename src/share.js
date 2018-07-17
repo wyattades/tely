@@ -114,15 +114,6 @@ export const isOwner = (listMeta) => {
 
 // TODO: improve performance of onSnapshots with `snap.docChanges`
 
-// export const getLists = (cb) => db.lists.where(`roles.${db.getProfile().id}`, '==', 'o')
-// .onSnapshot((snap) => {
-//   cb(null, snap.docs.map((doc) => {
-//     const data = doc.data();
-//     data.id = doc.id;
-//     return data;
-//   }));
-// }, cb);
-
 export const getSharedLists = (cb) => db.lists.where(`roles.${db.getProfile().id}`, '>', '')
 .onSnapshot((snap) => {
   const userId = db.getProfile().id;

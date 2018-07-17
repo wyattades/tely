@@ -1,7 +1,7 @@
 import React from 'react';
 
 import * as db from '../../db';
-import MultiInput from '../MultiInput';
+import MultiInput from '../form/MultiInput';
 
 export default class Settings extends React.Component {
 

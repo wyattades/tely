@@ -1,7 +1,7 @@
 import React from 'react';
 
 import * as db from '../db';
-import { MultiSelect } from './form';
+import BigSelect from './form/BigSelect';
 import { SmallSection } from './misc';
 import services from '../services';
 
@@ -91,16 +91,17 @@ class NewMediaList extends React.Component {
           <div className="field">
             <label className="label" htmlFor="list-type">Select a List Type</label>
             <div className="control">
-              <MultiSelect required options={types} name="list-type" value={type}
+              <BigSelect required options={types} name="list-type" value={type}
                 onChange={this.typeChange}/>
             </div>
             { err.type && (
               <p className="help is-danger">This is a required field</p>
             )}
           </div>
+          <br/>
           <div className="field">
             <div className="control">
-              <button className={`button is-primary is-medium ${submitting && 'is-loading'}`}
+              <button className={`button is-primary is-medium is-fullwidth ${submitting && 'is-loading'}`}
                 type="submit" disabled={this.state.checking}>
                 Create
               </button>

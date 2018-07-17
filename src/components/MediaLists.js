@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import { SmallSection, Spinner } from './misc';
 import services from '../services';
-
 import { getSharedLists } from '../share';
+
 
 export const ListView = ({ id, type, name }) => {
 

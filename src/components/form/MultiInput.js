@@ -1,6 +1,5 @@
 import React from 'react';
 
-// TODO: don't rely on HTML5 features i.e. use custom error display, disable add button
 
 export default class MultiInput extends React.Component {
 
@@ -14,6 +13,7 @@ export default class MultiInput extends React.Component {
       this.setState({
         adding: false,
         addValue: '',
+        valid: false,
       });
   }
   
@@ -38,24 +38,31 @@ export default class MultiInput extends React.Component {
   }
 
   addItemChange = (e) => {
-    if (this.props.type !== 'number' || /^\d*$/.test(e.target.value))
-      this.setState({ addValue: e.target.value });
+    const val = e.target.value;
+
+    if (this.props.type === 'number') {
+      if (MultiInput.TEST_NUMBER.test(val)) {
+        const valid = val.length >= (this.props.minLength || 0);
+        this.setState({ addValue: val, valid });
+      }
+    } else if (this.props.type === 'url') {
+      const valid = MultiInput.TEST_URL.test(val);
+      this.setState({ addValue: val, valid });
+    }
   }
+
+  static TEST_URL = /^http(s)?:\/\/[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+  static TEST_NUMBER = /^\d*$/;
 
   render() {
     const { placeholder, minLength, maxLength, type, items } = this.props;
-    const { addValue, adding } = this.state;
-
-    const attrs = type === 'url' ? {
-      title: 'Url must use http or https protocol',
-      pattern: '^https?://.*',
-    } : {};
+    const { addValue, adding, valid } = this.state;
 
     return <>
       {items.map((value) => (
         <div className="field has-addons" key={value}>
           <div className="control is-expanded">
-            <input className="input has-text-smono" type="text" value={value} disabled/>
+            <input className="input" type="text" value={value} disabled/>
           </div>
           <div className="control">
             <button className="button is-danger" onClick={this.removeItem(value)}
@@ -70,11 +77,11 @@ export default class MultiInput extends React.Component {
           <div className="control is-expanded">
             <input className="input" type={(!type || type === 'number') ? 'text' : type}
               value={addValue} onChange={this.addItemChange} required minLength={minLength}
-              disabled={adding} placeholder={placeholder} maxLength={maxLength} {...attrs}/>
+              disabled={adding} placeholder={placeholder} maxLength={maxLength}/>
           </div>
           <div className="control">
             <button type="submit" className={`button is-success ${adding ? 'is-loading' : ''}`}
-              disabled={adding} title="Add">
+              disabled={adding || !valid} title="Add">
               <i className="fas fa-plus"/>
             </button>
           </div>
