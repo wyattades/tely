@@ -1,6 +1,6 @@
 # Tely
 
-Mom! Come look at the Tely!
+Create and share lists of media with your Discord pals!
 
 ## About
 Tely is a media aggregation platform that integrates with your Discord friends and servers.
@@ -11,7 +11,6 @@ Currently, you can create and share lists containing:
 
 
 ## TODO
-- Overhaul permissions system to allow sharing with Discord servers
-- Implement sorting and filtering on Browse page
-- Limit usage of TMDB and Discord APIs becuase they have rate limiting
-- Improve performance of large lists (use PureComponent!)
+- Limit usage of TMDB and Discord APIs (due to rate limiting)
+- Improve general styling
+- Improve Spotify playback capabilities
