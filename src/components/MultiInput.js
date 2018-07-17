@@ -1,6 +1,6 @@
 import React from 'react';
 
-// TODO: abstract this class from Discord User IDs in case we want to use it for something else
+// TODO: don't rely on HTML5 features i.e. use custom error display, disable add button
 
 export default class MultiInput extends React.Component {
 
@@ -68,7 +68,7 @@ export default class MultiInput extends React.Component {
       <form onSubmit={this.addItem}>
         <div className="field has-addons">
           <div className="control is-expanded">
-            <input className="input has-text-msono" type={(!type || type === 'number') ? 'text' : type}
+            <input className="input" type={(!type || type === 'number') ? 'text' : type}
               value={addValue} onChange={this.addItemChange} required minLength={minLength}
               disabled={adding} placeholder={placeholder} maxLength={maxLength} {...attrs}/>
           </div>

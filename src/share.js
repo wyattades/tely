@@ -100,11 +100,17 @@ export const unshareServer = (serverId, listMeta) => {
 };
 
 export const canWrite = (listMeta) => {
-  const role = listMeta.roles[db.getProfile().id];
+  const profile = db.getProfile();
+  if (!profile) return false;
+  const role = listMeta.roles[profile.id];
   return role === 'w' || role === 'o';
 };
 
-export const isOwner = (listMeta) => listMeta.roles[db.getProfile().id] === 'o';
+export const isOwner = (listMeta) => {
+  const profile = db.getProfile();
+  if (!profile) return false;
+  return listMeta.roles[profile.id] === 'o';
+};
 
 // TODO: improve performance of onSnapshots with `snap.docChanges`
 

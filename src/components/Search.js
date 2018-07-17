@@ -23,7 +23,6 @@ export class Search extends React.Component {
     if (str) {
       this.setState({
         searching: true,
-        resultCount: null,
       }, () => {
         this.media.search(str)
         .then((results) => {

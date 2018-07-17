@@ -25,9 +25,9 @@ class NewMediaList extends React.Component {
   createList = (name, type) => db.lists
   .add({
     created: Date.now(),
-    popularity: 0,
     name,
     type,
+    popularity: 0,
     is_public: false,
     shared_servers: {},
     shared_users: {},

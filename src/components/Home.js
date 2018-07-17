@@ -12,7 +12,11 @@ export default ({ history }) => {
     <section className="hero is-fullheight-flex">
       <div className="hero-body">
         <div className="container has-text-centered">
-          <h3 className="title is-1">Tely</h3>
+          <h2 className="title is-size-1 has-text-primary">Tely</h2>
+          <h5 className="is-size-5">
+            Create and share lists of media with your Discord pals!
+          </h5>
+          <br/>
           <button className="button is-medium is-discord" onClick={signIn}>SIGN IN WITH DISCORD</button>
         </div>
       </div>

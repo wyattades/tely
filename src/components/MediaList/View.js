@@ -3,9 +3,14 @@ import React from 'react';
 import { ListItem, SearchItem } from '../ListItem';
 import { Search } from '../Search';
 import { sendWebhooks } from '../../discord';
+import * as share from '../../share';
 
 
 export default class View extends React.Component {
+
+  componentWillMount() {
+    this.canWrite = share.canWrite(this.props.meta);
+  }
 
   toggle = (item) => () => {
     const { contents, searchResults, onSearch, meta } = this.props;
@@ -35,13 +40,13 @@ export default class View extends React.Component {
     let Content = null;
     if (searchResults) {
       Content = searchResults.map((item) => (
-        <SearchItem item={item} key={item.media_id}
+        <SearchItem item={item} key={item.media_id} canWrite={this.canWrite}
           toggle={this.toggle(item)} type={meta.type}/>
       ));
     } else if (list.length) {
       // grid = true;
       Content = list.map((item) => (
-        <ListItem {...item} type={meta.type} key={item.id} className={grid && "column is-4"} listRef={contents}/>
+        <ListItem {...item} type={meta.type} key={item.id} className={grid && "column is-4"} listRef={contents} canWrite={this.canWrite}/>
       ));
     } else {
       Content = <p className="is-size-4 has-text-centered">Empty List!</p>;

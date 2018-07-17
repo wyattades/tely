@@ -3,6 +3,7 @@ import React from 'react';
 import { SearchItem } from '../ListItem';
 import services from '../../services';
 import { Spinner } from '../misc';
+import * as share from '../../share';
 
 
 export default class Suggest extends React.Component {
@@ -13,6 +14,10 @@ export default class Suggest extends React.Component {
   }
 
   componentWillMount() {
+    this.canWrite = share.canWrite(this.props.meta);
+  }
+
+  componentDidMount() {
     this.fetchSuggested();
   }
 
@@ -49,7 +54,8 @@ export default class Suggest extends React.Component {
     if (err) Content = <p className="has-text-danger has-text-centered">An error occurred while fetching content</p>;
     else if (!suggested) Content = <><br/><br/><Spinner centered/></>;
     else if (suggested.length) Content = suggested.map((item) => (
-      <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)} type={meta.type}/>
+      <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)}
+        type={meta.type} canWrite={this.canWrite}/>
     ));
     else Content = <p className="is-size-4 has-text-centered">No Suggestions!</p>;
 
