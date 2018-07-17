@@ -8,10 +8,6 @@
 
 // Main containers
 
-html {
-  overflow-y: auto;
-}
-
 .big-error-code {
   font-size: 25vw;
   line-height: 100%;
@@ -53,9 +49,9 @@ html {
   }
 }
 
-.has-text-mono {
-  font-family: $family-monospace;
-}
+// .has-text-mono {
+//   font-family: $family-monospace;
+// }
 
 // Must be direct child of flex-direction: row OR min-width: 0
 .is-clipped {
