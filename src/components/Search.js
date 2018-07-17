@@ -21,17 +21,12 @@ class Search extends React.Component {
     this.media = services.asObject[props.type];
   }
 
-  SEARCH_DELAY = 1000;
-
   componentDidMount() {
     if (this.state.searchQuery)
       this.search();
   }
 
-  // componentWillReceiveProps(nextProps) {
-  //   if (this.props.search !== nextProps.search)
-  //     this.setState({ searchQuery: nextProps.search || '' }, this.search);
-  // }
+  SEARCH_DELAY = 1000;
 
   search = () => {
     const str = this.state.searchQuery;
