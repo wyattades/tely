@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { SmallSection } from './misc';
 import services from '../services';
@@ -31,13 +32,14 @@ export default () => (
       </ul>
       <br/>
       <p>
-        <i>This application is currently in development</i>, so many features
-        are on the way. If you don't care, log in to get started!
+        <i>This application is currently in development</i>, so many features are on the way.
+        Please feel free to submit <a href="https://github.com/wyattades/tely/issues">issues and feature requests</a>.
+        If you don't care, <Link to="/">log in</Link> to get started!
       </p>
       <br/>
-      <pre>
-        {/* eslint-disable-next-line max-len */}
-        Tely is an <a href="https://github.com/wyattades/tely">Open Source</a> app created by <a href="https://wyattades.com">Wyatt Ades</a>
+      <pre style={{ whiteSpace: 'normal' }}>
+        Tely is an <a href="https://github.com/wyattades/tely">Open Source</a> app
+        created by <a href="https://wyattades.com">Wyatt Ades</a>.
         <br/>
         Copyright © 2018
       </pre>
