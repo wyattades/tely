@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { SmallSection, Spinner } from './misc';
 import services from '../services';
 
-import { getMyLists, getSharedLists } from '../share';
+import { getSharedLists } from '../share';
 
 export const ListView = ({ id, type, name }) => {
 
@@ -37,13 +37,13 @@ class MediaLists extends React.Component {
   }
 
   componentDidMount() {
-    this.unsubscribeMine = getMyLists((error, lists) => this.setState({ error, lists }));
-    this.unsubscribeShared = getSharedLists((error, sharedLists) => this.setState({ error, sharedLists }));
+    this.unsubscribe = getSharedLists(
+      (error, lists, sharedLists) => this.setState({ error, lists, sharedLists }),
+    );
   }
 
   componentWillUnmount() {
-    this.unsubscribeMine();
-    this.unsubscribeShared();
+    this.unsubscribe();
   }
 
   render() {
