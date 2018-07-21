@@ -6,6 +6,7 @@ import * as share from '../../share';
 import MultiInput from '../form/MultiInput';
 
 
+// TODO: clean page formatting
 class SharedItem extends React.Component {
 
   state = {
@@ -92,9 +93,9 @@ export default class Share extends React.Component {
     [state]: toggle,
   });
 
-  togglePublic = (e) => {
+  togglePublic = () => {
     this.props.meta.update({
-      is_public: e.target.checked,
+      is_public: !this.props.metaData.is_public,
     })
     .catch(console.error);
   };
@@ -119,40 +120,40 @@ export default class Share extends React.Component {
         You can make this list public or share it with an entire discord server,
         specific users, or no one at all!
       </p>
-      <label className="checkbox is-size-4" htmlFor="public">
-        <input id="public" type="checkbox" onChange={this.togglePublic} defaultChecked={is_public}/>
-        &nbsp;Make this list public?
-      </label>
-      <p>Everyone in the world could see it</p>
+      <hr/>
+      <h4 className="is-size-3">Readers</h4>
+      <p className="has-text-grey">
+        Publish this list to make it readable by anyone. It
+        will show up on the <em>Browse</em> page
+      </p>
       <br/>
-      <h4 className="is-size-4 has-text-centered">Share with Discord Users</h4>
+      <button className={`button is-medium ${is_public ? 'is-success' : 'is-warning'}`}
+        onClick={this.togglePublic}>
+        {is_public ? 'Unpublish' : 'Publish'}
+      </button>
+      <hr/>
+      <h4 className="is-size-3">Collaborators</h4>
+      <p className="has-text-grey">Let individual users or entire Discord servers edit this list</p>
       <br/>
-      {
-        shared_users && (
-          <MultiInput items={Object.keys(shared_users)} onAddItem={this.shareUser} onRemoveItem={this.unshareUser}
-            placeholder="User ID" minLength={6} maxLength={20} type="number"/>
-        )
-      }
+      <label className="label" htmlFor="_">Users</label>
+      <MultiInput items={shared_users ? Object.keys(shared_users) : []}
+        placeholder="User ID" minLength={6} maxLength={20} type="number"
+        onAddItem={this.shareUser} onRemoveItem={this.unshareUser}/>
       <p className="help">
         A user's ID can be retrieved by right clicking his
         or her icon and clicking <code>Copy ID</code>
       </p>
       <br/>
-      <h2 className="has-text-centered is-size-4">Share with Discord Servers</h2>
-      <br/>
-      <p className="has-text-centered has-text-grey">Currently Shared With:</p>
-      <br/>
+      <label className="label" htmlFor="_">Servers</label>
       <div className="box">
         { sharedGuilds && (sharedGuilds.length
           ? sharedGuilds.map(this.sharedItem(true))
           : <p className="has-text-centered has-text-danger">No one!</p>) }
       </div>
-      <p className="has-text-centered has-text-grey">Share:</p>
-      <br/>
       { error && <p>{error}</p> }
       <div className="box is-clickable" onClick={!showGuilds ? this.show('showGuilds', true) : null}>
         <p className="space-between">
-          <span>{ !showGuilds && 'Show guilds' }</span>
+          <span>{ !showGuilds && 'Show servers' }</span>
           <i className={`${showGuilds ? 'delete' : 'dropdown-icon'}`}
             onClick={showGuilds ? this.show('showGuilds', false) : null}
             role="button" tabIndex="0" onKeyPress={roleClick}/>
