@@ -59,7 +59,7 @@ const spotifyStrat = new SpotifyStrategy({
   clientID: config.spotify.client_id,
   clientSecret: config.spotify.client_secret,
   callbackURL: `${SERVER_URL}/auth/spotify/callback`,
-  scope: [ 'streaming', 'user-read-birthdate', 'user-read-email', 'user-read-private' ],
+  scope: [ 'streaming', 'user-read-birthdate', 'user-read-email', 'user-read-private', 'user-library-modify' ],
 }, (accessToken, refreshToken, expires_in, profile, cb) => {
   if (accessToken) profile.accessToken = accessToken;
   if (refreshToken) profile.refreshToken = refreshToken;

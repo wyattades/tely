@@ -24,12 +24,12 @@ export const renderBody = ({ artist, artist_id, album, album_id }) => <>
 const mapResponse = ({ external_urls, artists, id, name, album }) => ({
   label: 'Song',
   title: name,
-  image: album.images[1].url,
+  image: album.images && album.images.length > 1 && album.images[1].url,
   media_id: id,
   link: external_urls.spotify,
   released: album.release_date ? new Date(album.release_date).getTime() : null,
-  artist: artists[0].name,
-  artist_id: artists[0].id,
+  artist: artists && artists.length && artists[0].name,
+  artist_id: artists && artists.length && artists[0].id,
   album: album.name,
   album_id: album.id,
 });

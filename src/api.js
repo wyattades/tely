@@ -105,12 +105,16 @@ export const apiFetch = (url, accessToken, method, body) => fetch(url, {
   mode: 'cors',
 })
 .then((res) => {
-  if (res.ok) return res.status === 204 ? {} : res.json();
-  return res.json()
+  const contentType = res.headers.get('content-type');
+  const hasJSON = contentType && contentType.indexOf('application/json') !== -1;
+
+  if (res.ok) return hasJSON ? res.json() : {};
+  
+  return hasJSON ? res.json()
   .then((data) => {
     console.error(res, data);
     throw { code: res.status, msg: data.message };
-  });
+  }) : Promise.reject({ code: res.status });
 });
 
 export const apiFactory = (service, api_url, autoSignIn) => (path, method = 'GET', body) => {

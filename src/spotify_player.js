@@ -15,7 +15,9 @@ const api = apiFactory('spotify', API_URL, true);
 let initialized = false,
     loaded = false,
     player = null,
-    playerId = null;
+    playerId = null,
+    initControls = null;
+
 
 const loadPlayer = () => new Promise((resolve, reject) => {
 
@@ -71,6 +73,7 @@ const playTrack = (id) => {
   return (!profiles.spotify ? signIn('spotify') : Promise.resolve())
   .then(() => expired('spotify') ? refreshToken('spotify') : Promise.resolve())
   .then(() => !player ? loadPlayer() : Promise.resolve())
+  .then(() => initControls ? initControls() : Promise.resolve())
   .then(() => playerId ? api(`/me/player/play?device_id=${playerId}`, 'PUT', {
     uris: [ `spotify:track:${id}` ],
   }) : Promise.reject('No playerId'));
@@ -79,6 +82,16 @@ const playTrack = (id) => {
 const pausePlayer = () => {
   if (player && playerId) player.pause().catch(() => {});
 };
+
+const PlayButton = () => (
+  <svg version="1.1"
+    xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+    x="0px" y="0px" width="100%" height="100%" viewBox="0 0 213.7 213.7"
+    enableBackground="new 0 0 213.7 213.7" xmlSpace="preserve">
+    <polygon points="73.5,62.5 148.5,105.8 73.5,149.1 "/>
+    <circle cx="106.8" cy="106.8" r="103.3"/>
+  </svg>
+);
 
 export class SpotifyPlayerWeb extends React.Component {
 
@@ -90,8 +103,6 @@ export class SpotifyPlayerWeb extends React.Component {
   componentWillUnmount() {
     if (this.listener && player) {
       player.removeListener('player_state_changed', this.onStateChange);
-
-      if (this.state.playing) pausePlayer();
     }
   }
 
@@ -123,15 +134,9 @@ export class SpotifyPlayerWeb extends React.Component {
 
     return <>
       <img src={image} alt={title}/>
-      <a className={`play-button ${playing ? 'playing' : ''} ${error ? 'error' : ''}`}
+      <a className={`play-button floating ${playing ? 'playing' : ''} ${error ? 'error' : ''}`}
         onClick={this.onClick} title={playing ? 'Pause' : 'Play'}>
-        <svg version="1.1"
-          xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-          x="0px" y="0px" width="100%" height="100%" viewBox="0 0 213.7 213.7"
-          enableBackground="new 0 0 213.7 213.7" xmlSpace="preserve">
-          <polygon points="73.5,62.5 148.5,105.8 73.5,149.1 "/>
-          <circle cx="106.8" cy="106.8" r="103.3"/>
-        </svg>
+        <PlayButton/>
       </a>
     </>;
   }
@@ -144,4 +149,104 @@ const SpotifyPlayerMobile = ({ id, title }) => (
   </a>
 );
 
-export const SpotifyPlayer = !MOBILE ? SpotifyPlayerWeb : SpotifyPlayerMobile;
+export const SpotifyPlayer = MOBILE ? SpotifyPlayerMobile : SpotifyPlayerWeb;
+
+
+class SpotifyControlsWeb extends React.PureComponent {
+
+  state = {
+    error: null,
+    playing: false,
+    hidden: true,
+    collapsed: false,
+    track: null,
+  }
+
+  componentDidMount() {
+    initControls = () => {
+      if (!this.initialized) {
+        this.initialized = true;
+        player.addListener('player_state_changed', this.onStateChange);
+      }
+    };
+  }
+
+  componentWillUnmount() {
+    if (this.listener)
+      player.removeListener('player_state_changed', this.onStateChange);
+  }
+
+  onStateChange = (playerState) => {
+    if (!playerState) {
+      this.setState({ error: true });
+      return;
+    }
+
+    if (!playerState.track_window.current_track) {
+      this.setState({
+        hidden: false,
+        playing: false,
+        track: null,
+      });
+      return;
+    }
+
+    const { paused, track_window } = playerState;
+    const { name, album, artists, id } = track_window.current_track;
+    this.setState({
+      hidden: false,
+      playing: !paused,
+      track: {
+        id,
+        name: name || '---',
+        link: `https://open.spotify.com/track/${id}`,
+        artist: (artists && artists.length && artists[0].name) || '---',
+        image: album && album.images && album.images.length && album.images[0].url,
+      },
+    });
+  }
+
+  togglePlay = () => {
+    player.togglePlay().catch(console.error);
+  }
+
+  toggleCollapse = () => this.setState(({ collapsed }) => ({ collapsed: !collapsed }))
+
+  saveTrack = () => {
+    api('/me/tracks', 'PUT', { ids: [ this.state.track.id ] })
+    .then(() => alert('Track saved to your library'))
+    .catch(console.error);
+  }
+
+  render() {
+    const { playing, hidden, collapsed, track, error } = this.state;
+
+    if (hidden) return null;
+
+    return (
+      <div className={`spotify-controls ${collapsed ? 'collapsed' : ''}`}>
+        <div className="spotify-controls-body">
+          <div className="spotify-controls-info">
+            { track ? <>
+              <p title={track.name}><a href={track.link}>{track.name}</a></p>
+              <p title={track.artist}><small>{track.artist}</small></p>
+            </> : '---' }
+          </div>
+          <a className={`play-button ${playing ? 'playing' : ''} ${error ? 'error' : ''}`}
+            onClick={this.togglePlay} title={playing ? 'Pause' : 'Play'}>
+            <PlayButton/>
+          </a>
+          <a onClick={this.saveTrack} title="Save" className="icon">
+            <i className="fas fa-plus"/>
+          </a>
+        </div>
+        <button onClick={this.toggleCollapse} className="spotify-controls-collapser"
+          title={collapsed ? 'Expand' : 'Collapse'}>
+          <i className="fas fa-ellipsis-v"/>
+        </button>
+      </div>
+    );
+  }
+}
+
+export const SpotifyControls = MOBILE ? () => null : SpotifyControlsWeb;

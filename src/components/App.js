@@ -18,6 +18,7 @@ import MediaLists from './MediaLists';
 import MediaList from './MediaList';
 import NewMediaList from './NewMediaList';
 import Header from './Header';
+import { SpotifyControls } from '../spotify_player';
 
 import * as db from '../db';
 
@@ -53,6 +54,7 @@ class App extends React.Component {
                 <Route render={() => { throw { code: 404 }; }}/>
               </Switch>
             </ErrorBoundary>
+            <SpotifyControls/>
           </>
         </RouterToUrlQuery>
       </Router>
