@@ -4,15 +4,12 @@
 @import '~bulma/sass/utilities/functions';
 // Define variables:
 
-// $family-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+$green: #1db954;
 
 $discordmain: #7289DA;
 $discordmain-invert: findColorInvert($discordmain);
 $discord: #333;
 $discord-invert: findColorInvert($discord);
-
-// @import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
-// $family-sans-serif: "Raleway", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Arial, sans-serif;
 
 @import "~bulma/sass/utilities/derived-variables";
 

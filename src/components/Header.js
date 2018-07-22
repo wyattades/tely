@@ -43,7 +43,7 @@ class Header extends React.PureComponent {
         <div className="container">
           <div className="navbar-brand">
             <Link className="navbar-item" to="/">
-              <h1 className="is-size-4 has-text-primary">Tely</h1>
+              <h1 className="is-size-4 site-title">Tely</h1>
             </Link>
             <div className={`navbar-burger burger ${open ? 'is-active' : ''}`}
               onClick={this.toggle} role="button" tabIndex="0" onKeyPress={roleClick}>

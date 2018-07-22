@@ -166,3 +166,9 @@
 .input[disabled] {
   cursor: text;
 }
+
+.site-title {
+  color: $primary;
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: bold;
+}

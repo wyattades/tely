@@ -12,7 +12,7 @@ export default ({ history }) => {
     <section className="hero is-fullheight-flex">
       <div className="hero-body">
         <div className="container has-text-centered">
-          <h2 className="title is-size-1 has-text-primary">Tely</h2>
+          <h2 className="site-title" style={{ fontSize: 120 }}>Tely</h2>
           <h5 className="is-size-5">
             Create and share lists of media with your Discord pals!
           </h5>

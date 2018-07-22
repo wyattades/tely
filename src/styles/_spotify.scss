@@ -1,7 +1,7 @@
 
 .play-button {
   $startColor: $white;
-  $endColor: $primary;
+  $endColor: $success;
   $errorColor: $danger;
   $transitionCircle: 0.3s;
   $transitionTriangle: 0.4s;
@@ -108,10 +108,10 @@
   }
 
   .spotify-controls-body {
-    padding: 8px;
+    padding: 10px;
     width: 280px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     & > a {
       width: 32px;

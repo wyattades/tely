@@ -6,9 +6,14 @@ import { roleClick } from '../utils';
 export const Spinner = ({ fullPage, centered }) => (
   <div className={`${fullPage && 'full-page'} ${centered && 'buttons is-centered'}`}>
     <div className="spinner">
-      <div className="bounce1"/>
+      {/* <div className="bounce1"/>
       <div className="bounce2"/>
-      <div className="bounce3"/>
+      <div className="bounce3"/> */}
+      <div className="rect1"/>
+      <div className="rect2"/>
+      <div className="rect3"/>
+      <div className="rect4"/>
+      <div className="rect5"/>
     </div>
   </div>
 );
