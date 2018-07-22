@@ -62,10 +62,12 @@ export default class Account extends React.Component {
               <strong>Spotify</strong>
               <p>{profiles.spotify.username}</p>
             </div>
-            <button className="button" onClick={this.disconnect('spotify')}>Disconnect</button>
+            <button className="button is-success is-outlined is-inverted"
+              onClick={this.disconnect('spotify')}>
+              Disconnect
+            </button>
           </div>
-        ) : <p>None</p>}
-        <br/>
+        ) : <><p>None</p><br/></> }
         <p className="label">Account Created</p>
         <p>{new Date(user.metadata.creationTime).toLocaleString()}</p>
         <br/>
