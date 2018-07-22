@@ -5,8 +5,7 @@ import { isEmpty } from './utils';
 export const MATCH_ID = /\d{6,20}/;
 
 const DISCORD_API = 'https://discordapp.com/api';
-const AVATAR_URL = 'https://cdn.discordapp.com/avatar';
-export const ICON_URL = 'https://cdn.discordapp.com/icons';
+export const IMAGE_URL = 'https://cdn.discordapp.com';
 
 const CLIENT_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:8080/tely'
@@ -27,6 +26,13 @@ export const sendWebhooks = (listMeta, item) => {
 
   const profile = profiles.discord;
   const serviceLabel = services.asObject[listMeta.type].LABEL;
+  
+  let subtitle;
+  if (item.artist) subtitle = `by ${item.artist}`;
+  else if (item.desc) subtitle = item.desc.length > 50
+    ? `${item.desc.substring(0, 50)}...`
+    : item.desc;
+  else subtitle = '---';
 
   const payload = {
     embeds: [{
@@ -39,11 +45,13 @@ export const sendWebhooks = (listMeta, item) => {
       },
       author: {
         name: profile.username,
-        icon_url: `${AVATAR_URL}/${profile.id}/${profile.avatar}.png`,
+        icon_url: profile.avatar
+          ? `${IMAGE_URL}/avatars/${profile.id}/${profile.avatar}.png`
+          : `${IMAGE_URL}/embed/avatars/${parseInt(profile.discriminator, 10) % 5}.png`,
       },
       fields: [{
         name: item.title,
-        value: item.type === 'spotify_music' ? `by ${item.author}` : (item.released || '---'),
+        value: subtitle,
       }],
       footer: {
         text: '© Tely',
