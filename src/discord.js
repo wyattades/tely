@@ -39,7 +39,7 @@ export const sendWebhooks = (listMeta, item) => {
       },
       author: {
         name: profile.username,
-        icon_url: `${AVATAR_URL}/${profile.id}/${profile.icon}.png`,
+        icon_url: `${AVATAR_URL}/${profile.id}/${profile.avatar}.png`,
       },
       fields: [{
         name: item.title,
