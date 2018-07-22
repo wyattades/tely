@@ -1,5 +1,4 @@
 import { decodeQuery, popupCenter } from './utils';
-import { signOut } from './db';
 
 const SERVER_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000/tely-db/us-central1/widgets'
@@ -74,28 +73,7 @@ export const signIn = (service) => new Promise((resolve, reject) => {
   throw err;
 });
 
-export const refreshToken = (service) => fetch(`${SERVER_URL}/auth/${service}/refresh`, {
-  method: 'POST',
-  body: JSON.stringify({ token: profiles[service].refreshToken }),
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-  mode: 'cors',
-})
-.then((res) => {
-  if (!res.ok) throw res;
-  return res.json();
-})
-.then(({ token }) => updateProfile(service, { accessToken: token }))
-.catch((err) => {
-  console.error(err);
-  // Redirect back to login when redirect token expires
-  return signOut();
-  // .then(() => window.history.pushState({}, '', '/tely'));
-});
-
-export const apiFetch = (url, accessToken, method, body) => fetch(url, {
+export const apiFetch = (url, accessToken, method, body) => window.fetch(url, {
   method,
   body: body ? JSON.stringify(body) : undefined,
   headers: {
@@ -110,12 +88,21 @@ export const apiFetch = (url, accessToken, method, body) => fetch(url, {
 
   if (res.ok) return hasJSON ? res.json() : {};
   
-  return hasJSON ? res.json()
-  .then((data) => {
-    console.error(res, data);
-    throw { code: res.status, msg: data.message };
-  }) : Promise.reject({ code: res.status });
+  return hasJSON
+    ? res.json().then((data) => Promise.reject({ code: res.status, msg: data.message }))
+    : Promise.reject({ code: res.status });
 });
+
+export const refreshToken = (service) => {
+  const profile = profiles[service];
+  if (!profile || !profile.refreshToken)
+    throw { code: 401, msg: 'No refresh token available' };
+
+  return apiFetch(`${SERVER_URL}/auth/${service}/refresh`, null, 'POST', {
+    token: profile.refreshToken,
+  })
+  .then(({ token }) => updateProfile(service, { accessToken: token }));
+};
 
 export const apiFactory = (service, api_url, autoSignIn) => (path, method = 'GET', body) => {
   const profile = profiles[service];

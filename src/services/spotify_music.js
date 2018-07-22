@@ -40,6 +40,7 @@ export const search = (str, page = 1) => {
     q: str,
     type: 'track',
     limit: 15,
+    offset: (page - 1) * 15,
     market: 'US',
   });
 

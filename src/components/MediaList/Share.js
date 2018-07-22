@@ -6,7 +6,6 @@ import * as share from '../../share';
 import MultiInput from '../form/MultiInput';
 
 
-// TODO: clean page formatting
 class SharedItem extends React.Component {
 
   state = {
@@ -31,7 +30,7 @@ class SharedItem extends React.Component {
         <div className="button is-discord is-fullwidth
           space-between is-medium has-text-left is-unclickable">
           { icon && (
-            <img style={{ marginRight: 16 }} src={`${discord.IMAGE_URL}/icons/${id}/${icon}.png`}
+            <img style={{ marginRight: 16 }} src={discord.serverIcon(id, icon)}
               alt={name} className="image is-48x48 is-rounded"/>
           )}
           <span className="is-clipped" style={{ flex: 1 }}>{name}</span>

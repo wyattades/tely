@@ -42,7 +42,7 @@ const mapResponse = (type) => ({ id, title, name, poster_path, overview, release
   released: type === 'tv' ? first_air_date : release_date,
 });
 
-const tmdbFetch = (type, path, query) => fetch(`${API_URL}${path}?${query}`)
+const tmdbFetch = (type, path, query) => window.fetch(`${API_URL}${path}?${query}`)
 .then((res) => {
   if (!res.ok) return Promise.reject(res);
   return res;
@@ -65,9 +65,11 @@ export const search = (str, page = 1) => {
 export const suggest = (list) => {
 
   const listMap = {};
-  for (const listItem of list) listMap[listItem.media_id] = true;
-
-  let sample = [ ...list ];
+  const sample = [];
+  for (const listItem of list) {
+    listMap[listItem.media_id] = true;
+    sample.push(listItem);
+  }
 
   const resultMap = {};
   const results = [];

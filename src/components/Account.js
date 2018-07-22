@@ -19,13 +19,11 @@ export default class Account extends React.Component {
   }
 
   deleteAll = () => {
-    const afirm = window.confirm('Are your sure? This will delete all of your lists permanently.');
-    if (!afirm) return;
+    if (!window.confirm('Are your sure? This will delete all of your lists permanently.')) return;
   
     db.deleteAll()
-    .then(db.signOut)
     .then(() => {
-      this.props.history.push('/');
+      this.props.history.push('/logout');
       window.alert('Successfully deleted profile. Goodbye!');
     })
     .catch((err) => {
@@ -38,12 +36,11 @@ export default class Account extends React.Component {
     const { discord } = profiles;
     const { spotify } = this.state;
     const user = db.getUser();
-
+    
     return (
       <SmallSection>
         <h1 className="is-size-1">Account</h1>
         <br/>
-        {/* <label className="label">Avatar</label> */}
         { discord.avatar && (
           <p>
             <img className="image" alt={discord.username}

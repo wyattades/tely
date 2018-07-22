@@ -69,7 +69,6 @@ const discordStrat = new DiscordStrategy({
       .then(() => batch.commit())
       .catch(console.error);
 
-      profile.created = Date.now();
       return trans.set(userDoc.ref, profile);
     }
   }))

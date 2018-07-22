@@ -2,10 +2,10 @@ import { apiFactory, apiFetch, profiles } from './api';
 import services from './services';
 import { isEmpty } from './utils';
 
+
 export const MATCH_ID = /\d{6,20}/;
 
 const DISCORD_API = 'https://discordapp.com/api';
-export const IMAGE_URL = 'https://cdn.discordapp.com';
 
 const CLIENT_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:8080/tely'
@@ -15,11 +15,22 @@ export const MAX_GUILD_MEMBERS = 64; // TODO
 
 const api = apiFactory('discord', DISCORD_API);
 
-export const getMe = () => api('/users/@me');
+// export const getMe = () => api('/users/@me');
 
 export const getGuilds = () => api('/users/@me/guilds');
 
 export const getFriends = () => api('/users/@me/channels');
+
+const IMAGE_URL = 'https://cdn.discordapp.com';
+
+export const userAvatar = () => {
+  const profile = profiles.discord;
+  return profile.avatar
+    ? `${IMAGE_URL}/avatars/${profile.id}/${profile.avatar}.png`
+    : `${IMAGE_URL}/embed/avatars/${parseInt(profile.discriminator, 10) % 5}.png`;
+};
+
+export const serverIcon = (serverId, icon) => `${IMAGE_URL}/icons/${serverId}/${icon}.png`;
 
 export const sendWebhooks = (listMeta, item) => {
   if (isEmpty(listMeta.webhooks)) return;
@@ -39,15 +50,13 @@ export const sendWebhooks = (listMeta, item) => {
       title: `Added New ${serviceLabel} to __${listMeta.name}__`,
       url: `${CLIENT_URL}/list/${listMeta.id}`,
       timestamp: new Date().toISOString(),
-      color: 16762902, // TODO
+      color: 53682, // is-primary
       thumbnail: {
         url: item.image,
       },
       author: {
         name: profile.username,
-        icon_url: profile.avatar
-          ? `${IMAGE_URL}/avatars/${profile.id}/${profile.avatar}.png`
-          : `${IMAGE_URL}/embed/avatars/${parseInt(profile.discriminator, 10) % 5}.png`,
+        icon_url: userAvatar(),
       },
       fields: [{
         name: item.title,

@@ -29,10 +29,6 @@ class Header extends React.PureComponent {
   .then(() => this.props.history.push('/list'))
   .catch(console.error);
 
-  signOut = () => db.signOut()
-  .then(() => this.props.history.push('/'))
-  .catch(console.error);
-
   render() {
     const { open, loggedIn } = this.state;
 
@@ -75,10 +71,9 @@ class Header extends React.PureComponent {
                       Account
                     </Link>
                     <hr className="navbar-divider"/>
-                    <a className="navbar-item" onClick={this.signOut}
-                      role="button" tabIndex="0" onKeyPress={roleClick}>
+                    <Link className="navbar-item" to="/logout">
                       Logout
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </> : (

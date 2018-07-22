@@ -22,6 +22,7 @@ import { SpotifyControls } from '../spotify_player';
 
 import * as db from '../db';
 
+
 // Set default NavLink activeClassName
 NavLink.defaultProps.activeClassName = 'is-active';
 
@@ -51,6 +52,10 @@ class App extends React.Component {
                 <PrivateRoute exact path="/list" component={MediaLists}/>
                 <PrivateRoute exact path="/list/new" component={NewMediaList}/>
                 <Route path="/list/:listid" component={MediaList}/>
+                <Route exact path="/logout" render={() => {
+                  db.signOut().catch(console.error);
+                  return <Redirect to="/"/>;
+                }}/>
                 <Route render={() => { throw { code: 404 }; }}/>
               </Switch>
             </ErrorBoundary>

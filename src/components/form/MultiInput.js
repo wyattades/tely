@@ -51,7 +51,7 @@ export default class MultiInput extends React.Component {
     }
   }
 
-  static TEST_URL = /^http(s)?:\/\/[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
+  static TEST_URL = /^http(s)?:\/\/[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
   static TEST_NUMBER = /^\d*$/;
 
   render() {

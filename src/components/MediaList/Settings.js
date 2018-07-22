@@ -35,7 +35,7 @@ export default class Settings extends React.Component {
 
   deleteList = () => {
     const { history, metaData, meta } = this.props;
-    if (window.confirm(`Are you sure you want to delete "${metaData.name}?"`)) {
+    if (window.confirm(`Are you sure you want to delete "${metaData.name}"?`)) {
       history.push('/list');
       meta.delete()
       .catch(console.error);
@@ -43,8 +43,9 @@ export default class Settings extends React.Component {
   }
 
   addOrRemoveWebhook = (add) => (url) => {
+    // Create a unique key for URL just by encoding it
     this.props.meta.update({
-      [`webhooks.${btoa(url)}`]: add ? url : db.Helpers.FieldValue.delete(),
+      [`webhooks.${encodeURIComponent(url).replace(/\./g, '%2E')}`]: add ? url : db.Helpers.FieldValue.delete(),
     })
     .catch(console.error);
   };

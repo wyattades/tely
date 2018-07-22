@@ -80,7 +80,7 @@ class MediaLists extends React.Component {
           </div>
           <div className="level-right">
             <div className="level-item">
-              <Link to="/list/new" className="button is-success">
+              <Link to="/list/new" className="button is-primary">
                 <span className="icon is-small is-left">
                   <i className="fas fa-plus"/>
                 </span>
