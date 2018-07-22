@@ -64,7 +64,7 @@ export default class Suggest extends React.Component {
       <h1 className="is-size-1">{meta.name}</h1>
       <br/>
       <center>
-        <button className="button is-info is-medium" onClick={this.fetchSuggested}>
+        <button className="button is-primary is-medium" onClick={this.fetchSuggested}>
           <span className="icon"><i className="fas fa-sync-alt"/></span>
           <span>Refresh Suggestions</span>
         </button>

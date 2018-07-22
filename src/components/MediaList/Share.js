@@ -31,7 +31,7 @@ class SharedItem extends React.Component {
         <div className="button is-discord is-fullwidth
           space-between is-medium has-text-left is-unclickable">
           { icon && (
-            <img style={{ marginRight: 16 }} src={`${discord.ICON_URL}/${id}/${icon}.png`}
+            <img style={{ marginRight: 16 }} src={`${discord.IMAGE_URL}/icons/${id}/${icon}.png`}
               alt={name} className="image is-48x48 is-rounded"/>
           )}
           <span className="is-clipped" style={{ flex: 1 }}>{name}</span>
@@ -127,7 +127,7 @@ export default class Share extends React.Component {
         will show up on the <em>Browse</em> page
       </p>
       <br/>
-      <button className={`button is-medium ${is_public ? 'is-success' : 'is-warning'}`}
+      <button className={`button is-medium ${is_public ? 'is-danger' : 'is-success'}`}
         onClick={this.togglePublic}>
         {is_public ? 'Unpublish' : 'Publish'}
       </button>

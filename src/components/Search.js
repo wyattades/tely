@@ -116,7 +116,7 @@ class Search extends React.Component {
             {Side}
           </div>
           <div className="control">
-            <button type="submit" className="button is-info">Search</button>
+            <button type="submit" className="button is-primary">Search</button>
           </div>
         </div>
       </form>

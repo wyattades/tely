@@ -66,12 +66,7 @@ export default class Settings extends React.Component {
         </div>
       </div>
       <div className="field">
-        <label className="label" htmlFor="webhooks">
-          Webhooks&nbsp;
-          <span className="has-text-weight-normal has-text-grey">
-            Items added to the list will be posted to these Discord server webhooks:
-          </span>
-        </label>
+        <label className="label" htmlFor="webhooks">Webhooks</label>
         <MultiInput items={Object.values(webhooks)} placeholder="Webhook URL" type="url"
           onAddItem={this.addOrRemoveWebhook(true)} onRemoveItem={this.addOrRemoveWebhook(false)}/>
         <p className="help">
