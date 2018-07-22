@@ -108,7 +108,8 @@ export const apiFactory = (service, api_url, autoSignIn) => (path, method = 'GET
   const profile = profiles[service];
 
   if (!profile) {
-    if (autoSignIn) return signIn(service).then(() => apiFetch(api_url + path, profile.accessToken, method, body));
+    if (autoSignIn) return signIn(service)
+    .then(() => apiFetch(api_url + path, profiles[service].accessToken, method, body));
     else return Promise.reject({ code: 403 });
   }
 
