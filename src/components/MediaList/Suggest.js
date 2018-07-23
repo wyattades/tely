@@ -4,6 +4,7 @@ import { SearchItem } from '../ListItem';
 import services from '../../services';
 import { Spinner } from '../misc';
 import * as share from '../../share';
+import { toggleListItem } from '../../db';
 
 
 export default class Suggest extends React.Component {
@@ -22,28 +23,16 @@ export default class Suggest extends React.Component {
   }
 
   onToggle = (item) => () => {
-    const { contents } = this.props;
-
-    if (item.id) return contents.doc(item.id).delete()
+    toggleListItem(item, this.props.contents)
     .then(() => {
-      item.id = null;
-      // Rerender suggested
       this.setState(({ suggested }) => ({ suggested: [ ...suggested ] }));
     });
-    else {
-      item.created = Date.now();
-      return contents.add(item)
-      .then((snap) => {
-        item.id = snap.id;
-        this.setState(({ suggested }) => ({ suggested: [ ...suggested ] }));
-      });
-    }
   };
 
   fetchSuggested = () => {
     services.asObject[this.props.meta.type].suggest(this.props.list)
     .then((suggested) => this.setState({ suggested }))
-    .catch((err) => console.error(err) || this.setState({ err: 502 }));
+    .catch((err) => console.error(err) || this.setState({ err: true }));
   }
 
   render() {

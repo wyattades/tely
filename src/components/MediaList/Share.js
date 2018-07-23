@@ -18,7 +18,6 @@ class SharedItem extends React.Component {
     this.setState({ waiting: true });
 
     share[shared ? 'unshareServer' : 'shareServer'](guild.id, metaData, true)
-    .then(() => this.setState({ waiting: false }))
     .catch((err) => console.error(err) || this.setState({ waiting: false }));
   }
   

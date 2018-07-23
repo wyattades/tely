@@ -23,12 +23,11 @@ export const getFriends = () => api('/users/@me/channels');
 
 const IMAGE_URL = 'https://cdn.discordapp.com';
 
-export const userAvatar = () => {
-  const profile = profiles.discord;
-  return profile.avatar
-    ? `${IMAGE_URL}/avatars/${profile.id}/${profile.avatar}.png`
-    : `${IMAGE_URL}/embed/avatars/${parseInt(profile.discriminator, 10) % 5}.png`;
-};
+export const userAvatar = (profile = profiles.discord, size = 128) => (
+  profile.avatar
+    ? `${IMAGE_URL}/avatars/${profile.id}/${profile.avatar}.png?size=${size}`
+    : `${IMAGE_URL}/embed/avatars/${parseInt(profile.discriminator, 10) % 5}.png?size=${size}`
+);
 
 export const serverIcon = (serverId, icon) => `${IMAGE_URL}/icons/${serverId}/${icon}.png`;
 

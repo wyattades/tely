@@ -66,7 +66,6 @@ export const shareServer = (serverId, listMeta, canWrite) => db.users
 
   snap.forEach(({ id: userId }) => {
     userIds[userId] = true;
-    console.log(roles[userId]);
     if (roles[userId] !== 'o' && roles[userId] !== 'w') roles[userId] = canWrite ? 'w' : 'r';
   });
 

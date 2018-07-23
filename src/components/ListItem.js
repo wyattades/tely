@@ -1,9 +1,45 @@
 import React from 'react';
 
-import { roleClick } from '../utils';
+import { roleClick, timeAgo } from '../utils';
 import services from '../services';
 import { SpotifyPlayer } from '../spotify_player';
 import * as db from '../db';
+import { userAvatar } from '../discord';
+
+
+const MediaContent = ({
+  link, released, media_id, image, title, service, label, mediaBottom, mediaRight, ...body
+}) => <>
+  <article className="media">
+    <div className="media-left">
+      <figure className="image media-image">
+        {/* TODO: use abstracted renderer */}
+        { service.ID === 'spotify_music'
+          ? <SpotifyPlayer id={media_id} image={image} title={title}/>
+          : (image && <img src={image} alt={title}/>)
+        }
+      </figure>
+    </div>
+    <div className="media-content">
+      <div className="content">
+        <p>
+          <strong><a href={link}>{title}</a></strong>&nbsp;
+          <strong><small>{label}</small></strong>&nbsp;
+          { released ? <small>Released {new Date(released).toLocaleDateString()}</small> : null }
+          <br/>
+          {service.renderBody(body)}
+        </p>
+      </div>
+      {mediaBottom}
+    </div>
+    { mediaRight ? (
+      <div className="media-right">
+        {mediaRight}
+      </div>
+    ) : null}
+  </article>
+</>;
+MediaContent.shouldComponentUpdate = () => false;
 
 export class ListItem extends React.Component {
 
@@ -16,18 +52,14 @@ export class ListItem extends React.Component {
   }
 
   delete = () => {
-    const { listRef, id } = this.props;
-    listRef.doc(id).delete();
+    const { listRef, item } = this.props;
+    listRef.doc(item.id).delete();
   };
 
   favorite = () => {
+    this.setState({ favorite: 'loading' });
     db.createFavorite(this.props.type)
-    .then((listRef) => {
-      const itemData = Object.assign({}, this.props);
-      for (const key of ['listRef', 'className', 'canWrite']) delete itemData[key];
-
-      return listRef.collection('contents').add(itemData);
-    })
+    .then((listRef) => listRef.collection('contents').add(this.props.item))
     .then(() => this.setState({ favorite: true }))
     .catch(console.error);
   };
@@ -36,63 +68,55 @@ export class ListItem extends React.Component {
     window.navigator.share({
       title: `Checkout some ${this.props.label} from Tely`,
       text: '',
-      url: this.props.link || window.location.href,
+      url: this.props.item.link || window.location.href,
     })
     .then(() => console.log('Successfully shared'))
     .catch((error) => console.error('Error sharing:', error));
   }
 
   render() {
-    const { id, media_id, title, link, type, label, canWrite,
-      created, image, listRef, className, ...body } = this.props;
+    const { item, canWrite, type, className } = this.props;
     const { favorite } = this.state;
+
+    const userId = db.getProfile() && db.getProfile().id;
+
+    const levelBottom = (
+      <nav className="level is-mobile">
+        { item.creator && (
+          <div className="level-left">
+            <small className="has-text-grey has-text-right">
+              {timeAgo(item.created)}
+              { userId !== item.creator.id ? (
+                <span>
+                  &nbsp;by <em>{item.creator.username}</em>
+                  &nbsp;<img src={userAvatar(item.creator, 20)} alt={item.creator.username} width="20"/>
+                </span>
+              ) : null }
+            </small>
+          </div>
+        )}
+        <div className="level-right" style={{ margin: -14 }}>
+          { canWrite && <>
+            <button className="button is-inverted is-link" onClick={this.delete} title="Delete from List">
+              <span className="icon"><i className="fas fa-trash"/></span>
+            </button>
+            <button className={`button is-inverted ${favorite === true ? 'is-success' : 'is-link'}`}
+              onClick={this.favorite} title="Add to Favorites" disabled={favorite}>
+              <span className="icon"><i className="fas fa-heart"/></span>
+            </button>
+          </> }
+          { (window.navigator && window.navigator.share) ? (
+            <button className="button is-inverted is-link" onClick={this.share} title="Share">
+              <span className="icon"><i className="fas fa-share-alt"/></span>
+            </button>
+          ) : null }
+        </div>
+      </nav>
+    );
 
     return (
       <div className={`box ${className}`}>
-        <article className="media">
-          <div className="media-left">
-            <figure className="image media-image">
-              {/* TODO: use abstracted renderer */}
-              { type === 'spotify_music'
-                ? <SpotifyPlayer id={media_id} image={image} title={title}/>
-                : (image && <img src={image} alt={title}/>)
-              }
-            </figure>
-          </div>
-          <div className="media-content">
-            <div className="content">
-              <p>
-                <strong><a href={link}>{title}</a></strong>&nbsp;
-                <strong><small>{label}</small></strong>&nbsp;
-                <small>Added {new Date(created).toLocaleDateString()}</small>
-                <br/>
-                {services.asObject[type].renderBody(body)}
-              </p>
-            </div>
-            <nav className="level is-mobile">
-              <div className="level-left">
-                { canWrite && <>
-                  <a className="level-item" onClick={this.delete} title="Delete from List"
-                    role="button" tabIndex="0" onKeyPress={roleClick}>
-                    <span className="icon is-small"><i className="fas fa-trash" /></span>
-                  </a>
-                  <a className={`level-item ${favorite ? 'is-unclickable' : ''}`} onClick={this.favorite}
-                    role="button" tabIndex="0" onKeyPress={roleClick} title="Add to Favorites">
-                    <span className={`icon is-small ${favorite ? 'has-text-success' : ''}`}>
-                      <i className="fas fa-heart"/>
-                    </span>
-                  </a>
-                </> }
-                { (window.navigator && window.navigator.share) ? (
-                  <a className="level-item" onClick={this.share} title="Share"
-                    role="button" tabIndex="0" onKeyPress={roleClick}>
-                    <span className="icon is-small"><i className="fas fa-share-alt" /></span>
-                  </a>
-                ) : null }
-              </div>
-            </nav>
-          </div>
-        </article>
+        <MediaContent {...item} service={services.asObject[type]} mediaBottom={levelBottom}/>
       </div>
     );
   }
@@ -110,12 +134,11 @@ export class SearchItem extends React.PureComponent {
 
   render() {
     const { item, toggle, type, canWrite } = this.props;
-    const { id, title, image, released, label, link, media_id, ...body } = item;
     const { hovered } = this.state;
 
     let addIcon;
     if (canWrite) {
-      if (id) addIcon = (
+      if (item.id) addIcon = (
         <a className={`icon has-text-${hovered ? 'danger' : 'success'}`}
           onMouseEnter={this.hoverEnter} onMouseLeave={this.hoverLeave}
           onClick={toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
@@ -127,7 +150,7 @@ export class SearchItem extends React.PureComponent {
           <i className="fas fa-plus"/>
         </a>
       );
-    } else if (id) {
+    } else if (item.id) {
       addIcon = (
         <a className="icon has-text-success is-unclickable">
           <i className="fas fa-check"/>
@@ -136,31 +159,7 @@ export class SearchItem extends React.PureComponent {
     }
 
     return (
-      <article className="media">
-        <div className="media-left">
-          <figure className="image media-image">
-            {/* TODO: use abstracted renderer */}
-            { type === 'spotify_music'
-              ? <SpotifyPlayer id={media_id} image={image} title={title}/>
-              : (image && <img src={image} alt={title}/>)
-            }
-          </figure>
-        </div>
-        <div className="media-content">
-          <div className="content">
-            <p>
-              <a href={link}><strong>{title}</strong></a>&nbsp;
-              <strong><small>{label}</small></strong>&nbsp;
-              <small>{released && `Released ${new Date(released).toLocaleDateString()}`}</small>
-              <br/>
-              {services.asObject[type].renderBody(body)}
-            </p>
-          </div>
-        </div>
-        <div className="media-right">
-          {addIcon}
-        </div>
-      </article>
+      <MediaContent {...item} service={services.asObject[type]} mediaRight={addIcon}/>
     );
   }
 }

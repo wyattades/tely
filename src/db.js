@@ -98,3 +98,28 @@ export const createFavorite = (type) => {
     : favRef.set(newListMeta(`${services.asObject[type].LABEL} Favorites`, type)))
   .then(() => favRef);
 };
+
+export const toggleListItem = (item, listContents) => {
+  if (item.id) {
+    return listContents.doc(item.id).delete()
+    .then(() => {
+      item.id = null;
+      return item;
+    });
+  } else {
+    const profile = getProfile();
+    item.created = Date.now();
+    // TODO: redundant user data
+    item.creator = {
+      id: profile.id,
+      username: profile.username,
+      discriminator: profile.discriminator,
+      avatar: profile.avatar,
+    };
+    return listContents.add(item)
+    .then((snap) => {
+      item.id = snap.id;
+      return item;
+    });
+  }
+};

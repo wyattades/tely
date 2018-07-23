@@ -88,3 +88,41 @@ export const popupCenter = (url, w, h) => {
 
   return newWindow;
 };
+
+// const MONTH_NAMES = [
+//   'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'June',
+//   'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.',
+// ];
+const DAY_IN_MS = 86400000; // 24 * 60 * 60 * 1000
+
+export const timeAgo = (date) => {
+  if (!date || typeof date !== 'number') {
+    return null;
+  }
+
+  const seconds = Math.round((Date.now() - date) / 1000);
+  const minutes = Math.round(seconds / 60);
+  const hours = Math.round(minutes / 60);
+  const days = Math.round(hours / 24);
+  const weeks = Math.round(days / 7);
+  const months = Math.round(days / 30);
+  const years = Math.round(days / 365);
+
+  if (seconds < 90) {
+    return 'Just now';
+  } else if (minutes < 6) {
+    return 'A few minutes ago';
+  } else if (minutes < 60) {
+    return `${minutes} minutes ago`;
+  } else if (hours < 12) {
+    return `${hours} hours ago`;
+  } else if (days < 7) {
+    return `${days} days ago`;
+  } else if (weeks < 4) {
+    return `${weeks} weeks ago`;
+  } else if (months < 12) {
+    return `${months} months ago`;
+  } else {
+    return `${years} years ago`;
+  }
+};

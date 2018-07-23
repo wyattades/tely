@@ -4,6 +4,7 @@ import { ListItem, SearchItem } from '../ListItem';
 import Search from '../Search';
 import { sendWebhooks } from '../../discord';
 import * as share from '../../share';
+import { toggleListItem } from '../../db';
 
 
 export default class View extends React.Component {
@@ -15,21 +16,11 @@ export default class View extends React.Component {
   toggle = (item) => () => {
     const { contents, searchResults, onSearch, meta } = this.props;
 
-    if (item.id) return contents.doc(item.id).delete()
+    toggleListItem(item, contents)
     .then(() => {
-      item.id = null;
       onSearch([ ...searchResults ]);
+      if (item.id) sendWebhooks(meta, item);
     });
-    else {
-      item.created = Date.now();
-      return contents.add(item)
-      .then((snap) => {
-        item.id = snap.id;
-        onSearch([ ...searchResults ]);
-
-        sendWebhooks(meta, item);
-      });
-    }
   };
   
   render() {
@@ -46,7 +37,7 @@ export default class View extends React.Component {
     } else if (list.length) {
       // grid = true;
       Content = list.map((item) => (
-        <ListItem {...item} type={meta.type} key={item.id} className={grid && "column is-4"}
+        <ListItem item={item} type={meta.type} key={item.id} className={grid && "column is-4"}
           listRef={contents} canWrite={this.canWrite}/>
       ));
     } else {
