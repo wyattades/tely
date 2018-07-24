@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { encodeQuery, randInt } from '../utils';
+import { encodeQuery, randInt, arrSample } from '../utils';
 import { TruncateText } from '../components/misc'; // TODO
 
 
@@ -62,14 +62,19 @@ export const search = (str, page = 1) => {
   .then(([ l1, l2 ]) => l1.concat(l2));
 };
 
+// TODO always have 6 items if possible!
 export const suggest = (list) => {
 
+  if (list.length === 0) return Promise.resolve([]);
+
+  let maxRecPerItem;
+  if (list.length === 1) maxRecPerItem = 6;
+  else if (list.length === 2) maxRecPerItem = 3;
+  else maxRecPerItem = 2;
+
   const listMap = {};
-  const sample = [];
-  for (const listItem of list) {
-    listMap[listItem.media_id] = true;
-    sample.push(listItem);
-  }
+  const sample = [ ...list ];
+  for (const listItem of list) listMap[listItem.media_id] = true;
 
   const resultMap = {};
   const results = [];
@@ -91,9 +96,11 @@ export const suggest = (list) => {
 
       // TODO: show user which items recommendations are based on
 
+      const shuffledRecs = arrSample(recommendations, 6);
+
       sample.splice(randIndex, 1);
       let counter = 0;
-      for (const item of recommendations) {
+      for (const item of shuffledRecs) {
         if (!(item.media_id in listMap) && !(item.media_id in resultMap)) {
           results.push(item);
           resultMap[item.media_id] = true;
@@ -101,7 +108,7 @@ export const suggest = (list) => {
             return results;
           }
           counter++;
-          if (counter >= 2) break;
+          if (counter >= maxRecPerItem) break;
         }
       }
       return getMore();
