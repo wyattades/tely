@@ -55,6 +55,7 @@ export default class Share extends React.Component {
   componentDidMount() {
     discord.getGuilds()
     .then((guilds) => {
+      console.log('sada')
       this.guilds = guilds;
       this.filterGuilds(this.props.metaData.shared_servers);
     })
@@ -63,6 +64,7 @@ export default class Share extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (!sameSet(nextProps.metaData.shared_servers, this.props.metaData.shared_servers)) {
+      console.log('asd')
       this.filterGuilds(nextProps.metaData.shared_servers);
     }
   }
@@ -70,6 +72,9 @@ export default class Share extends React.Component {
   filterGuilds = (sharedServers = {}) => {
     const guilds = [],
           sharedGuilds = [];
+
+    if (!this.guilds) return;
+
     for (const guild of this.guilds) {
       const sharedServer = sharedServers[guild.id];
       if (sharedServer) {
