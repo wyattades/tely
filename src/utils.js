@@ -54,7 +54,7 @@ export const decodeQuery = (str) => {
 };
 
 export const sameSet = (A, B) => {
-  if (A !== B || typeof A !== 'object' || typeof B !== 'object') return false;
+  if (typeof A !== 'object' || typeof B !== 'object') return false;
   const keysA = Object.keys(A).sort(),
         keysB = Object.keys(B).sort();
   if (keysA.length !== keysB.length) return false;
@@ -89,11 +89,7 @@ export const popupCenter = (url, w, h) => {
   return newWindow;
 };
 
-// const MONTH_NAMES = [
-//   'Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'June',
-//   'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.',
-// ];
-const DAY_IN_MS = 86400000; // 24 * 60 * 60 * 1000
+const timeAgoString = (label, amount) => `${amount} ${label}${amount === 1 ? '' : 's'} ago`;
 
 export const timeAgo = (date) => {
   if (!date || typeof date !== 'number') {
@@ -101,28 +97,18 @@ export const timeAgo = (date) => {
   }
 
   const seconds = Math.round((Date.now() - date) / 1000);
-  const minutes = Math.round(seconds / 60);
-  const hours = Math.round(minutes / 60);
-  const days = Math.round(hours / 24);
-  const weeks = Math.round(days / 7);
-  const months = Math.round(days / 30);
-  const years = Math.round(days / 365);
+  let minutes,
+      hours,
+      days,
+      weeks,
+      months;
 
-  if (seconds < 90) {
-    return 'Just now';
-  } else if (minutes < 6) {
-    return 'A few minutes ago';
-  } else if (minutes < 60) {
-    return `${minutes} minutes ago`;
-  } else if (hours < 12) {
-    return `${hours} hours ago`;
-  } else if (days < 7) {
-    return `${days} days ago`;
-  } else if (weeks < 4) {
-    return `${weeks} weeks ago`;
-  } else if (months < 12) {
-    return `${months} months ago`;
-  } else {
-    return `${years} years ago`;
-  }
+  if (seconds < 90) return 'Just now';
+  else if ((minutes = Math.round(seconds / 60)) < 6) return 'A few minutes ago';
+  else if (minutes < 60) return timeAgoString('minute', minutes);
+  else if ((hours = Math.round(minutes / 60)) < 12) return timeAgoString('hour', hours);
+  else if ((days = Math.round(hours / 24)) < 7) return timeAgoString('day', days);
+  else if ((weeks = Math.round(days / 7)) < 4) return timeAgoString('week', weeks);
+  else if ((months = Math.round(days / 30)) < 12) return timeAgoString('month', months);
+  else return timeAgoString('year', Math.round(days / 365));
 };
