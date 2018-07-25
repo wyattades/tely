@@ -58,7 +58,7 @@ export const unshareUser = (userId, listMeta) => {
 };
 
 export const shareServer = (serverId, listMeta, canWrite) => db.users
-.where(`guilds.${serverId}.id`, '>', '').get() // This is a hack to query where guilds.${serverId} exists
+.where(`guilds.${serverId}`, '==', true).get()
 .then((snap) => {
 
   const userIds = {};

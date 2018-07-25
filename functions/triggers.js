@@ -46,10 +46,14 @@ exports.listUpdate = functions.firestore
 .onWrite((change, ctx) => (
   firestore.runTransaction((trans) => (
     trans.get(lists.doc(ctx.params.listId))
-    .then((doc) => trans.update(doc.ref, {
-      popularity: (doc.data().popularity || 0) + 1,
-      modified: Date.now(),
-    }))
+    .then((doc) => {
+      if (doc.exists)
+        return trans.update(doc.ref, {
+          popularity: (doc.data().popularity || 0) + 1,
+          modified: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      return Promise.resolve();
+    })
   ))
 ));
 

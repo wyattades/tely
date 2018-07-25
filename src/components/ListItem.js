@@ -25,7 +25,10 @@ const MediaContent = ({
         <p>
           <strong><a href={link}>{title}</a></strong>&nbsp;
           <strong><small>{label}</small></strong>&nbsp;
-          { released ? <small>Released {new Date(released).toLocaleDateString()}</small> : null }
+          { released instanceof db.Helpers.Timestamp
+            ? <small>Released {released.toDate().toLocaleDateString()}</small>
+            : null
+          }
           <br/>
           {service.renderBody(body)}
         </p>
@@ -85,7 +88,7 @@ export class ListItem extends React.Component {
         { item.creator && (
           <div className="level-left">
             <small className="has-text-grey has-text-right">
-              {timeAgo(item.created)}
+              {timeAgo(item.created instanceof db.Helpers.Timestamp ? item.created.toMillis() : item.created)}
               { userId !== item.creator.id ? (
                 <span>
                   &nbsp;by <em>{item.creator.username}</em>

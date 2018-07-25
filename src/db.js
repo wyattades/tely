@@ -67,7 +67,7 @@ export const deleteAll = () => {
 };
 
 const newListMeta = (name, type) => {
-  const created = Date.now();
+  const created = Helpers.Timestamp.now();
   const userId = getProfile().id;
 
   return {
@@ -108,7 +108,7 @@ export const toggleListItem = (item, listContents) => {
     });
   } else {
     const profile = getProfile();
-    item.created = Date.now();
+    item.created = Helpers.Timestamp.now();
     // TODO: redundant user data
     item.creator = {
       id: profile.id,

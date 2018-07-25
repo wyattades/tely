@@ -2,6 +2,7 @@ import React from 'react';
 
 import { encodeQuery, randInt, arrSample } from '../utils';
 import { TruncateText } from '../components/misc'; // TODO
+import { Helpers } from '../db';
 
 
 // TODO: hide API key?
@@ -39,7 +40,7 @@ const mapResponse = (type) => ({ id, title, name, poster_path, overview, release
   desc: overview,
   media_id: id,
   link: `${MEDIA_URL}/${type}/${id}`,
-  released: type === 'tv' ? first_air_date : release_date,
+  released: Helpers.Timestamp.fromMillis(type === 'tv' ? first_air_date : release_date),
 });
 
 const tmdbFetch = (type, path, query) => window.fetch(`${API_URL}${path}?${query}`)

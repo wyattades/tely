@@ -34,10 +34,10 @@ const discordStrat = new DiscordStrategy({
   if (refreshToken) profile.refreshToken = refreshToken;
   if (res && res.expires_in) profile.expires_on = Date.now() + res.expires_in;
 
-  // Convert guilds array to object
+  // Convert guilds array to key map
   if (Array.isArray(profile.guilds)) {
     const guilds = {};
-    for (const guild of profile.guilds) guilds[guild.id] = guild;
+    for (const guild of profile.guilds) guilds[guild.id] = true;
     profile.guilds = guilds;
   } else {
     cb('Failed to fetch guilds');
@@ -62,12 +62,12 @@ const discordStrat = new DiscordStrategy({
           // TODO: might need to handle if shared_users contains profile.id
           snap.forEach((doc) => batch.update(doc.ref, {
             [`shared_servers.${guildId}.members.${profile.id}`]: true,
-            [`roles.${profile.id}`]: doc.get().shared_servers[guildId].role,
+            [`roles.${profile.id}`]: doc.data().shared_servers[guildId].role,
           }));
         })
       )))
       .then(() => batch.commit())
-      .catch(console.error);
+      .catch((err) => console.error('batch share servers:', err));
 
       return trans.set(userDoc.ref, profile);
     }

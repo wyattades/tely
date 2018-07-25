@@ -3,6 +3,8 @@ import React from 'react';
 import { encodeQuery, arrSample } from '../utils';
 import { apiFactory } from '../api';
 import { initPlayer } from '../spotify_player';
+import { Helpers } from '../db';
+
 
 export const ID = 'spotify_music';
 export const LABEL = 'Spotify Music';
@@ -27,7 +29,7 @@ const mapResponse = ({ external_urls, artists, id, name, album }) => ({
   image: album.images && album.images.length > 1 && album.images[1].url,
   media_id: id,
   link: external_urls.spotify,
-  released: album.release_date ? new Date(album.release_date).getTime() : null,
+  released: album.release_date ? Helpers.Timestamp.fromDate(new Date(album.release_date)) : null,
   artist: artists && artists.length && artists[0].name,
   artist_id: artists && artists.length && artists[0].id,
   album: album.name,
