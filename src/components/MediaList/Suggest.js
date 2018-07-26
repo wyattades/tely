@@ -23,7 +23,8 @@ export default class Suggest extends React.Component {
   }
 
   onToggle = (item) => () => {
-    toggleListItem(item, this.props.contents)
+    const { meta, contents } = this.props;
+    toggleListItem(item, contents, meta)
     .then(() => {
       this.setState(({ suggested }) => ({ suggested: [ ...suggested ] }));
     });

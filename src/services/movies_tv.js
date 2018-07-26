@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { encodeQuery, randInt, arrSample } from '../utils';
+import { encodeQuery, randInt, arrSample, toTimestamp } from '../utils';
 import { TruncateText } from '../components/misc'; // TODO
-import { Helpers } from '../db';
 
 
 // TODO: hide API key?
@@ -10,18 +9,6 @@ const API_KEY = 'e516ac54480a35fac52c1c9c8af54200';
 const API_URL = 'https://api.themoviedb.org/3';
 const IMAGE_SRC = 'https://image.tmdb.org/t/p/w92';
 const MEDIA_URL = 'https://tmdb.org';
-
-/*
-"poster_sizes": [
-  "w92",
-  "w154",
-  "w185",
-  "w342",
-  "w500",
-  "w780",
-  "original"
-],
-*/
 
 export const ID = 'movies_tv';
 export const LABEL = 'Movies & TV';
@@ -40,7 +27,7 @@ const mapResponse = (type) => ({ id, title, name, poster_path, overview, release
   desc: overview,
   media_id: id,
   link: `${MEDIA_URL}/${type}/${id}`,
-  released: Helpers.Timestamp.fromMillis(type === 'tv' ? first_air_date : release_date),
+  released: toTimestamp(type === 'tv' ? first_air_date : release_date),
 });
 
 const tmdbFetch = (type, path, query) => window.fetch(`${API_URL}${path}?${query}`)
@@ -63,7 +50,6 @@ export const search = (str, page = 1) => {
   .then(([ l1, l2 ]) => l1.concat(l2));
 };
 
-// TODO always have 6 items if possible!
 export const suggest = (list) => {
 
   if (list.length === 0) return Promise.resolve([]);

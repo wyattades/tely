@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { encodeQuery, arrSample } from '../utils';
+import { encodeQuery, arrSample, toTimestamp } from '../utils';
 import { apiFactory } from '../api';
 import { initPlayer } from '../spotify_player';
-import { Helpers } from '../db';
 
 
 export const ID = 'spotify_music';
@@ -23,13 +22,13 @@ export const renderBody = ({ artist, artist_id, album, album_id }) => <>
 </>;
 
 
-const mapResponse = ({ external_urls, artists, id, name, album }) => ({
+const mapResponse = ({ external_urls, artists, id, name, album, ...rest }) => ({
   label: 'Song',
   title: name,
   image: album.images && album.images.length > 1 && album.images[1].url,
   media_id: id,
   link: external_urls.spotify,
-  released: album.release_date ? Helpers.Timestamp.fromDate(new Date(album.release_date)) : null,
+  released: toTimestamp(album.release_date),
   artist: artists && artists.length && artists[0].name,
   artist_id: artists && artists.length && artists[0].id,
   album: album.name,
@@ -70,13 +69,20 @@ export const suggest = (list) => {
     const results = [];
     for (const item of res.tracks) {
       if (!(item.id in listMap)) {
-        results.push(mapResponse(item));
+        results.push(item.id);
         if (results.length >= 6) {
           break;
         }
       }
     }
 
-    return results;
+    if (!results.length) return results;
+
+    const query2 = encodeQuery({
+      ids: results.join(','),
+    });
+
+    return api(`/tracks?${query2}`)
+    .then((res2) => res2.tracks.map(mapResponse));
   });
 };

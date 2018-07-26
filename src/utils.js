@@ -1,3 +1,5 @@
+import firebase from 'firebase/app';
+
 
 export const roleClick = (e) => (e.which || e.charCode || e.keyCode) === 13 && e.target.click();
 
@@ -89,14 +91,42 @@ export const popupCenter = (url, w, h) => {
   return newWindow;
 };
 
+export const toDate = (time) => {
+  if (!time) return null;
+
+  if (typeof time === 'number') return new Date(time);
+  if (typeof time === 'string') {
+    const date = Date.parse(time);
+    return Number.isNaN(date) ? null : new Date(date);
+  }
+  if (time instanceof Date) return time;
+  if (time instanceof firebase.firestore.Timestamp) return time.toDate();
+
+  return null;
+};
+
+// NOTE: Timestamp.fromMillis() is broken, so using fromDate()
+export const toTimestamp = (time) => {
+  if (!time) return null;
+    
+  if (typeof time === 'number') return firebase.firestore.Timestamp.fromDate(new Date(time));
+  if (typeof time === 'string') {
+    const date = Date.parse(time);
+    return Number.isNaN(date) ? null : firebase.firestore.Timestamp.fromDate(new Date(time));
+  }
+  if (time instanceof Date) return firebase.firestore.Timestamp.fromDate(time);
+  if (time instanceof firebase.firestore.Timestamp) return time;
+  
+  return null;
+};
+
 const timeAgoString = (label, amount) => `${amount} ${label}${amount === 1 ? '' : 's'} ago`;
 
 export const timeAgo = (date) => {
-  if (!date || typeof date !== 'number') {
-    return null;
-  }
+  date = toDate(date);
+  if (!date) return null;
 
-  const seconds = Math.round((Date.now() - date) / 1000);
+  const seconds = Math.round((Date.now() - date.getTime()) / 1000);
   let minutes,
       hours,
       days,

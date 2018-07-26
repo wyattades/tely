@@ -2,7 +2,6 @@ import React from 'react';
 
 import { ListItem, SearchItem } from '../ListItem';
 import Search from '../Search';
-import { sendWebhooks } from '../../discord';
 import * as share from '../../share';
 import { toggleListItem } from '../../db';
 
@@ -16,10 +15,9 @@ export default class View extends React.Component {
   toggle = (item) => () => {
     const { contents, searchResults, onSearch, meta } = this.props;
 
-    toggleListItem(item, contents)
+    toggleListItem(item, contents, meta)
     .then(() => {
       onSearch([ ...searchResults ]);
-      if (item.id) sendWebhooks(meta, item);
     });
   };
   

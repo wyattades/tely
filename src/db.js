@@ -4,6 +4,7 @@ import 'firebase/firestore';
 
 import * as API from './api';
 import services from './services';
+import { sendWebhooks } from './discord';
 
 
 firebase.initializeApp({
@@ -99,7 +100,7 @@ export const createFavorite = (type) => {
   .then(() => favRef);
 };
 
-export const toggleListItem = (item, listContents) => {
+export const toggleListItem = (item, listContents, listMeta) => {
   if (item.id) {
     return listContents.doc(item.id).delete()
     .then(() => {
@@ -119,6 +120,9 @@ export const toggleListItem = (item, listContents) => {
     return listContents.add(item)
     .then((snap) => {
       item.id = snap.id;
+
+      sendWebhooks(listMeta, item);
+
       return item;
     });
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { roleClick, timeAgo } from '../utils';
+import { roleClick, timeAgo, toDate } from '../utils';
 import services from '../services';
 import { SpotifyPlayer } from '../spotify_player';
 import * as db from '../db';
@@ -9,39 +9,46 @@ import { userAvatar } from '../discord';
 
 const MediaContent = ({
   link, released, media_id, image, title, service, label, mediaBottom, mediaRight, ...body
-}) => <>
-  <article className="media">
-    <div className="media-left">
-      <figure className="image media-image">
-        {/* TODO: use abstracted renderer */}
-        { service.ID === 'spotify_music'
-          ? <SpotifyPlayer id={media_id} image={image} title={title}/>
-          : (image && <img src={image} alt={title}/>)
-        }
-      </figure>
-    </div>
-    <div className="media-content">
-      <div className="content">
-        <p>
-          <strong><a href={link}>{title}</a></strong>&nbsp;
-          <strong><small>{label}</small></strong>&nbsp;
-          { released instanceof db.Helpers.Timestamp
-            ? <small>Released {released.toDate().toLocaleDateString()}</small>
-            : null
+}) => {
+
+  const releaseDate = toDate(released);
+
+  return <>
+    <article className="media">
+      <div className="media-left">
+        <figure className="image media-image">
+          {/* TODO: use abstracted renderer */}
+          { service.ID === 'spotify_music'
+            ? <SpotifyPlayer id={media_id} image={image} title={title}/>
+            : (image && <img src={image} alt={title}/>)
           }
-          <br/>
-          {service.renderBody(body)}
-        </p>
+        </figure>
       </div>
-      {mediaBottom}
-    </div>
-    { mediaRight ? (
-      <div className="media-right">
-        {mediaRight}
+      <div className="media-content">
+        <div className="content">
+          <p>
+            <strong><a href={link}>{title}</a></strong>&nbsp;
+            <strong><small>{label}</small></strong>&nbsp;
+            { releaseDate
+              ? <small>Released {releaseDate.toLocaleDateString()}</small>
+              : null
+            }
+            <br/>
+            {service.renderBody(body)}
+          </p>
+        </div>
+        {mediaBottom}
       </div>
-    ) : null}
-  </article>
-</>;
+      { mediaRight ? (
+        <div className="media-right">
+          {mediaRight}
+        </div>
+      ) : null}
+    </article>
+  </>;
+};
+
+// TODO
 MediaContent.shouldComponentUpdate = () => false;
 
 export class ListItem extends React.Component {
@@ -88,11 +95,12 @@ export class ListItem extends React.Component {
         { item.creator && (
           <div className="level-left">
             <small className="has-text-grey has-text-right">
-              {timeAgo(item.created instanceof db.Helpers.Timestamp ? item.created.toMillis() : item.created)}
+              {timeAgo(item.created)}
               { userId !== item.creator.id ? (
                 <span>
-                  &nbsp;by <em>{item.creator.username}</em>
-                  &nbsp;<img src={userAvatar(item.creator, 20)} alt={item.creator.username} width="20"/>
+                  &nbsp;by <em>{item.creator.username}</em>&nbsp;
+                  <img src={userAvatar(item.creator, 20)} alt={item.creator.username}
+                    width="20" className="is-rounded"/>
                 </span>
               ) : null }
             </small>
