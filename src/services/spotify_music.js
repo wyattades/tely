@@ -21,16 +21,17 @@ export const renderBody = ({ artist, artist_id, album, album_id }) => <>
   <small><a href={`https://open.spotify.com/album/${album_id}`}>{album}</a></small>
 </>;
 
+export const textBody = ({ artist }) => artist ? `by ${artist}` : '[Unknown artist]';
 
-const mapResponse = ({ external_urls, artists, id, name, album, ...rest }) => ({
+const mapResponse = ({ external_urls, artists, id, name, album }) => ({
   label: 'Song',
   title: name,
   image: album.images && album.images.length > 1 && album.images[1].url,
   media_id: id,
   link: external_urls.spotify,
   released: toTimestamp(album.release_date),
-  artist: artists && artists.length && artists[0].name,
-  artist_id: artists && artists.length && artists[0].id,
+  artist: artists.length && artists[0].name,
+  artist_id: artists.length && artists[0].id,
   album: album.name,
   album_id: album.id,
 });

@@ -35,20 +35,12 @@ export const sendWebhooks = (listMeta, item) => {
   if (isEmpty(listMeta.webhooks)) return;
 
   const profile = profiles.discord;
-  const serviceLabel = services.asObject[listMeta.type].LABEL;
-  
-  let subtitle;
-  if (item.artist) subtitle = `by ${item.artist}`;
-  else if (item.desc) subtitle = item.desc.length > 50
-    ? `${item.desc.substring(0, 50)}...`
-    : item.desc;
-  else subtitle = '---';
+  const service = services.asObject[listMeta.type];
 
   const payload = {
     embeds: [{
-      title: `Added New ${serviceLabel} to __${listMeta.name}__`,
+      title: `Added New ${service.LABEL} to: ${listMeta.name}`,
       url: `${CLIENT_URL}/list/${listMeta.id}`,
-      timestamp: new Date().toISOString(),
       color: 53682, // is-primary
       thumbnail: {
         url: item.image,
@@ -59,7 +51,7 @@ export const sendWebhooks = (listMeta, item) => {
       },
       fields: [{
         name: item.title,
-        value: subtitle,
+        value: service.textBody(item),
       }],
       footer: {
         text: '© Tely',

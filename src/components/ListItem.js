@@ -95,10 +95,10 @@ export class ListItem extends React.Component {
         { item.creator && (
           <div className="level-left">
             <small className="has-text-grey has-text-right">
-              {timeAgo(item.created)}
+              {timeAgo(item.created)}&nbsp;
               { userId !== item.creator.id ? (
-                <span>
-                  &nbsp;by <em>{item.creator.username}</em>&nbsp;
+                <span className="text-tag">
+                  by <em>{item.creator.username}</em>&nbsp;
                   <img src={userAvatar(item.creator, 20)} alt={item.creator.username}
                     width="20" className="is-rounded"/>
                 </span>

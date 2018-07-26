@@ -20,6 +20,8 @@ export const init = () => {};
 
 export const renderBody = ({ desc }) => <TruncateText text={desc}/>;
 
+export const textBody = ({ desc = '' }) => desc.length > 100 ? `${desc.substring(0, 100)}...` : desc;
+
 const mapResponse = (type) => ({ id, title, name, poster_path, overview, release_date, first_air_date }) => ({
   label: type === 'tv' ? 'TV' : 'Movie',
   title: type === 'tv' ? name : title,
