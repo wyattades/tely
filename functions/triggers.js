@@ -50,7 +50,7 @@ exports.listUpdate = functions.firestore
       if (doc.exists)
         return trans.update(doc.ref, {
           popularity: (doc.data().popularity || 0) + 1,
-          modified: admin.firestore.FieldValue.serverTimestamp(),
+          modified: admin.firestore.Timestamp.now(),
         });
       return Promise.resolve();
     })

@@ -90,7 +90,7 @@ const spotifyStrat = new SpotifyStrategy({
 }, (accessToken, refreshToken, expires_in, profile, cb) => {
   if (accessToken) profile.accessToken = accessToken;
   if (refreshToken) profile.refreshToken = refreshToken;
-  if (expires_in) profile.expires_on = Date.now() + expires_in;
+  if (expires_in) profile.expires_on = admin.firestore.Timestamp.now().toMillis() + expires_in;
   cb(null, profile);
 });
 
