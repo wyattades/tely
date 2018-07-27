@@ -19,6 +19,7 @@ import MediaList from './MediaList';
 import NewMediaList from './NewMediaList';
 import Header from './Header';
 import { SpotifyControls } from '../spotify_player';
+import { Spinner } from './misc';
 
 import * as db from '../db';
 
@@ -30,14 +31,26 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => db.getUser() ? <Component {...props}/> : (
     <Redirect to={{
       pathname: '/',
-      state: { from: props.location },
+      search: `?from=${encodeURIComponent(props.location.pathname)}`,
     }}/>
   )}/>
 );
 
-// eslint-disable-next-line react/prefer-stateless-function
 class App extends React.Component {
+
+  state = {
+    mounted: false,
+  }
+
+  componentDidMount() {
+    db.init()
+    .then(() => this.setState({ mounted: true }));
+  }
+
   render() {
+
+    if (!this.state.mounted) return <Spinner fullPage/>;
+
     return (
       <Router basename="/tely">
         <RouterToUrlQuery>

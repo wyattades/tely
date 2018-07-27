@@ -87,21 +87,11 @@ const newListMeta = (name, type) => {
 
 export const createList = (name, type) => lists.add(newListMeta(name, type));
 
-export const createFavorite = (type) => {
-  const userId = getProfile().id;
-  const favRef = lists.doc(`fav_${userId}_${type}`);
-
-  return favRef.get()
-  .then((doc) => doc.exists)
-  .catch((err) => Promise.resolve(err.code !== 'permission-denied'))
-  .then((exists) => exists
-    ? Promise.resolve()
-    : favRef.set(newListMeta(`${services.asObject[type].LABEL} Favorites`, type)))
-  .then(() => favRef);
-};
-
-export const toggleListItem = (item, listContents, listMeta) => {
-  if (item.id) {
+// If force is true then delete, else if false then add,
+// else if null then use item.id to determine
+export const toggleListItem = (item, listContents, listMeta, force = null) => {
+  item = { ...item };
+  if (force === null ? item.id : !force) {
     return listContents.doc(item.id).delete()
     .then(() => {
       item.id = null;
@@ -120,10 +110,32 @@ export const toggleListItem = (item, listContents, listMeta) => {
     return listContents.add(item)
     .then((snap) => {
       item.id = snap.id;
-
       sendWebhooks(listMeta, item);
 
       return item;
     });
   }
+};
+
+export const favoriteListItem = (item, type) => {
+  const userId = getProfile().id;
+  const favRef = lists.doc(`fav_${userId}_${type}`);
+  const service = services.asObject[type];
+
+  let listMeta;
+
+  return favRef.get()
+  .then((doc) => {
+    if (doc.exists) listMeta = doc.data();
+    return doc.exists;
+  })
+  .catch((err) => Promise.resolve(err.code !== 'permission-denied'))
+  .then((exists) => {
+    if (!exists) {
+      listMeta = newListMeta(`${service.LABEL} Favorites`, type);
+      return favRef.set(listMeta);
+    }
+    return Promise.resolve();
+  })
+  .then(() => toggleListItem(item, favRef.collection('contents'), listMeta, true));
 };

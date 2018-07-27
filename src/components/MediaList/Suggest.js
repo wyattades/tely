@@ -25,9 +25,9 @@ export default class Suggest extends React.Component {
   onToggle = (item) => () => {
     const { meta, contents } = this.props;
     toggleListItem(item, contents, meta)
-    .then(() => {
-      this.setState(({ suggested }) => ({ suggested: [ ...suggested ] }));
-    });
+    .then((newItem) => this.setState(({ suggested }) => ({
+      suggested: suggested.map((_item) => _item.media_id === newItem.media_id ? newItem : _item),
+    })));
   };
 
   fetchSuggested = () => {

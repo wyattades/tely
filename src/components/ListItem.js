@@ -55,24 +55,28 @@ export class ListItem extends React.Component {
 
   state = {
     favorite: false,
+    deleting: false,
   }
 
   shouldComponentUpdate(_, nextState) {
-    return this.state.favorite !== nextState.favorite;
+    return this.state.favorite !== nextState.favorite
+        || this.state.deleting !== nextState.deleting;
   }
 
   delete = () => {
-    const { listRef, item } = this.props;
-    listRef.doc(item.id).delete();
-  };
+    this.setState({ deleting: true }, () => {
+      this.props.toggle(this.props.item);
+    });
+  }
 
   favorite = () => {
-    this.setState({ favorite: 'loading' });
-    db.createFavorite(this.props.type)
-    .then((listRef) => listRef.collection('contents').add(this.props.item))
-    .then(() => this.setState({ favorite: true }))
-    .catch(console.error);
-  };
+    const { item, listMeta } = this.props;
+    this.setState({ favorite: 'loading' }, () => {
+      db.favoriteListItem(item, listMeta.type)
+      .then(() => this.setState({ favorite: true }))
+      .catch(console.error);
+    });
+  }
 
   share = () => {
     window.navigator.share({
@@ -85,8 +89,8 @@ export class ListItem extends React.Component {
   }
 
   render() {
-    const { item, canWrite, type, className } = this.props;
-    const { favorite } = this.state;
+    const { item, canWrite, listMeta, className } = this.props;
+    const { favorite, deleting } = this.state;
 
     const userId = db.getProfile() && db.getProfile().id;
 
@@ -108,7 +112,8 @@ export class ListItem extends React.Component {
         )}
         <div className="level-right" style={{ margin: -14 }}>
           { canWrite && <>
-            <button className="button is-inverted is-link" onClick={this.delete} title="Delete from List">
+            <button className="button is-inverted is-link" onClick={this.delete}
+              title="Delete from List" disabled={deleting}>
               <span className="icon"><i className="fas fa-trash"/></span>
             </button>
             <button className={`button is-inverted ${favorite === true ? 'is-success' : 'is-link'}`}
@@ -127,24 +132,33 @@ export class ListItem extends React.Component {
 
     return (
       <div className={`box ${className}`}>
-        <MediaContent {...item} service={services.asObject[type]} mediaBottom={levelBottom}/>
+        <MediaContent {...item} service={services.asObject[listMeta.type]} mediaBottom={levelBottom}/>
       </div>
     );
   }
 }
 
-export class SearchItem extends React.PureComponent {
+export class SearchItem extends React.Component {
 
   state = {
     hovered: false,
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.state.hovered !== nextState.hovered
+        || this.props.item.id !== nextProps.item.id;
   }
 
   hoverEnter = () => this.setState({ hovered: true });
   
   hoverLeave = () => this.setState({ hovered: false });
 
+  toggle = () => {
+    this.props.toggle(this.props.item);
+  }
+
   render() {
-    const { item, toggle, type, canWrite } = this.props;
+    const { item, type, canWrite } = this.props;
     const { hovered } = this.state;
 
     let addIcon;
@@ -152,12 +166,12 @@ export class SearchItem extends React.PureComponent {
       if (item.id) addIcon = (
         <a className={`icon has-text-${hovered ? 'danger' : 'success'}`}
           onMouseEnter={this.hoverEnter} onMouseLeave={this.hoverLeave}
-          onClick={toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
+          onClick={this.toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
           <i className={`fas ${hovered ? 'fa-times' : 'fa-check'}`}/>
         </a>
       );
       else addIcon = (
-        <a className="icon" onClick={toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
+        <a className="icon" onClick={this.toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
           <i className="fas fa-plus"/>
         </a>
       );

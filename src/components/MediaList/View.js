@@ -12,17 +12,24 @@ export default class View extends React.Component {
     this.canWrite = share.canWrite(this.props.meta);
   }
 
-  toggle = (item) => () => {
-    const { contents, searchResults, onSearch, meta } = this.props;
+  toggleSearchItem = (item) => {
+    const { contents, meta } = this.props;
 
     toggleListItem(item, contents, meta)
-    .then(() => {
-      onSearch([ ...searchResults ]);
+    .then((newItem) => {
+      const { searchResults, onSearch } = this.props;
+      onSearch(searchResults.map((_item) => _item.media_id === newItem.media_id ? newItem : _item));
     });
-  };
+  }
+
+  toggleListItem = (item) => {
+    const { contents } = this.props;
+
+    toggleListItem(item, contents, null, false);
+  }
   
   render() {
-    const { meta, contents, searchResults, list, onSearch } = this.props;
+    const { meta, searchResults, list, onSearch } = this.props;
 
     let grid = false;
 
@@ -30,13 +37,13 @@ export default class View extends React.Component {
     if (searchResults) {
       Content = searchResults.map((item) => (
         <SearchItem item={item} key={item.media_id} canWrite={this.canWrite}
-          toggle={this.toggle(item)} type={meta.type}/>
+          toggle={this.toggleSearchItem} type={meta.type}/>
       ));
     } else if (list.length) {
       // grid = true;
       Content = list.map((item) => (
-        <ListItem item={item} type={meta.type} key={item.id} className={grid && "column is-4"}
-          listRef={contents} canWrite={this.canWrite}/>
+        <ListItem item={item} listMeta={meta} key={item.id} className={grid && "column is-4"}
+          toggle={this.toggleListItem} canWrite={this.canWrite}/>
       ));
     } else {
       Content = <p className="is-size-4 has-text-centered">Empty List!</p>;
