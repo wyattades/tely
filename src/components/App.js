@@ -52,7 +52,7 @@ class App extends React.Component {
     if (!this.state.mounted) return <Spinner fullPage/>;
 
     return (
-      <Router basename="/tely">
+      <Router basename={process.env.BASENAME}>
         <RouterToUrlQuery>
           <>
             <Header/>

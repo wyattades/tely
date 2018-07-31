@@ -24,6 +24,8 @@ const loaderHTML = `<div class="full-page">\
 </div>\
 </div>`;
 
+const basename = '';
+
 const baseConfig = {
 
   mode: process.env.NODE_ENV,
@@ -94,6 +96,9 @@ const sharedPlugins = [
   new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+      BASENAME: JSON.stringify(basename),
+      URL: JSON.stringify(process.env.NODE_ENV === 'production'
+        ? 'https://tely.app' : 'http://localhost:8080'),
     },
   }),
 
@@ -113,7 +118,7 @@ const sharedPlugins = [
       content: 'Mom! Come look at the Tely!',
     }, {
       name: 'keywords',
-      content: 'tely,live,media,tv,television,movie,music,spotify',
+      content: 'tely,discord,share,live,media,tv,television,movie,music,spotify,',
     }],
     mobile: true,
     loader: loaderHTML,
@@ -145,7 +150,7 @@ if (process.env.NODE_ENV === 'production') { // PRODUCTION CONFIG
 
     output: {
       path: PATHS.dist,
-      publicPath: '/tely/', // use gh-pages directory as root
+      publicPath: `${basename}/`,
       filename: '[name].[chunkhash].js',
     },
 

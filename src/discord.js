@@ -7,9 +7,7 @@ export const MATCH_ID = /\d{6,20}/;
 
 const DISCORD_API = 'https://discordapp.com/api';
 
-const CLIENT_URL = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:8080/tely'
-  : 'https://wyattades.github.io/tely';
+const CLIENT_URL = `${process.env.URL}${process.env.BASENAME}`;
 
 export const MAX_GUILD_MEMBERS = 64; // TODO
 

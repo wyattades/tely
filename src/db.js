@@ -26,16 +26,21 @@ firestore.settings({ timestampsInSnapshots: true });
 export const Helpers = firebase.firestore;
 
 // Collections
-export const users = firestore.collection('users');
-export const lists = firestore.collection('lists');
+export let users;
+export let lists;
 
 export const signOut = () => {
   API.clearProfile('discord');
   return auth.signOut();
 };
 
-export const init = () => new Promise((resolve) => {
-
+export const init = () => firestore.enablePersistence()
+.catch((err) => {
+  console.error(err);
+  if (err.code === 'failed-precondition')
+    window.alert('Failed to initialize caching because multiple sessions are open');
+})
+.then(new Promise((resolve) => {
   const unsubscribe = auth.onAuthStateChanged(() => {
     console.log('Signed in:', !!auth.currentUser);
     unsubscribe();
@@ -45,6 +50,10 @@ export const init = () => new Promise((resolve) => {
     unsubscribe();
     resolve();
   });
+}))
+.then(() => {
+  users = firestore.collection('users');
+  lists = firestore.collection('lists');
 });
 
 export const getUser = () => auth.currentUser;

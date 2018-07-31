@@ -34,8 +34,6 @@ class MediaList extends React.Component {
   componentDidMount() {
     this.unsubscribeMeta = this.listRef
     .onSnapshot((snap) => {
-      if (!snap.exists) throw { code: 404 }; // TODO: does this work?
-
       const meta = snap.data();
       meta.id = snap.id;
 
