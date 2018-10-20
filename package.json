@@ -1,60 +1,29 @@
 {
   "name": "tely",
-  "version": "0.0.1",
   "description": "Live media sharing",
   "scripts": {
     "lint": "eslint src",
-    "dev": "NODE_ENV=development webpack-dev-server --color",
+    "dev": "NODE_ENV=development webpack-dev-server",
     "build": "NODE_ENV=production webpack",
     "deploy": "aws s3 rm s3://tely.app --recursive --include \"*.js\" --include \"*.css\" && aws s3 sync dist s3://tely.app/ && cf-invalidate --wait -- E3DPVB0EVFU1XV index.html",
     "build-deploy": "npm run build && npm run deploy"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
-    "bulma": "^0.7.1",
-    "firebase": "^5.3.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-hot-loader": "^4.3.4",
+    "bulma": "^0.7.2",
+    "firebase": "^5.5.5",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-hot-loader": "^4.3.11",
     "react-router-dom": "^4.3.1",
     "react-url-query": "^1.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.54",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.54",
-    "@babel/preset-env": "^7.0.0-beta.54",
-    "@babel/preset-react": "^7.0.0-beta.54",
-    "autoprefixer": "^9.0.1",
-    "babel-eslint": "^8.2.6",
-    "babel-loader": "^8.0.0-beta.2",
-    "clean-webpack-plugin": "^0.1.19",
-    "css-loader": "^1.0.0",
-    "dotenv": "^6.0.0",
-    "eslint": "^5.2.0",
-    "eslint-config-airbnb": "^17.0.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-jsx-a11y": "6.0.3",
-    "eslint-plugin-react": "^7.10.0",
-    "extract-text-webpack-plugin": "^4.0.0-alpha.0",
-    "file-loader": "^1.1.11",
-    "font-awesome": "^4.7.0",
-    "gh-pages": "^1.2.0",
-    "html-webpack-plugin": "^3.2.0",
-    "node-sass": "^4.9.2",
-    "optimize-css-assets-webpack-plugin": "^5.0.0",
-    "postcss-loader": "^2.1.6",
-    "pug": "^2.0.3",
-    "pug-loader": "https://github.com/pugjs/pug-loader/tarball/master",
-    "sass-loader": "^7.0.3",
-    "style-loader": "^0.21.0",
-    "uglifyjs-webpack-plugin": "^1.2.7",
-    "url-loader": "^1.0.1",
-    "webpack": "^4.16.2",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.5"
+    "webpack-boiler": "^0.1.13"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/wyattades/tely"
-  }
+  },
+  "private": true
 }
