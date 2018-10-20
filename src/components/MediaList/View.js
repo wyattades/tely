@@ -51,7 +51,7 @@ export default class View extends React.Component {
 
     return <>
       <p className="is-size-5 has-text-grey">Your List:</p>
-      <h1 className="is-size-1">{meta.name}</h1>
+      <h1 className="is-size-1 is-clipped">{meta.name}</h1>
       <br/>
       <Search type={meta.type} setResults={onSearch}/>
       <br/>

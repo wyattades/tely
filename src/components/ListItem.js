@@ -110,7 +110,7 @@ export class ListItem extends React.Component {
             </small>
           </div>
         )}
-        <div className="level-right" style={{ margin: -14 }}>
+        <div className="level-right" style={{ height: '1rem', overflow: 'hidden' }}>
           { canWrite && <>
             <button className="button is-inverted is-link" onClick={this.delete}
               title="Delete from List" disabled={deleting}>

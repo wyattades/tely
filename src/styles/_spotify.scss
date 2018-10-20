@@ -102,6 +102,10 @@
   color: $white;
   transition: left 0.3s ease-in-out;
 
+  @include mobile {
+    bottom: 84px;
+  }
+
   &.collapsed {
     left: -280px;
     transition: left 0.3s ease-in-out;

@@ -51,7 +51,7 @@ export default class Suggest extends React.Component {
 
     return <>
       <p className="is-size-5 has-text-grey">Suggested:</p>
-      <h1 className="is-size-1">{meta.name}</h1>
+      <h1 className="is-size-1 is-clipped">{meta.name}</h1>
       <br/>
       <center>
         <button className="button is-primary is-medium" onClick={this.fetchSuggested}>

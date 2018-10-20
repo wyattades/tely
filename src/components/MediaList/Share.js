@@ -115,7 +115,7 @@ export default class Share extends React.Component {
 
     return <>
       <p className="is-size-5 has-text-grey">Share:</p>
-      <h1 className="is-size-1">{name}</h1>
+      <h1 className="is-size-1 is-clipped">{name}</h1>
       <br/>
       <p className="content">
         Tely was built to create collaborative lists between friends.

@@ -25,7 +25,7 @@ const loadPlayer = () => new Promise((resolve, reject) => {
   player = new window.Spotify.Player({
     name: 'Tely Online Playback',
     volume: 0.7,
-    getOAuthToken: cb => { cb(profiles.spotify.accessToken); },
+    getOAuthToken: (cb) => { cb(profiles.spotify.accessToken); },
   });
 
   player.addListener('initialization_error', reject);
@@ -144,9 +144,10 @@ export class SpotifyPlayerWeb extends React.Component {
 }
 
 const SpotifyPlayerMobile = ({ id, title }) => (
-  <a className="scale-box">
-    <iframe src={`https://open.spotify.com/embed?uri=spotify:track:${id}`} width="80" height="80"
-      frameBorder="0" allowTransparency allow="encrypted-media" title={title}/>
+  <a className="play-button floating playing" href={`https://open.spotify.com/track/${id}`} title={title}>
+    <PlayButton/>
+    {/* <iframe src={`https://open.spotify.com/embed?uri=spotify:track:${id}`} width="80" height="80"
+      frameBorder="0" allowTransparency allow="encrypted-media" title={title}/> */}
   </a>
 );
 

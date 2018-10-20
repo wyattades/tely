@@ -15,10 +15,9 @@ const lists = firestore.collection('lists');
 const SERVER_URL = config.admin.mode === 'development'
   ? 'http://localhost:5000/tely-db/us-central1/widgets'
   : 'https://us-central1-tely-db.cloudfunctions.net/widgets';
-const ORIGIN = config.admin.mode === 'development'
+const ORIGIN_URL = config.admin.mode === 'development'
   ? 'http://localhost:8080'
-  : 'https://wyattades.github.io';
-const ORIGIN_URL = `${ORIGIN}/tely`;
+  : 'https://tely.app';
 
 // TODO: necessary?
 passport.serializeUser((user, done) => done(null, user));
@@ -105,7 +104,7 @@ app.use(express.json());
 
 // CORS!
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', ORIGIN);
+  res.header('Access-Control-Allow-Origin', ORIGIN_URL);
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });

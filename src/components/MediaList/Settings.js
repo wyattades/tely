@@ -57,7 +57,7 @@ export default class Settings extends React.Component {
       
     return <>
       <p className="is-size-5 has-text-grey">Settings:</p>
-      <h1 className="is-size-1">{this.state.name || name}</h1>
+      <h1 className="is-size-1 is-clipped">{this.state.name || name}</h1>
       <br/>
       <div className="field">
         <label className="label" htmlFor="name">List Name</label>
@@ -71,7 +71,8 @@ export default class Settings extends React.Component {
         <MultiInput items={Object.values(webhooks)} placeholder="Webhook URL" type="url"
           onAddItem={this.addOrRemoveWebhook(true)} onRemoveItem={this.addOrRemoveWebhook(false)}/>
         <p className="help">
-          Go to your Discord server's settings to fetch a new webhook (must have role Server Manager)
+          Go to your Discord server's settings to fetch a new webhook (must have role Server Manager).
+          Add the webhook here to notify your server when list items are added!
         </p>
       </div>
       <br/>

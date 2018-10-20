@@ -11,6 +11,7 @@ Currently, you can create and share lists containing:
 
 
 ## TODO
+- List item labels
+- Improve general styling. Add some flare!
 - Limit usage of TMDB and Discord APIs (due to rate limiting)
-- Improve general styling
-- Improve Spotify playback capabilities
+- Improve Spotify playback capabilities. Add support for current player
