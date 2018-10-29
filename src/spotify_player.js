@@ -143,13 +143,14 @@ export class SpotifyPlayerWeb extends React.Component {
   }
 }
 
-const SpotifyPlayerMobile = ({ id, title }) => (
+const SpotifyPlayerMobile = ({ id, image, title }) => <>
+  <img src={image} alt={title}/>
   <a className="play-button floating playing" href={`https://open.spotify.com/track/${id}`} title={title}>
     <PlayButton/>
     {/* <iframe src={`https://open.spotify.com/embed?uri=spotify:track:${id}`} width="80" height="80"
       frameBorder="0" allowTransparency allow="encrypted-media" title={title}/> */}
   </a>
-);
+</>;
 
 export const SpotifyPlayer = IS_MOBILE ? SpotifyPlayerMobile : SpotifyPlayerWeb;
 

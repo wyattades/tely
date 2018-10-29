@@ -38,7 +38,7 @@ export const init = () => firestore.enablePersistence()
 .catch((err) => {
   console.error(err);
   if (err.code === 'failed-precondition')
-    window.alert('Failed to initialize caching because multiple sessions are open');
+    console.warn('Failed to initialize caching because multiple sessions are open');
 })
 .then(new Promise((resolve) => {
   const unsubscribe = auth.onAuthStateChanged(() => {
@@ -148,3 +148,5 @@ export const favoriteListItem = (item, type) => {
   })
   .then(() => toggleListItem(item, favRef.collection('contents'), listMeta, true));
 };
+
+// exports.

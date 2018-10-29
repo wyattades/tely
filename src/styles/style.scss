@@ -22,9 +22,14 @@
 }
 
 .text-tag {
+  display: inline-block;
+  padding: 0 6px;
   background-color: #eee;
-  padding: 6px;
+  line-height: 28px;
   border-radius: 4px;
+  img {
+    vertical-align: middle;
+  }
 }
 
 .media {
@@ -48,6 +53,28 @@
     right: 0;
     top: 0;
     bottom: 0;
+  }
+  @include mobile {
+    width: 60px;
+    min-height: 60px;
+  }
+}
+
+.info-row {
+  .info-right {
+    float: right;
+    clear: both;
+  }
+  > * {
+    vertical-align: middle;
+    display: inline-block;
+  }
+}
+
+.list-item.box {
+  @include mobile {
+    border-radius: 0;
+    margin: 0 -12px;
   }
 }
 

@@ -2,14 +2,12 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 
-const config = functions.config();
-
-// Store service account credentials in base64 to simplify env variables
-const SERVICE_ACCOUNT = JSON.parse(Buffer.from(config.admin.account, 'base64').toString('ascii'));
+global.DEV = process.env.NODE_ENV === 'development';
+global.config = functions.config();
 
 // Enable database access
 admin.initializeApp({
-  credential: admin.credential.cert(SERVICE_ACCOUNT),
+  credential: admin.credential.applicationDefault(),
 });
 
 // Expose Express API as a single Cloud Function:

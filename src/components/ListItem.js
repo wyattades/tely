@@ -95,9 +95,9 @@ export class ListItem extends React.Component {
     const userId = db.getProfile() && db.getProfile().id;
 
     const levelBottom = (
-      <nav className="level is-mobile">
+      <nav className="info-row">
         { item.creator && (
-          <div className="level-left">
+          <div className="info-left">
             <small className="has-text-grey has-text-right">
               {timeAgo(item.created)}&nbsp;
               { userId !== item.creator.id ? (
@@ -110,7 +110,7 @@ export class ListItem extends React.Component {
             </small>
           </div>
         )}
-        <div className="level-right" style={{ height: '1rem', overflow: 'hidden' }}>
+        <div className="info-right">
           { canWrite && <>
             <button className="button is-inverted is-link" onClick={this.delete}
               title="Delete from List" disabled={deleting}>
@@ -131,7 +131,7 @@ export class ListItem extends React.Component {
     );
 
     return (
-      <div className={`box ${className}`}>
+      <div className={`box ${className} list-item`}>
         <MediaContent {...item} service={services.asObject[listMeta.type]} mediaBottom={levelBottom}/>
       </div>
     );

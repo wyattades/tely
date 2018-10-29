@@ -1,4 +1,3 @@
-const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const express = require('express');
 const passport = require('passport');
@@ -8,14 +7,13 @@ const refresh = require('passport-oauth2-refresh');
 const Query = require('querystring');
 
 
-const config = functions.config();
 const firestore = admin.firestore();
 const lists = firestore.collection('lists');
 
-const SERVER_URL = config.admin.mode === 'development'
+const SERVER_URL = global.DEV
   ? 'http://localhost:5000/tely-db/us-central1/widgets'
   : 'https://us-central1-tely-db.cloudfunctions.net/widgets';
-const ORIGIN_URL = config.admin.mode === 'development'
+const ORIGIN_URL = global.DEV
   ? 'http://localhost:8080'
   : 'https://tely.app';
 
@@ -24,8 +22,8 @@ passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
 const discordStrat = new DiscordStrategy({
-  clientID: config.discord.client_id,
-  clientSecret: config.discord.client_secret,
+  clientID: global.config.discord.client_id,
+  clientSecret: global.config.discord.client_secret,
   callbackURL: `${SERVER_URL}/auth/discord/callback`,
   scope: [ 'identify', 'email', 'guilds' ],
 }, (accessToken, refreshToken, res, profile, cb) => {
@@ -82,8 +80,8 @@ const discordStrat = new DiscordStrategy({
 });
 
 const spotifyStrat = new SpotifyStrategy({
-  clientID: config.spotify.client_id,
-  clientSecret: config.spotify.client_secret,
+  clientID: global.config.spotify.client_id,
+  clientSecret: global.config.spotify.client_secret,
   callbackURL: `${SERVER_URL}/auth/spotify/callback`,
   scope: [ 'streaming', 'user-read-birthdate', 'user-read-email', 'user-read-private', 'user-library-modify' ],
 }, (accessToken, refreshToken, expires_in, profile, cb) => {

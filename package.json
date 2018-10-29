@@ -12,6 +12,7 @@
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
     "bulma": "^0.7.2",
     "firebase": "^5.5.5",
+    "offline-plugin": "^5.0.5",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-hot-loader": "^4.3.11",
@@ -19,7 +20,7 @@
     "react-url-query": "^1.4.0"
   },
   "devDependencies": {
-    "webpack-boiler": "^0.1.13"
+    "webpack-boiler": "^0.2.0"
   },
   "repository": {
     "type": "git",
