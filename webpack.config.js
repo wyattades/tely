@@ -8,10 +8,13 @@ const loaderHTML = `<div class="full-page">\
 </div>\
 </div>`;
 
-const config = require('webpack-boiler')({
+module.exports = require('webpack-boiler')({
   googleAnalytics: 'UA-105229811-3',
   url: 'https://tely.app',
   react: true,
+  offline: process.env.NODE_ENV === 'development' ? false : {
+    ServiceWorker: { output: 'tely-sw.js' },
+  },
   manifest: {
     background_color: '#00d1b2',
     display: 'standalone',
@@ -28,8 +31,3 @@ const config = require('webpack-boiler')({
     loader: loaderHTML,
   }],
 });
-
-const OfflinePlugin = require('offline-plugin');
-config.plugins.push(new OfflinePlugin());
-
-module.exports = config;
