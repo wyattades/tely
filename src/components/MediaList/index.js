@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import services from '../../services';
 import * as db from '../../db';
 import * as share from '../../share';
-import { Spinner, LiveSwitch } from '../misc';
+import { Spinner, LiveSwitch, LiveTextEdit } from '../misc';
 import ListView from './View';
 import ListSuggest from './Suggest';
 import ListShare from './Share';
@@ -25,6 +25,7 @@ class MediaList extends React.Component {
     this.state = {
       list: null,
       meta: null,
+      labels: null,
       err: null,
       isOwner: null,
       canWrite: null,
@@ -55,13 +56,51 @@ class MediaList extends React.Component {
         itemData.id = doc.id;
         return itemData;
       });
-      this.setState({ list });
+      this.setState({ list }, () => this.applyLabels());
     }, (err) => this.setState({ err }));
+
+    if (db.getProfile()) {
+      this.unsubscribeLabels = db.getLabels((err, labels) => {
+        if (err) console.error(err);
+        else {
+          this.setState({ labels }, () => this.applyLabels());
+        }
+      });
+
+      this.unsubscribeLabelItems = db.listLabelMap(this.listId, (err, labelItemMap) => {
+        if (err) console.error(err);
+        else {
+          this.labelItemMap = labelItemMap;
+          this.applyLabels();
+        }
+      });
+    }
   }
 
   componentWillUnmount() {
     this.unsubscribeContent();
     this.unsubscribeMeta();
+    if (this.unsubscribeLabels) this.unsubscribeLabels();
+    if (this.unsubscribeLabelItems) this.unsubscribeLabelItems();
+  }
+
+  applyLabels() {
+    const { labels, list } = this.state;
+    if (!list || !labels || !this.labelItemMap) return;
+
+    const labelMap = {};
+    for (const label of this.state.labels) labelMap[label.id] = label;
+
+    this.setState((oldState) => ({
+      list: oldState.list.map((item) => {
+        const itemLabels = this.labelItemMap[item.id];
+        if (itemLabels) {
+          for (const labelId in itemLabels) itemLabels[labelId] = labelMap[labelId];
+          item.labels = itemLabels;
+        }
+        return { ...item };
+      }),
+    }));
   }
 
   onSearch = (searchResults) => {
@@ -83,6 +122,11 @@ class MediaList extends React.Component {
       searchResults,
     });
   }
+
+  // setName = (name) => {
+  //   this.listRef.update({ name })
+  //   .catch(console.error);
+  // }
 
   render() {
     const { meta, list, err, searchResults, canWrite, isOwner } = this.state;
@@ -125,6 +169,7 @@ class MediaList extends React.Component {
                 </ul>
               </aside>
               <div className="column is-offset-3 is-8-desktop">
+                {/* <LiveTextEdit onUpdate={this.setName} className="is-size-1" value={meta.name}/> */}
                 <LiveSwitch location={this.props.location} match={this.props.match} routes={[
                   { exact: true, path: prev, element: <ListView searchResults={searchResults} canWrite={canWrite}
                     meta={meta} contents={this.contentsRef} list={list} id={this.listId} onSearch={this.onSearch}/> },

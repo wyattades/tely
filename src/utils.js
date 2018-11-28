@@ -142,3 +142,12 @@ export const timeAgo = (date) => {
   else if ((months = Math.round(days / 30)) < 12) return timeAgoString('month', months);
   else return timeAgoString('year', Math.round(days / 365));
 };
+
+export const onSnap = (ref, cb) => ref.onSnapshot((snap) => {
+  const items = snap.docs.map((doc) => {
+    const itemData = doc.data();
+    itemData.id = doc.id;
+    return itemData;
+  });
+  cb(null, items);
+}, (error) => cb(error, null));

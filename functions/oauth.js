@@ -8,7 +8,8 @@ const Query = require('querystring');
 
 
 const firestore = admin.firestore();
-const lists = firestore.collection('lists');
+firestore.settings({ timestampsInSnapshots: true });
+
 
 const SERVER_URL = global.DEV
   ? 'http://localhost:5000/tely-db/us-central1/widgets'
@@ -48,24 +49,6 @@ const discordStrat = new DiscordStrategy({
     if (userDoc.exists) {
       return trans.update(userDoc.ref, profile);
     } else {
-
-      // Add this user to all lists that share with one of his servers
-      // This is a very expensive operation, so only do it on account creation
-      const batch = firestore.batch();
-      Promise.all(Object.keys(profile.guilds).map((guildId) => (
-        lists.where(`shared_servers.${guildId}.role`, '>', '')
-        .get()
-        .then((snap) => {
-          // TODO: might need to handle if shared_users contains profile.id
-          snap.forEach((doc) => batch.update(doc.ref, {
-            [`shared_servers.${guildId}.members.${profile.id}`]: true,
-            [`roles.${profile.id}`]: doc.data().shared_servers[guildId].role,
-          }));
-        })
-      )))
-      .then(() => batch.commit())
-      .catch((err) => console.error('batch share servers:', err));
-
       return trans.set(userDoc.ref, profile);
     }
   }))

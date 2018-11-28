@@ -6,6 +6,6 @@ import './styles/style.scss';
 import App from './components/App';
 
 
-Offline.install();
+if (process.env.NODE_ENV === 'production') Offline.install();
 
 render(<App/>, document.getElementById('root'));

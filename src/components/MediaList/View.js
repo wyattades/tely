@@ -36,14 +36,14 @@ export default class View extends React.Component {
     let Content = null;
     if (searchResults) {
       Content = searchResults.map((item) => (
-        <SearchItem item={item} key={item.media_id} canWrite={this.canWrite}
-          toggle={this.toggleSearchItem} type={meta.type}/>
+        <SearchItem key={item.media_id} item={item} canWrite={this.canWrite}
+          toggle={this.toggleSearchItem}/>
       ));
     } else if (list.length) {
       // grid = true;
       Content = list.map((item) => (
-        <ListItem item={item} listMeta={meta} key={item.id} className={grid && "column is-4"}
-          toggle={this.toggleListItem} canWrite={this.canWrite}/>
+        <ListItem key={item.id} item={item} className={grid && "column is-4"}
+          toggle={this.toggleListItem} canWrite={this.canWrite} listId={meta.id}/>
       ));
     } else {
       Content = <p className="is-size-4 has-text-centered">Empty List!</p>;

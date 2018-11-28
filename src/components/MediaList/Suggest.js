@@ -44,8 +44,7 @@ export default class Suggest extends React.Component {
     if (err) Content = <p className="has-text-danger has-text-centered">An error occurred while fetching content</p>;
     else if (!suggested) Content = <><br/><br/><Spinner centered/></>;
     else if (suggested.length) Content = suggested.map((item) => (
-      <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)}
-        type={meta.type} canWrite={this.canWrite}/>
+      <SearchItem item={item} key={item.media_id} toggle={this.onToggle(item)} canWrite={this.canWrite}/>
     ));
     else Content = <p className="is-size-4 has-text-centered">No Suggestions!</p>;
 

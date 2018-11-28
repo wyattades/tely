@@ -23,6 +23,7 @@ export const renderBody = ({ desc }) => <TruncateText text={desc}/>;
 export const textBody = ({ desc = '' }) => desc.length > 120 ? `${desc.substring(0, 120)}...` : desc;
 
 const mapResponse = (type) => ({ id, title, name, poster_path, overview, release_date, first_air_date }) => ({
+  service: 'movies_tv',
   label: type === 'tv' ? 'TV' : 'Movie',
   title: type === 'tv' ? name : title,
   image: poster_path && `${IMAGE_SRC}${poster_path}`,

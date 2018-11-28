@@ -18,11 +18,11 @@ export const Spinner = ({ fullPage, centered }) => (
   </div>
 );
 
-export const SmallSection = ({ children }) => (
+export const SmallSection = ({ children, size = 6 }) => (
   <section className="section">
     <div className="container">
       <div className="columns is-centered">
-        <div className="column is-half">
+        <div className={`column is-${size}`}>
           {children}
         </div>
       </div>
@@ -37,6 +37,69 @@ export const ContainerSection = ({ children }) => (
     </div>
   </section>
 );
+
+export class LiveTextEdit extends React.Component {
+
+  state = {
+    value: this.props.value,
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.value !== this.props.value)
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ value: this.props.value });
+  }
+
+  componentWillUnmount() {
+    this.clearTimeout();
+  }
+
+  clearTimeout() {
+    if (this.timeout !== null) {
+      window.clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+  }
+
+  timeout = null;
+
+  onKeyPress = (e) => {
+    if (e.which === 13) {
+      e.target.blur();
+    }
+  }
+
+  onBlur = () => {
+    this.clearTimeout();
+    this.props.onUpdate(this.state.value);
+  }
+
+  onChange = (e) => {
+    const value = e.target.value;
+
+    this.clearTimeout();
+
+    if (value) {
+      this.timeout = window.setTimeout(() => {
+        this.props.onUpdate(value);
+        this.timeout = null;
+      }, 500);
+    }
+
+    this.setState({ value });
+  }
+
+  render() {
+    const { value: _, onUpdate: __, className = '', ...inputProps } = this.props;
+    const { value } = this.state;
+
+    return <>
+      <input type="text" {...inputProps} value={value} className={`live-text-edit ${className}`}
+        onChange={this.onChange} onKeyPress={this.onKeyPress} onBlur={this.onBlur}/>
+      {/* <span className="fas fa-edit"></span> */}
+    </>;
+  }
+}
 
 // Similar to react-router Switch component, but keeps routes
 // rendered in background after they have been visited

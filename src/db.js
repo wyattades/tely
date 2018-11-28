@@ -1,10 +1,11 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+// import { EventEmitter } from 'events';
 
 import * as API from './api';
-import services from './services';
 import { sendWebhooks } from './discord';
+import { onSnap, isEmpty, decodeQuery } from './utils';
 
 
 firebase.initializeApp({
@@ -25,20 +26,32 @@ firestore.settings({ timestampsInSnapshots: true });
 
 export const Helpers = firebase.firestore;
 
-// Collections
+// Global collections
+/** @type firebase.firestore.CollectionReference */
 export let users;
+/** @type firebase.firestore.CollectionReference */
 export let lists;
+/** @type firebase.firestore.CollectionReference */
+let labels;
+/** @type firebase.firestore.CollectionReference */
+let labelItems;
 
-export const signOut = () => {
-  API.clearProfile('discord');
-  return auth.signOut();
+export const getUser = () => auth.currentUser;
+
+export const getProfile = () => API.profiles.discord;
+
+const listenLabels = () => {
+  const userRef = users.doc(getProfile().id);
+  labels = userRef.collection('labels');
+  labelItems = userRef.collection('labelItems');
 };
 
 export const init = () => firestore.enablePersistence()
 .catch((err) => {
-  console.error(err);
   if (err.code === 'failed-precondition')
     console.warn('Failed to initialize caching because multiple sessions are open');
+  else
+    console.error(err);
 })
 .then(new Promise((resolve) => {
   const unsubscribe = auth.onAuthStateChanged(() => {
@@ -54,26 +67,30 @@ export const init = () => firestore.enablePersistence()
 .then(() => {
   users = firestore.collection('users');
   lists = firestore.collection('lists');
+
+  if (getProfile()) {
+    listenLabels();
+  }
 });
 
-export const getUser = () => auth.currentUser;
-
-export const getProfile = () => API.profiles.discord;
-
 export const signIn = () => API.signIn('discord')
-.then((profile) => auth.signInWithCustomToken(profile.token));
+.then((profile) => auth.signInWithCustomToken(profile.token))
+.then(() => {
+
+  listenLabels();
+
+  const { from } = decodeQuery(window.location.search);
+  return from && from.startsWith('/') && from;
+});
+
+export const signOut = () => {
+  API.clearProfile('discord');
+  return auth.signOut();
+};
 
 export const deleteAll = () => {
   const userId = getProfile().id;
-  const batch = firestore.batch();
-
-  batch.delete(users.doc(userId));
-
-  return lists.where(`roles.${userId}`, '==', 'o').get()
-  .then((snap) => {
-    for (const doc of snap.docs) batch.delete(doc.ref);
-    return batch.commit();
-  });
+  return users.doc(userId).delete();
 };
 
 const newListMeta = (name, type) => {
@@ -126,27 +143,80 @@ export const toggleListItem = (item, listContents, listMeta, force = null) => {
   }
 };
 
-export const favoriteListItem = (item, type) => {
-  const userId = getProfile().id;
-  const favRef = lists.doc(`fav_${userId}_${type}`);
-  const service = services.asObject[type];
+export const getLabels = (cb) => onSnap(labels, cb);
 
-  let listMeta;
+export const createLabel = (name, color) => labels.add({
+  name,
+  color,
+});
 
-  return favRef.get()
-  .then((doc) => {
-    if (doc.exists) listMeta = doc.data();
-    return doc.exists;
-  })
-  .catch((err) => Promise.resolve(err.code !== 'permission-denied'))
-  .then((exists) => {
-    if (!exists) {
-      listMeta = newListMeta(`${service.LABEL} Favorites`, type);
-      return favRef.set(listMeta);
+export const updateLabel = (id, meta) => labels.doc(id).update(meta);
+
+export const deleteLabel = (id) => {
+  const batch = firestore.batch();
+
+  batch.delete(labels.doc(id));
+
+  const queryField = `labels.${id}`;
+
+  return labelItems.where(queryField, '==', true).get()
+  .then((snap) => {
+    for (const doc of snap.docs) {
+      const itemData = doc.data();
+      delete itemData.labels[id];
+      if (isEmpty(itemData.labels))
+        batch.delete(doc.ref);
+      else
+        batch.update(doc.ref, {
+          [queryField]: Helpers.FieldValue.delete(),
+        });
     }
-    return Promise.resolve();
-  })
-  .then(() => toggleListItem(item, favRef.collection('contents'), listMeta, true));
+    return batch.commit();
+  });
 };
 
-// exports.
+
+// TODO This method allows duplicate items
+export const addItemLabel = (item, labelId, listId) => (
+  firestore.runTransaction((trans) => {
+    const ref = labelItems.doc(item.id);
+    return (item.labels ? Promise.resolve(true) : trans.get(ref).then((doc) => doc.exists))
+    .then((exists) => {
+      if (exists) {
+        return trans.update(ref, {
+          [`labels.${labelId}`]: true,
+          listId,
+        });
+      } else {
+        const newItem = {
+          ...item,
+          labels: { [labelId]: true },
+          listId,
+        };
+        delete newItem.creator;
+        return trans.set(ref, newItem);
+      }
+    });
+  })
+);
+
+// TODO use transaction?
+export const removeItemLabel = (labelItem, labelId) => {
+  delete labelItem.labels[labelId];
+  if (isEmpty(labelItem.labels))
+    return labelItems.doc(labelItem.id).delete();
+  return labelItems.doc(labelItem.id).update({
+    [`labels.${labelId}`]: Helpers.FieldValue.delete(),
+  });
+};
+
+export const listLabelMap = (listId, cb) => labelItems.where('listId', '==', listId)
+.onSnapshot((snap) => {
+  const map = {};
+  snap.forEach((doc) => {
+    map[doc.id] = doc.data().labels;
+  });
+  cb(null, map);
+}, (err) => cb(err, null));
+
+export const selectByLabel = (labelId, cb) => onSnap(labelItems.where(`labels.${labelId}`, '==', true), cb);

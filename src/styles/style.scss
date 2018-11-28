@@ -46,6 +46,7 @@
   width: 92px;
   min-height: 92px;
   position: relative;
+  margin-bottom: 8px;
   button {
     position: absolute;
     margin: auto;
@@ -74,7 +75,12 @@
 .list-item.box {
   @include mobile {
     border-radius: 0;
-    margin: 0 -12px;
+    margin: 0 -24px;
+    box-shadow: none;
+    border-bottom: 1px solid rgba(10, 10, 10, 0.1);
+    &:first-child {
+      border-top: 1px solid rgba(10, 10, 10, 0.1);
+    }
   }
 }
 
@@ -181,9 +187,16 @@
 }
 .fixed-column + .column {
   @include mobile {
-    padding: 0;
+    // padding: 0;
     padding-bottom: 64px;
   }
+}
+
+// Fix navbar margin above tablet
+.navbar > .container > * {
+  // @include tablet {
+    margin: 0 !important;
+  // }
 }
 
 // TEMP
@@ -209,4 +222,50 @@
   color: $primary;
   font-family: 'Times New Roman', Times, serif;
   font-weight: bold;
+}
+
+.has-border {
+  box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.16) !important;
+}
+
+button.tag {
+  border: none;
+}
+
+.labels .tag {
+  margin-right: 12px;
+  cursor: pointer;
+}
+
+.labels.low {
+  margin-bottom: -20px;
+  .tag {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.live-text-edit {
+  // position: relative;
+  width: 100%;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  border-bottom: 3px solid transparent;
+  // transition: border-width 0.3s ease-in-out;
+  
+  // + span {
+  //   float: right;
+  // }
+  &:hover {
+    border-color: $grey;
+    // + span {
+    //   color: $dark;
+    // }
+  }
+  &:focus {
+    border-color: $link;
+  }
 }

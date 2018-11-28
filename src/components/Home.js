@@ -7,7 +7,7 @@ export default class Home extends React.PureComponent {
 
   signIn = () => {
     db.signIn()
-    .then(() => this.props.history.push('/list'))
+    .then((from) => this.props.history.push(from || '/list'))
     .catch(console.error);
   }
 

@@ -5,15 +5,16 @@ import services from '../services';
 import { SpotifyPlayer } from '../spotify_player';
 import * as db from '../db';
 import { userAvatar } from '../discord';
+import { LabelEditor } from './Labels';
 
 
 const MediaContent = ({
-  link, released, media_id, image, title, service, label, mediaBottom, mediaRight, ...body
+  service, mediaBottom, mediaRight, item: { labels, link, released, media_id, image, title, label, ...body },
 }) => {
 
   const releaseDate = toDate(released);
 
-  return <>
+  return (
     <article className="media">
       <div className="media-left">
         <figure className="image media-image">
@@ -45,7 +46,7 @@ const MediaContent = ({
         </div>
       ) : null}
     </article>
-  </>;
+  );
 };
 
 // TODO
@@ -54,13 +55,19 @@ MediaContent.shouldComponentUpdate = () => false;
 export class ListItem extends React.Component {
 
   state = {
-    favorite: false,
     deleting: false,
+    labelMap: null,
   }
 
-  shouldComponentUpdate(_, nextState) {
-    return this.state.favorite !== nextState.favorite
-        || this.state.deleting !== nextState.deleting;
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.state.deleting !== nextState.deleting
+        || this.props.item !== nextProps.item
+        || this.props.item.labels !== nextProps.item.labels
+        || this.state.labelMap !== nextState.labelMap;
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) this.unsubscribe();
   }
 
   delete = () => {
@@ -69,18 +76,27 @@ export class ListItem extends React.Component {
     });
   }
 
-  favorite = () => {
-    const { item, listMeta } = this.props;
-    this.setState({ favorite: 'loading' }, () => {
-      db.favoriteListItem(item, listMeta.type)
-      .then(() => this.setState({ favorite: true }))
-      .catch(console.error);
-    });
+  toggleLabelEditor = () => {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+      this.setState({ labelMap: null });
+    } else {
+      this.unsubscribe = db.getLabels((err, labelArray) => {
+        if (err) console.error(err);
+        else {
+          const labelMap = {};
+          for (const label of labelArray) labelMap[label.id] = label;
+
+          this.setState({ labelMap });
+        }
+      });
+    }
   }
 
   share = () => {
     window.navigator.share({
-      title: `Checkout some ${this.props.label} from Tely`,
+      title: `Checkout some ${this.props.item.label} from Tely`,
       text: '',
       url: this.props.item.link || window.location.href,
     })
@@ -89,8 +105,11 @@ export class ListItem extends React.Component {
   }
 
   render() {
-    const { item, canWrite, listMeta, className } = this.props;
-    const { favorite, deleting } = this.state;
+    const { item, canWrite, className, listId } = this.props;
+    const { deleting, labelMap } = this.state;
+
+    // TEMP
+    const type = item.service || (item.label === 'Song' ? 'spotify_music' : 'movies_tv');
 
     const userId = db.getProfile() && db.getProfile().id;
 
@@ -116,9 +135,9 @@ export class ListItem extends React.Component {
               title="Delete from List" disabled={deleting}>
               <span className="icon"><i className="fas fa-trash"/></span>
             </button>
-            <button className={`button is-inverted ${favorite === true ? 'is-success' : 'is-link'}`}
-              onClick={this.favorite} title="Add to Favorites" disabled={favorite}>
-              <span className="icon"><i className="fas fa-heart"/></span>
+            <button className="button is-inverted is-link"
+              onClick={this.toggleLabelEditor} title="Edit Labels">
+              <span className="icon"><i className="fas fa-tags"/></span>
             </button>
           </> }
           { (window.navigator && window.navigator.share) ? (
@@ -131,8 +150,11 @@ export class ListItem extends React.Component {
     );
 
     return (
-      <div className={`box ${className} list-item`}>
-        <MediaContent {...item} service={services.asObject[listMeta.type]} mediaBottom={levelBottom}/>
+      <div className={`box ${className || ''} list-item`}>
+        <MediaContent item={item} service={services.asObject[type]} mediaBottom={levelBottom}/>
+        { (item.labels || labelMap) && (
+          <LabelEditor listId={listId} labelMap={labelMap} item={item} itemLabels={item.labels || {}}/>
+        ) }
       </div>
     );
   }
@@ -158,8 +180,11 @@ export class SearchItem extends React.Component {
   }
 
   render() {
-    const { item, type, canWrite } = this.props;
+    const { item, canWrite } = this.props;
     const { hovered } = this.state;
+
+    // TEMP
+    const type = item.service || (item.label === 'Song' ? 'spotify_music' : 'movies_tv');
 
     let addIcon;
     if (canWrite) {
@@ -184,7 +209,7 @@ export class SearchItem extends React.Component {
     }
 
     return (
-      <MediaContent {...item} service={services.asObject[type]} mediaRight={addIcon}/>
+      <MediaContent item={item} service={services.asObject[type]} mediaRight={addIcon}/>
     );
   }
 }

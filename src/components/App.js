@@ -18,11 +18,14 @@ import MediaLists from './MediaLists';
 import MediaList from './MediaList';
 import NewMediaList from './NewMediaList';
 import Header from './Header';
+import { Labels } from './Labels';
 import { SpotifyControls } from '../spotify_player';
 import { Spinner } from './misc';
 
 import * as db from '../db';
 
+
+if (process.env.NODE_ENV === 'development') window.db = db;
 
 // Set default NavLink activeClassName
 NavLink.defaultProps.activeClassName = 'is-active';
@@ -52,7 +55,7 @@ class App extends React.Component {
     if (!this.state.mounted) return <Spinner fullPage/>;
 
     return (
-      <Router basename={process.env.BASENAME}>
+      <Router>
         <RouterToUrlQuery>
           <>
             <Header/>
@@ -64,6 +67,7 @@ class App extends React.Component {
                 <PrivateRoute exact path="/account" component={Account}/>
                 <PrivateRoute exact path="/list" component={MediaLists}/>
                 <PrivateRoute exact path="/list/new" component={NewMediaList}/>
+                <PrivateRoute path="/labels" component={Labels}/>
                 <Route path="/list/:listid" component={MediaList}/>
                 <Route exact path="/logout" render={() => {
                   db.signOut().catch(console.error);

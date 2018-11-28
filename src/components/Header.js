@@ -26,7 +26,7 @@ class Header extends React.PureComponent {
   toggle = () => this.setState(({ open }) => ({ open: !open }))
 
   signIn = () => db.signIn()
-  .then(() => this.props.history.push('/list'))
+  .then((from) => this.props.history.push(from || '/list'))
   .catch(console.error);
 
   render() {
@@ -59,6 +59,9 @@ class Header extends React.PureComponent {
             </div>
             <div className="navbar-end">
               { loggedIn ? <>
+                <NavLink className="navbar-item" to="/labels">
+                  <span>Labels</span>
+                </NavLink>
                 <NavLink className="navbar-item" to="/list">
                   <span>My Lists</span>
                 </NavLink>

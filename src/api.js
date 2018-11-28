@@ -43,7 +43,7 @@ export const signIn = (service) => new Promise((resolve, reject) => {
   const intervalId = window.setInterval(() => {
     if (!popup) {
       window.clearInterval(intervalId);
-      throw 'Window closed unexpectedly!';
+      throw 'Sign in window was closed unexpectedly';
     }
     
     let arrived = false;
