@@ -11,16 +11,16 @@
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
     "bulma": "^0.7.2",
-    "firebase": "^5.5.5",
-    "offline-plugin": "^5.0.5",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
-    "react-hot-loader": "^4.3.11",
+    "firebase": "^5.5.8",
+    "offline-plugin": "^5.0.6",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-hot-loader": "^4.3.12",
     "react-router-dom": "^4.3.1",
     "react-url-query": "^1.4.0"
   },
   "devDependencies": {
-    "webpack-boiler": "^0.2.0"
+    "webpack-boiler": "^0.2.3"
   },
   "repository": {
     "type": "git",
