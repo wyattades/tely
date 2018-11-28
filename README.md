@@ -15,7 +15,6 @@ Tely uses the `webpack-boiler` package for bundling and development. It supports
 While `react` and `react-router` are used for the front-end, I utilize Firebase's Firestore as the database and Firebase Functions for handling OAuth and database triggers. Firebase provides the capability for data subscriptions using websockets as well as robust user authentication.
 
 ## Planned Features
-- List item labels
 - Improve general styling. Add some flare!
 - Limit usage of TMDB and Discord APIs (due to rate limiting)
 - Improve Spotify playback capabilities. Add support for current player
