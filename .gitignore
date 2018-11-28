@@ -3,7 +3,7 @@ dist/
 package-lock.json
 .env*
 .runtimeconfig.json
-__migrate__.js
+functions/scripts/
 
 # Logs
 logs
