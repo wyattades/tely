@@ -3,7 +3,7 @@ import React from 'react';
 import { ListItem, SearchItem } from '../ListItem';
 import Search from '../Search';
 import * as share from '../../share';
-import { toggleListItem } from '../../db';
+import { toggleListItem, getProfile } from '../../db';
 
 
 export default class View extends React.Component {
@@ -31,6 +31,8 @@ export default class View extends React.Component {
   render() {
     const { meta, searchResults, list, onSearch } = this.props;
 
+    const loggedIn = !!getProfile();
+
     let grid = false;
 
     let Content = null;
@@ -43,7 +45,7 @@ export default class View extends React.Component {
       // grid = true;
       Content = list.map((item) => (
         <ListItem key={item.id} item={item} className={grid && "column is-4"}
-          toggle={this.toggleListItem} canWrite={this.canWrite} listId={meta.id}/>
+          toggle={this.toggleListItem} canDelete={this.canWrite} showLabels={loggedIn} listId={meta.id}/>
       ));
     } else {
       Content = <p className="is-size-4 has-text-centered">Empty List!</p>;

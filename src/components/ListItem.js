@@ -105,11 +105,8 @@ export class ListItem extends React.Component {
   }
 
   render() {
-    const { item, canWrite, className, listId } = this.props;
+    const { item, showLabels, canDelete, className, listId } = this.props;
     const { deleting, labelMap } = this.state;
-
-    // TEMP
-    const type = item.service || (item.label === 'Song' ? 'spotify_music' : 'movies_tv');
 
     const userId = db.getProfile() && db.getProfile().id;
 
@@ -130,16 +127,18 @@ export class ListItem extends React.Component {
           </div>
         )}
         <div className="info-right">
-          { canWrite && <>
+          { canDelete && (
             <button className="button is-inverted is-link" onClick={this.delete}
               title="Delete from List" disabled={deleting}>
               <span className="icon"><i className="fas fa-trash"/></span>
             </button>
-            <button className="button is-inverted is-link"
+          ) }
+          { showLabels && (
+            <button className={`button is-inverted ${labelMap ? 'is-dark' : 'is-link'}`}
               onClick={this.toggleLabelEditor} title="Edit Labels">
               <span className="icon"><i className="fas fa-tags"/></span>
             </button>
-          </> }
+          ) }
           { (window.navigator && window.navigator.share) ? (
             <button className="button is-inverted is-link" onClick={this.share} title="Share">
               <span className="icon"><i className="fas fa-share-alt"/></span>
@@ -151,7 +150,7 @@ export class ListItem extends React.Component {
 
     return (
       <div className={`box ${className || ''} list-item`}>
-        <MediaContent item={item} service={services.asObject[type]} mediaBottom={levelBottom}/>
+        <MediaContent item={item} service={services.asObject[item.service]} mediaBottom={levelBottom}/>
         { (item.labels || labelMap) && (
           <LabelEditor listId={listId} labelMap={labelMap} item={item} itemLabels={item.labels || {}}/>
         ) }

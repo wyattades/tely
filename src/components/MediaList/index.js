@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import services from '../../services';
 import * as db from '../../db';
 import * as share from '../../share';
-import { Spinner, LiveSwitch, LiveTextEdit } from '../misc';
+import { Spinner, LiveSwitch } from '../misc';
 import ListView from './View';
 import ListSuggest from './Suggest';
 import ListShare from './Share';

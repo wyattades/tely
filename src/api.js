@@ -38,7 +38,7 @@ export const expired = (service) => {
 export const signIn = (service) => new Promise((resolve, reject) => {
 
   const popup = popupCenter(`${SERVER_URL}/auth/${service}`, 500, 600);
-  if (!popup) throw null;
+  if (!popup) throw 'Sign in window failed to open';
 
   const intervalId = window.setInterval(() => {
     if (!popup) {
@@ -60,7 +60,7 @@ export const signIn = (service) => new Promise((resolve, reject) => {
 
       if (profile.accessToken && !error) {
         // TODO: fetch guilds and other profile info from db instead?
-        console.log('profile', service, profile);
+        // console.log('profile', service, profile);
         updateProfile(service, profile);
         resolve(profile);
       } else reject(error || 'Unknown signIn error');

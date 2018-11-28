@@ -3,7 +3,7 @@ import { Switch, Link, Route } from 'react-router-dom';
 
 import * as db from '../db';
 import { ListItem } from './ListItem';
-import { LiveTextEdit } from './misc';
+import LiveTextEdit from './form/LiveTextEdit';
 
 
 const colorMap = [
@@ -147,7 +147,7 @@ export class FilteredLabelItems extends React.Component {
     let Items;
     if (!items) Items = <div>Loading filtered label items...</div>;
     else if (!items.length) Items = <div>No items!</div>;
-    else Items = items.map((item) => <ListItem key={item.id} item={item} listId={item.listId}/>);
+    else Items = items.map((item) => <ListItem key={item.id} item={item} listId={item.listId} showLabels/>);
 
     return (
       <div>

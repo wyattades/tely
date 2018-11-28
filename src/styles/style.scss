@@ -232,16 +232,18 @@ button.tag {
   border: none;
 }
 
-.labels .tag {
-  margin-right: 12px;
-  cursor: pointer;
-}
-
-.labels.low {
-  margin-bottom: -20px;
+.labels {
+  margin-top: 4px;
   .tag {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+    margin-right: 12px;
+    cursor: pointer;
+  }
+  &.low {
+    margin-bottom: -20px;
+    .tag {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
   }
 }
 

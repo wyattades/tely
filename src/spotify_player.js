@@ -107,9 +107,17 @@ export class SpotifyPlayerWeb extends React.Component {
     }
   }
 
-  onStateChange = ({ paused, track_window }) => this.setState({
-    playing: !paused && this.props.id === track_window.current_track.id,
-  });
+  onStateChange = (playerState) => {
+    if (!playerState) {
+      this.setState({ error: true });
+      return;
+    }
+
+    const { paused, track_window } = playerState;
+    this.setState({
+      playing: !paused && this.props.id === track_window.current_track.id,
+    });
+  }
 
   onClick = () => {
     if (!this.state.playing)

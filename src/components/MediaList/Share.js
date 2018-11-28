@@ -22,7 +22,7 @@ class SharedItem extends React.Component {
   }
   
   render() {
-    const { guild: { id, icon, name, role }, shared } = this.props;
+    const { guild: { id, icon, name }, shared } = this.props;
 
     return (
       <div key={id} className="buttons">
@@ -35,7 +35,7 @@ class SharedItem extends React.Component {
           <span className="is-clipped" style={{ flex: 1 }}>{name}</span>
           <button className={`button is-medium is-discordmain is-marginless ${this.state.waiting ? 'is-loading' : ''}`}
             disabled={this.state.waiting} onClick={this.onClick}>
-            {shared ? 'Unshare' : 'Share'}
+            { shared ? 'Unshare' : 'Share' }
           </button>
         </div>
       </div>
@@ -137,16 +137,16 @@ export default class Share extends React.Component {
       <h4 className="is-size-3">Collaborators</h4>
       <p className="has-text-grey">Let individual users or entire Discord servers edit this list</p>
       <br/>
-      <label className="label" htmlFor="_">Users</label>
+      <label className="label">Users</label>
       <MultiInput items={shared_users ? Object.keys(shared_users) : []}
         placeholder="User ID" minLength={6} maxLength={20} type="number"
         onAddItem={this.shareUser} onRemoveItem={this.unshareUser}/>
       <p className="help">
-        A user's ID can be retrieved by right clicking his
-        or her icon and clicking <code>Copy ID</code>
+        A user's ID can be retrieved by right-clicking their
+        Discord icon and clicking <code>Copy ID</code>
       </p>
       <br/>
-      <label className="label" htmlFor="_">Servers</label>
+      <label className="label">Servers</label>
       <div className="box">
         { sharedGuilds && (sharedGuilds.length
           ? sharedGuilds.map(this.sharedItem(true))
