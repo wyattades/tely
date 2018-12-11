@@ -20,12 +20,9 @@ import NewMediaList from './NewMediaList';
 import Header from './Header';
 import { Labels } from './Labels';
 import { SpotifyControls } from '../spotify_player';
-import { Spinner } from './misc';
 
 import * as db from '../db';
 
-
-if (process.env.NODE_ENV === 'development') window.db = db;
 
 // Set default NavLink activeClassName
 NavLink.defaultProps.activeClassName = 'is-active';
@@ -39,25 +36,20 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   )}/>
 );
 
+
+// eslint-disable-next-line react/prefer-stateless-function
 class App extends React.Component {
-
-  state = {
-    mounted: false,
-  }
-
-  componentDidMount() {
-    db.init()
-    .then(() => this.setState({ mounted: true }));
-  }
-
   render() {
-
-    if (!this.state.mounted) return <Spinner fullPage/>;
-
     return (
       <Router>
         <RouterToUrlQuery>
           <>
+            <Route render={({ history }) => {
+              history.listen(() => {
+                if (window.swUpdate === true) window.location.reload();
+              });
+              return null;
+            }}/>
             <Header/>
             <ErrorBoundary>
               <Switch>
