@@ -246,8 +246,7 @@ export class Labels extends React.Component {
     if (!labels) LabelContent = <div>Loading labels...</div>;
     else if (!labels.length) LabelContent = <div>No labels!</div>;
     else LabelContent = labels.map((label) => (
-      <Link key={label.id} className={`button ${labelColor(label.color)}`} to={`/labels/${label.id}`}
-        style={{ marginRight: 8 }}>
+      <Link key={label.id} className={`button ${labelColor(label.color)}`} to={`/labels/${label.id}`}>
         {label.name}
       </Link>
     ));
@@ -275,7 +274,7 @@ export class Labels extends React.Component {
                 </div>
               </div>
               <hr/>
-              <div>
+              <div className="multiline-items">
                 {LabelContent}
               </div>
               <hr/>

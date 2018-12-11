@@ -271,3 +271,10 @@ button.tag {
     border-color: $link;
   }
 }
+
+.multiline-items {
+  margin: -8px;
+  & > * {
+    margin: 8px;
+  }
+}
