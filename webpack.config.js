@@ -13,7 +13,10 @@ module.exports = require('webpack-boiler')({
   url: 'https://tely.app',
   react: true,
   offline: process.env.NODE_ENV === 'development' ? false : {
-    ServiceWorker: { output: 'tely-sw.js' },
+    ServiceWorker: {
+      output: 'tely-sw.js',
+      events: true,
+    },
   },
   manifest: {
     background_color: '#00d1b2',

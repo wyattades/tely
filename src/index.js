@@ -4,8 +4,17 @@ import * as Offline from 'offline-plugin/runtime';
 
 import './styles/style.scss';
 import App from './components/App';
+import * as db from './db';
 
 
-if (process.env.NODE_ENV === 'production') Offline.install();
+if (process.env.NODE_ENV === 'production') {
+  Offline.install({
+    onUpdateReady: () => Offline.applyUpdate(),
+    onUpdated: () => { window.swUpdate = true; },
+  });
+}
 
-render(<App/>, document.getElementById('root'));
+db.init()
+.then(() => {
+  render(<App/>, document.getElementById('root'));
+});
