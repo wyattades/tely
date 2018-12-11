@@ -43,7 +43,7 @@ export default class Account extends React.Component {
         <br/>
         { discord.avatar && (
           <p>
-            <img className="image" alt={discord.username}
+            <img className="image" alt={discord.username} width="128" height="128"
               src={`${AVATAR_URL}/${discord.id}/${discord.avatar}.png`}/>
           </p>
         )}
