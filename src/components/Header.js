@@ -26,7 +26,7 @@ class Header extends React.PureComponent {
   toggle = () => this.setState(({ open }) => ({ open: !open }))
 
   signIn = () => db.signIn()
-  .then((from) => this.props.history.push(from || '/list'))
+  .then((path) => this.props.history.push(path))
   .catch(console.error);
 
   render() {
