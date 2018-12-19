@@ -20,8 +20,6 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error) {
-    console.log('Caught Error:', error);
-
     let message,
         code = 500;
     
