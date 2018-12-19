@@ -17,6 +17,8 @@ const urlPropsQueryConfig = {
   filter: {},
 };
 
+const RESULT_COUNT = 21;
+
 class Browse extends React.Component {
 
   state = {
@@ -26,38 +28,67 @@ class Browse extends React.Component {
 
   componentDidMount() {
     this.fetchLists(this.props);
+
+    window.addEventListener('scroll', this.onScroll);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.filter !== nextProps.filter || this.props.sort !== nextProps.sort)
-      this.fetchLists(nextProps);
+    if (this.props.filter !== nextProps.filter || this.props.sort !== nextProps.sort) {
+      this.lastDoc = null;
+      this.setState({ lists: null, error: null }, () => this.fetchLists(nextProps));
+    }
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    window.removeEventListener('scroll', this.onScroll);
   }
 
-  fetchLists = ({ sort, filter }) => {
-    if (this.unsubscribe) this.unsubscribe();
+  containerRef = React.createRef();
 
-    let query = db.lists.where('is_public', '==', true);
+  fetchLists({ sort, filter }) {
+
+    let query = db.lists.limit(RESULT_COUNT).where('is_public', '==', true);
 
     if (filter) query = query.where('type', '==', filter);
 
     if (sort === 'new') query = query.orderBy('created');
-    else if (sort === 'modified') query = query.orderBy('modified');
+    else if (sort === 'modified') query = query.orderBy('modified', 'desc');
     else query = query.orderBy('popularity', 'desc');
 
-    this.unsubscribe = query
-    .onSnapshot((snap) => {
+    const lastDoc = this.lastDoc;
+    this.lastDoc = null;
+
+    if (lastDoc) query = query.startAfter(lastDoc);
+    
+    query.get()
+    .then((snap) => {
+      
       const lists = [];
       snap.forEach((item) => {
         const itemData = item.data();
         itemData.id = item.id;
         lists.push(itemData);
       });
-      this.setState({ lists });
-    }, (error) => console.error(error) || this.setState({ error: error.code }));
+
+      if (lastDoc && this.state.lists)
+        this.setState((prevState) => ({
+          lists: prevState.lists.concat(lists),
+        }));
+      else
+        this.setState({ lists });
+
+      this.lastDoc = lists.length >= RESULT_COUNT ? snap.docs[snap.docs.length - 1] : null;
+
+      this.onScroll();
+    })
+    .catch((error) => console.error(error) || this.setState({ error: error.code }));
+  }
+
+  onScroll = () => {
+    if (this.lastDoc && this.containerRef.current
+        && this.containerRef.current.getBoundingClientRect().bottom < window.innerHeight) {
+      this.fetchLists(this.props);
+    }
   }
 
   changeFilter = (e) => this.props.onChangeFilter(e.target.value);
@@ -72,11 +103,12 @@ class Browse extends React.Component {
     if (error) {
       amount = <p className="has-text-danger">Error: {error}</p>;
     } else if (lists) {
-      if (lists.length === 0) amount = 'No Results Found';
-      else if (lists.length === 1) amount = '1 Result Found';
-      else amount = `${lists.length} Results Found`;
-      
-      amount = <p className="has-text-grey">{amount}</p>;
+      const len = lists.length;
+      amount = (
+        <p className="has-text-grey">
+          {len || 'No'} Result{len === 1 ? '' : 's'}{len < RESULT_COUNT ? ' Found' : ' Shown'}
+        </p>
+      );
     }
 
     return (
@@ -127,7 +159,7 @@ class Browse extends React.Component {
           </div>
         </div>
         { lists ? (
-          <div className="columns is-multiline">
+          <div className="columns is-multiline" ref={this.containerRef}>
             {lists.map(_ListView)}
           </div>
         ) : <><br/><br/><br/><Spinner centered/></> }
