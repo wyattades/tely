@@ -24,6 +24,9 @@ import { SpotifyControls } from '../spotify_player';
 import * as db from '../db';
 
 
+if (process.env.NODE_ENV === 'development')
+  window.db = db;
+
 // Set default NavLink activeClassName
 NavLink.defaultProps.activeClassName = 'is-active';
 
@@ -37,43 +40,39 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 );
 
 
-// eslint-disable-next-line react/prefer-stateless-function
-class App extends React.Component {
-  render() {
-    return (
-      <Router>
-        <RouterToUrlQuery>
-          <>
-            <Route render={({ history }) => {
-              history.listen(() => {
-                if (window.swUpdate === true) window.location.reload();
-              });
-              return null;
+const App = () => (
+  <Router>
+    <RouterToUrlQuery>
+      <>
+        <Header/>
+        <ErrorBoundary>
+          <Switch>
+            <Route exact path="/" component={Home}/>
+            <Route exact path="/about" component={About}/>
+            <Route exact path="/browse" component={Browse}/>
+            <PrivateRoute exact path="/account" component={Account}/>
+            <PrivateRoute exact path="/list" component={MediaLists}/>
+            <PrivateRoute exact path="/list/new" component={NewMediaList}/>
+            <PrivateRoute path="/labels" component={Labels}/>
+            <Route path="/list/:listid" component={MediaList}/>
+            <Route exact path="/logout" render={() => {
+              db.signOut().catch(console.error);
+              return <Redirect to="/"/>;
             }}/>
-            <Header/>
-            <ErrorBoundary>
-              <Switch>
-                <Route exact path="/" component={Home}/>
-                <Route exact path="/about" component={About}/>
-                <Route exact path="/browse" component={Browse}/>
-                <PrivateRoute exact path="/account" component={Account}/>
-                <PrivateRoute exact path="/list" component={MediaLists}/>
-                <PrivateRoute exact path="/list/new" component={NewMediaList}/>
-                <PrivateRoute path="/labels" component={Labels}/>
-                <Route path="/list/:listid" component={MediaList}/>
-                <Route exact path="/logout" render={() => {
-                  db.signOut().catch(console.error);
-                  return <Redirect to="/"/>;
-                }}/>
-                <Route render={() => { throw { code: 404 }; }}/>
-              </Switch>
-            </ErrorBoundary>
-            <SpotifyControls/>
-          </>
-        </RouterToUrlQuery>
-      </Router>
-    );
-  }
-}
+            <Route render={() => { throw { code: 404 }; }}/>
+          </Switch>
+        </ErrorBoundary>
+        <SpotifyControls/>
+        <Route render={({ history }) => {
+          // Auto-update service worker on route change
+          history.listen(() => {
+            if (window.swUpdate === true) window.location.reload();
+          });
+          return null;
+        }}/>
+      </>
+    </RouterToUrlQuery>
+  </Router>
+);
 
 export default hot(module)(App);
