@@ -32,9 +32,9 @@ export let users;
 /** @type firebase.firestore.CollectionReference */
 export let lists;
 /** @type firebase.firestore.CollectionReference */
-let labels;
+export let labels;
 /** @type firebase.firestore.CollectionReference */
-let labelItems;
+export let labelItems;
 
 export const getUser = () => auth.currentUser;
 
@@ -68,7 +68,7 @@ export const init = () => firestore.enablePersistence()
   users = firestore.collection('users');
   lists = firestore.collection('lists');
 
-  if (getProfile()) {
+  if (auth.currentUser) {
     listenLabels();
   }
 });
@@ -80,7 +80,9 @@ export const signIn = () => API.signIn('discord')
   listenLabels();
 
   const { from } = decodeQuery(window.location.search);
-  return from && from.startsWith('/') && from;
+  if (from && from.startsWith('/')) return from;
+  else if (window.location.pathname === '/') return '/list';
+  else return window.location.pathname;
 });
 
 export const signOut = () => {

@@ -95,7 +95,11 @@ class MediaList extends React.Component {
       list: oldState.list.map((item) => {
         const itemLabels = this.labelItemMap[item.id];
         if (itemLabels) {
-          for (const labelId in itemLabels) itemLabels[labelId] = labelMap[labelId];
+          for (const labelId in itemLabels) {
+            itemLabels[labelId] = labelMap[labelId];
+            // If our data is corrupted somehow and this label does not exist
+            if (!itemLabels[labelId]) delete itemLabels[labelId];
+          }
           item.labels = itemLabels;
         }
         return { ...item };
