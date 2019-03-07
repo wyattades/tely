@@ -19,6 +19,7 @@ class ErrorBoundary extends React.Component {
     hasError: false,
   }
 
+  // TODO use mapErrorToState
   componentDidCatch(error) {
     let message,
         code = 500;
@@ -36,6 +37,7 @@ class ErrorBoundary extends React.Component {
       message,
     });
 
+    // HACK
     const unlisten = this.props.history.listen(() => {
       this.setState({ hasError: false });
       unlisten();

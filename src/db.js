@@ -1,7 +1,6 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
-// import { EventEmitter } from 'events';
 
 import * as API from './api';
 import { sendWebhooks } from './discord';
