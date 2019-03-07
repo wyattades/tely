@@ -6,9 +6,6 @@ import { roleClick } from '../utils';
 export const Spinner = ({ fullPage, centered }) => (
   <div className={`${fullPage && 'full-page'} ${centered && 'buttons is-centered'}`}>
     <div className="spinner">
-      {/* <div className="bounce1"/>
-      <div className="bounce2"/>
-      <div className="bounce3"/> */}
       <div className="rect1"/>
       <div className="rect2"/>
       <div className="rect3"/>
@@ -18,8 +15,8 @@ export const Spinner = ({ fullPage, centered }) => (
   </div>
 );
 
-export const SmallSection = ({ children, size = 6, style = {}, className='' }) => (
-  <section className="section" style={style} className={className}>
+export const SmallSection = ({ children, size = 6, style = {} }) => (
+  <section className="section" style={style}>
     <div className="container">
       <div className="columns is-centered">
         <div className={`column is-${size}`}>
