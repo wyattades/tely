@@ -5,7 +5,7 @@
     "lint": "eslint src",
     "dev": "NODE_ENV=development webpack-dev-server",
     "build": "NODE_ENV=production webpack",
-    "deploy": "aws s3 rm s3://tely.app --recursive --exclude \"*\" --include \"*.js\" --include \"*.css\" && aws s3 sync dist s3://tely.app/ && cf-invalidate --wait -- $CFINVALIDATE index.html",
+    "deploy": "aws s3 rm s3://tely.app --recursive --exclude \"*\" --include \"*.js\" --include \"*.css\" && aws s3 sync dist s3://tely.app/ && cf-invalidate --wait -- $CFINVALIDATE index.html tely-sw.js",
     "build-deploy": "npm run build && npm run deploy"
   },
   "dependencies": {
