@@ -3,6 +3,7 @@ import React from 'react';
 import * as db from '../db';
 import { profiles, clearProfile } from '../api';
 import { SmallSection } from './misc';
+import { confirm, alert } from '../alert';
 
 
 const AVATAR_URL = 'https://cdn.discordapp.com/avatars';
@@ -19,16 +20,19 @@ export default class Account extends React.Component {
   }
 
   deleteAll = () => {
-    if (!window.confirm('Are your sure? This will delete all of your lists permanently.')) return;
-  
-    db.deleteAll()
-    .then(() => {
-      this.props.history.push('/logout');
-      window.alert('Successfully deleted profile. Goodbye!');
-    })
-    .catch((err) => {
-      console.error(err);
-      window.alert('An error occurred while deleting profile');
+    confirm('Are your sure? This will delete all of your lists permanently.')
+    .then((yes) => {
+      if (yes) {
+        db.deleteAll()
+        .then(() => {
+          this.props.history.push('/logout');
+          alert('Successfully deleted profile. Goodbye!');
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('An error occurred while deleting profile');
+        });
+      }
     });
   };
 

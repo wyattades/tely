@@ -4,6 +4,7 @@ import { Switch, Link, Route } from 'react-router-dom';
 import * as db from '../db';
 import { ListItem } from './ListItem';
 import LiveTextEdit from './form/LiveTextEdit';
+import { confirm, prompt } from '../alert';
 
 
 const colorMap = [
@@ -130,12 +131,15 @@ export class FilteredLabelItems extends React.Component {
   delete = () => {
     const { meta: { id, name }, history } = this.props;
 
-    if (!window.confirm(`Are you sure you want to delete the label: ${name}?`)) return;
-
-    history.replace('/labels');
+    confirm(<>Are you sure you want to delete the label <strong>{name}</strong>?</>)
+    .then((yes) => {
+      if (yes) {
+        history.replace('/labels');
     
-    db.deleteLabel(id)
-    .catch(console.error);
+        db.deleteLabel(id)
+        .catch(console.error);
+      }
+    });
   }
 
   render() {
@@ -211,13 +215,14 @@ export class Labels extends React.Component {
   }
 
   create = () => {
-    const name = window.prompt('Enter a name for your label');
-
-    if (name) {
-      db.createLabel(name, 0)
-      .then((doc) => this.props.history.push(`/labels/${doc.id}`))
-      .catch(console.error);
-    }
+    prompt('Enter a name for your label')
+    .then((name) => {
+      if (name) {
+        db.createLabel(name, 0)
+        .then((doc) => this.props.history.push(`/labels/${doc.id}`))
+        .catch(console.error);
+      }
+    });
   }
 
   renderItems = (props) => {

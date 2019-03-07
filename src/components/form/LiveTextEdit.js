@@ -18,7 +18,7 @@ export default class LiveTextEdit extends React.Component {
 
   clearTimeout() {
     if (this.timeout !== null) {
-      window.clearTimeout(this.timeout);
+      clearTimeout(this.timeout);
       this.timeout = null;
     }
   }
@@ -42,7 +42,7 @@ export default class LiveTextEdit extends React.Component {
     this.clearTimeout();
 
     if (value) {
-      this.timeout = window.setTimeout(() => {
+      this.timeout = setTimeout(() => {
         this.props.onUpdate(value);
         this.timeout = null;
       }, 500);

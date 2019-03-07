@@ -40,9 +40,9 @@ export const signIn = (service) => new Promise((resolve, reject) => {
   const popup = popupCenter(`${SERVER_URL}/auth/${service}`, 500, 600);
   if (!popup) throw 'Sign in window failed to open';
 
-  const intervalId = window.setInterval(() => {
+  const intervalId = setInterval(() => {
     if (!popup) {
-      window.clearInterval(intervalId);
+      clearInterval(intervalId);
       throw 'Sign in window was closed unexpectedly';
     }
     
@@ -54,7 +54,7 @@ export const signIn = (service) => new Promise((resolve, reject) => {
     }
 
     if (arrived) {
-      window.clearInterval(intervalId);
+      clearInterval(intervalId);
       const { error, ...profile } = decodeQuery(popup.location.search);
       popup.close();
 

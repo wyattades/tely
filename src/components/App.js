@@ -1,5 +1,5 @@
 import React from 'react';
-import { hot } from 'react-hot-loader';
+import { hot } from 'react-hot-loader/root';
 import {
   BrowserRouter as Router,
   Route,
@@ -20,12 +20,10 @@ import NewMediaList from './NewMediaList';
 import Header from './Header';
 import { Labels } from './Labels';
 import { SpotifyControls } from '../spotify_player';
+import { Alerts } from '../alert';
 
 import * as db from '../db';
 
-
-if (process.env.NODE_ENV === 'development')
-  window.db = db;
 
 // Set default NavLink activeClassName
 NavLink.defaultProps.activeClassName = 'is-active';
@@ -63,6 +61,7 @@ const App = () => (
           </Switch>
         </ErrorBoundary>
         <SpotifyControls/>
+        <Alerts/>
         <Route render={({ history }) => {
           // Auto-update service worker on route change
           history.listen(() => {
@@ -75,4 +74,4 @@ const App = () => (
   </Router>
 );
 
-export default hot(module)(App);
+export default hot(App);

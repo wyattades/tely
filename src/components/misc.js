@@ -18,8 +18,8 @@ export const Spinner = ({ fullPage, centered }) => (
   </div>
 );
 
-export const SmallSection = ({ children, size = 6 }) => (
-  <section className="section">
+export const SmallSection = ({ children, size = 6, style = {}, className='' }) => (
+  <section className="section" style={style} className={className}>
     <div className="container">
       <div className="columns is-centered">
         <div className={`column is-${size}`}>

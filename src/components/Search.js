@@ -60,9 +60,9 @@ class Search extends React.Component {
     this.setState({ searchQuery }, () => {
 
       if (this.searchDelayTimer)
-        window.clearTimeout(this.searchDelayTimer);
+        clearTimeout(this.searchDelayTimer);
 
-      this.searchDelayTimer = window.setTimeout(
+      this.searchDelayTimer = setTimeout(
         this.search,
         this.SEARCH_DELAY,
       );
@@ -73,7 +73,7 @@ class Search extends React.Component {
     event.preventDefault();
 
     if (this.searchDelayTimer)
-      window.clearInterval(this.searchDelayTimer);
+      clearInterval(this.searchDelayTimer);
 
     this.search();
   }

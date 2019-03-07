@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import * as db from '../db';
 
+
 export default class Home extends React.PureComponent {
 
   signIn = () => {

@@ -21,8 +21,6 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 
-// TEMP
-firestore.settings({ timestampsInSnapshots: true });
 
 export const Helpers = firebase.firestore;
 

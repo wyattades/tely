@@ -1,4 +1,4 @@
-import { render } from 'react-dom';
+import * as ReactDOM from 'react-dom';
 import React from 'react';
 import * as Offline from 'offline-plugin/runtime';
 
@@ -12,9 +12,11 @@ if (process.env.NODE_ENV === 'production') {
     onUpdateReady: () => Offline.applyUpdate(),
     onUpdated: () => { window.swUpdate = true; },
   });
+} else if (process.env.NODE_ENV === 'development') {
+  window.db = db;
 }
 
 db.init()
 .then(() => {
-  render(<App/>, document.getElementById('root'));
+  ReactDOM.render(<App/>, document.getElementById('root'));
 });
