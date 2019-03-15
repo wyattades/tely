@@ -24,7 +24,7 @@ export const renderBody = ({ artist, artist_id, album, album_id }) => <>
 export const textBody = ({ artist }) => artist ? `by ${artist}` : '[Unknown artist]';
 
 const mapResponse = ({ external_urls, artists, id, name, album }) => ({
-  service: 'spotify_music',
+  service: ID,
   label: 'Song',
   title: name,
   image: album.images && album.images.length > 1 && album.images[1].url,

@@ -98,25 +98,27 @@ export class TruncateText extends React.Component {
     maxLength: 200,
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      truncated: props.text.length > props.maxLength,
-    };
+  state = {
+    open: false,
+    truncated: this.props.text.length > this.props.maxLength,
   }
 
-  open = () => this.setState({
-    truncated: false,
-  })
+  toggle = () => this.setState(({ open }) => ({
+    open: !open,
+  }))
   
   render() {
-    if (this.state.truncated) {
+    const { open, truncated } = this.state;
+    const { text, maxLength } = this.props;
+
+    if (truncated) {
       return (
         <span>
-          {this.props.text.substring(0, this.props.maxLength - 3)}...
+          {open ? text : `${text.substring(0, maxLength - 3)}...`}
           <br/>
-          <a onClick={this.open} role="button" tabIndex="0" onKeyPress={roleClick}>Show More</a>
+          <a onClick={this.toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
+            { open ? 'Show Less' : 'Show More'}
+          </a>
         </span>
       );
     } else {
