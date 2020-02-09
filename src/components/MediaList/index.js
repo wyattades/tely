@@ -1,6 +1,6 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 
+import NavLink from '../NavLink';
 import services from '../../services';
 import * as db from '../../db';
 import * as share from '../../share';
@@ -30,7 +30,13 @@ class MediaList extends React.Component {
     };
   }
 
+  setPageClass(toggle) {
+    document.documentElement.classList.toggle('has-bottom-navbar', toggle);
+  }
+
   componentDidMount() {
+    this.setPageClass(true);
+
     this.unsubscribeMeta = this.listRef.onSnapshot(
       (snap) => {
         const meta = snap.data();
@@ -82,6 +88,8 @@ class MediaList extends React.Component {
   }
 
   componentWillUnmount() {
+    this.setPageClass(false);
+
     this.unsubscribeContent();
     this.unsubscribeMeta();
     if (this.unsubscribeLabels) this.unsubscribeLabels();

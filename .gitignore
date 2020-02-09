@@ -5,6 +5,7 @@ package-lock.json
 .runtimeconfig.json
 functions/scripts/
 gen-test/
+credentials.json
 
 # Logs
 logs

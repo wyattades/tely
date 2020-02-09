@@ -2,10 +2,10 @@ import React from 'react';
 import { hot } from 'react-hot-loader/root';
 import {
   BrowserRouter as Router,
+  __RouterContext as RouterContext,
   Route,
   Switch,
   Redirect,
-  NavLink,
 } from 'react-router-dom';
 import RouterToUrlQuery from 'react-url-query/lib/react/RouterToUrlQuery';
 
@@ -23,9 +23,6 @@ import { SpotifyControls } from '../spotify_player';
 import { Alerts } from '../alert';
 
 import * as db from '../db';
-
-// Set default NavLink activeClassName
-NavLink.defaultProps.activeClassName = 'is-active';
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
@@ -47,7 +44,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 
 const App = () => (
   <Router>
-    <RouterToUrlQuery>
+    <RouterToUrlQuery routerContext={RouterContext}>
       <>
         <Header />
         <ErrorBoundary>

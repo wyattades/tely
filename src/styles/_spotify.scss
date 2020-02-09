@@ -1,4 +1,3 @@
-
 .play-button {
   $startColor: $white;
   $endColor: $green;
@@ -20,7 +19,8 @@
   display: inline-block;
   transition: all 0.3s ease;
 
-  circle, polygon {
+  circle,
+  polygon {
     fill: none;
     stroke-width: 7;
     stroke-linecap: round;
@@ -35,7 +35,7 @@
     opacity: 0.3;
     transition: all $transitionCircle ease-in-out;
   }
-  
+
   polygon {
     stroke-dasharray: 240;
     stroke-dashoffset: 480;
@@ -44,39 +44,52 @@
   }
 
   &.playing {
-    polygon, circle {
+    polygon,
+    circle {
       stroke: $endColor;
     }
   }
 
   &.playing:hover {
-    polygon, circle {
+    polygon,
+    circle {
       stroke: $startColor;
     }
   }
 
   &.error {
-    polygon, circle {
+    polygon,
+    circle {
       stroke: $errorColor;
     }
   }
 
-  &:hover, &.playing {
-    
+  &:hover,
+  &.playing {
     polygon {
       stroke-dashoffset: 0;
       opacity: 1;
       animation: nudge $transitionTriangle ease-in-out;
-      
+
       @keyframes nudge {
-        0% { transform: translateX(0) }
-        30% { transform: translateX(-5px) }
-        50% { transform: translateX(5px) }
-        70% { transform: translateX(-2px) }
-        100% { transform: translateX(0) }
+        0% {
+          transform: translateX(0);
+        }
+        30% {
+          transform: translateX(-5px);
+        }
+        50% {
+          transform: translateX(5px);
+        }
+        70% {
+          transform: translateX(-2px);
+        }
+        100% {
+          transform: translateX(0);
+        }
       }
     }
-    
+
     circle {
       stroke-dashoffset: 0;
       opacity: 1;

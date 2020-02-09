@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { signIn, apiFactory, profiles, refreshToken, expired } from './api';
+import { alert, error } from './alert';
 
 // Test if on mobile device
 const a = navigator.userAgent || navigator.vendor || window.opera;
@@ -255,8 +256,8 @@ class SpotifyControlsWeb extends React.PureComponent {
 
   saveTrack = () => {
     api('/me/tracks', 'PUT', { ids: [this.state.track.id] })
-      .then(() => alert('Track saved to your library'))
-      .catch(console.error);
+      .then(() => alert('Saved track to your library!'))
+      .catch((err) => error('Failed to save track to your library', err));
   };
 
   render() {

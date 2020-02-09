@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link, NavLink, withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
+import NavLink from './NavLink';
 import { roleClick } from '../utils';
 import * as db from '../db';
 
@@ -55,7 +56,11 @@ class Header extends React.PureComponent {
           </div>
           <div className={`navbar-menu ${open ? 'is-active' : ''}`}>
             <div className="navbar-start">
-              <NavLink className="navbar-item" to="/browse">
+              <NavLink
+                className="navbar-item"
+                activeClassName="is-active"
+                to="/browse"
+              >
                 Browse
               </NavLink>
               <NavLink className="navbar-item" to="/about">

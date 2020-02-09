@@ -1,12 +1,26 @@
 import React from 'react';
 import { EventEmitter } from 'events';
 
-import { SmallSection } from './components/misc';
-
 const ee = new EventEmitter();
 
 export const alert = (msg) => {
-  ee.emit('alert', msg);
+  ee.emit('alert', { msg, className: 'is-info' });
+};
+
+const isError = (err) => {
+  return err && typeof err === 'object' && err.message;
+};
+
+export const error = (msg, err) => {
+  if (isError(msg)) {
+    err = msg;
+    msg = err.message;
+  }
+  msg = msg || 'An unknown error occurred';
+
+  console.error(msg, err);
+
+  ee.emit('alert', { msg, className: 'is-danger' });
 };
 
 export const confirm = (msg) =>
@@ -21,11 +35,12 @@ export const prompt = (msg) =>
     ee.emit('prompt', msg, true);
   });
 
-const ALERT_TIMEOUT = 3000;
+const DEFAULT_ALERT_TIMEOUT = 3000;
 
 class Alert extends React.Component {
   state = {
     msg: null,
+    className: null,
   };
 
   componentDidMount() {
@@ -36,14 +51,14 @@ class Alert extends React.Component {
     ee.off('alert', this.onAlert);
   }
 
-  onAlert = (msg) => {
+  onAlert = ({ msg, timeout, className }) => {
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
     }
 
-    this.setState({ msg }, () => {
-      this.timeout = setTimeout(this.onClose, ALERT_TIMEOUT);
+    this.setState({ msg, className }, () => {
+      this.timeout = setTimeout(this.onClose, timeout || DEFAULT_ALERT_TIMEOUT);
     });
   };
 
@@ -53,21 +68,27 @@ class Alert extends React.Component {
       this.timeout = null;
     }
 
-    this.setState({ msg: null });
+    this.setState({ msg: null, className: null });
   };
 
   render() {
-    const { msg } = this.state;
+    const { msg, className } = this.state;
 
     return msg ? (
-      <SmallSection
-        style={{ position: 'absolute', bottom: 16, left: 0, right: 0 }}
-      >
-        <div className="notification is-info">
-          <button className="delete" onClick={this.onClose} />
-          {msg}
+      <div className="fixed-above-bottom-nav" style={{ left: 0, right: 0 }}>
+        <div
+          style={{
+            maxWidth: 512,
+            padding: '0 1rem 1rem 1rem',
+            marginLeft: 'auto',
+          }}
+        >
+          <div className={`notification ${className || ''}`}>
+            <button className="delete" onClick={this.onClose} />
+            {msg}
+          </div>
         </div>
-      </SmallSection>
+      </div>
     ) : null;
   }
 }
