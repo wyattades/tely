@@ -5,41 +5,44 @@ import { SmallSection, Spinner } from './misc';
 import services from '../services';
 import { getSharedLists } from '../share';
 
-
 export const ListView = ({ id, type, name }) => {
-
   const service = services.asObject[type];
   if (!service) return <p>[Invalid List]</p>;
 
   return (
-    <Link to={`/list/${id}`} className="button space-between
-      has-text-left is-large is-fullwidth" title={name}>
+    <Link
+      to={`/list/${id}`}
+      className="button space-between
+      has-text-left is-large is-fullwidth"
+      title={name}
+    >
       <div style={{ minWidth: 0 }}>
         <p className="is-size-4 is-clipped">{name}</p>
         <p className="help">{service.LABEL}</p>
       </div>
-      <div className="icon"><i className={`fa fa-${service && service.ICON}`}/></div>
+      <div className="icon">
+        <i className={`fa fa-${service && service.ICON}`} />
+      </div>
     </Link>
   );
 };
 
 const _ListView = (props) => (
   <div key={props.id} className="buttons">
-    <ListView {...props}/>
+    <ListView {...props} />
   </div>
 );
 
 class MediaLists extends React.Component {
-
   state = {
     lists: null,
     sharedLists: null,
     error: null,
-  }
+  };
 
   componentDidMount() {
-    this.unsubscribe = getSharedLists(
-      (error, lists, sharedLists) => this.setState({ error, lists, sharedLists }),
+    this.unsubscribe = getSharedLists((error, lists, sharedLists) =>
+      this.setState({ error, lists, sharedLists }),
     );
   }
 
@@ -54,7 +57,7 @@ class MediaLists extends React.Component {
 
     let MyLists;
     if (!lists) {
-      MyLists = <Spinner centered/>;
+      MyLists = <Spinner centered />;
     } else if (lists.length) {
       MyLists = <ul>{lists.map(_ListView)}</ul>;
     } else {
@@ -63,7 +66,7 @@ class MediaLists extends React.Component {
 
     let SharedLists;
     if (!sharedLists) {
-      SharedLists = <Spinner centered/>;
+      SharedLists = <Spinner centered />;
     } else if (sharedLists.length) {
       SharedLists = <ul>{sharedLists.map(_ListView)}</ul>;
     } else {
@@ -82,20 +85,22 @@ class MediaLists extends React.Component {
             <div className="level-item">
               <Link to="/list/new" className="button is-primary">
                 <span className="icon is-small is-left">
-                  <i className="fas fa-plus"/>
+                  <i className="fas fa-plus" />
                 </span>
                 <span>Create New List</span>
               </Link>
             </div>
           </div>
         </div>
-        <hr/>
+        <hr />
         {MyLists}
-        <br/>
+        <br />
         <h1 className="is-size-1">Shared With You</h1>
-        <hr/>
+        <hr />
         {SharedLists}
-        <br/><br/><br/>
+        <br />
+        <br />
+        <br />
       </SmallSection>
     );
   }

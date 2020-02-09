@@ -1,7 +1,7 @@
 import firebase from 'firebase/app';
 
-
-export const roleClick = (e) => (e.which || e.charCode || e.keyCode) === 13 && e.target.click();
+export const roleClick = (e) =>
+  (e.which || e.charCode || e.keyCode) === 13 && e.target.click();
 
 export const isEmpty = (obj) => {
   for (const _ in obj) return false;
@@ -48,7 +48,7 @@ export const decodeQuery = (str) => {
   const search = /([^&=]+)=?([^&]*)/g;
 
   const obj = {};
-  while (match = search.exec(str)) {
+  while ((match = search.exec(str))) {
     obj[decodeURIComponent(match[1])] = decodeURIComponent(match[2]);
   }
 
@@ -58,7 +58,7 @@ export const decodeQuery = (str) => {
 export const sameSet = (A, B) => {
   if (typeof A !== 'object' || typeof B !== 'object') return false;
   const keysA = Object.keys(A).sort(),
-        keysB = Object.keys(B).sort();
+    keysB = Object.keys(B).sort();
   if (keysA.length !== keysB.length) return false;
   for (let i = 0; i < keysA.length; i++) {
     if (keysA[i] !== keysB[i]) return false;
@@ -69,17 +69,18 @@ export const sameSet = (A, B) => {
 // Courtosy of https://stackoverflow.com/a/16861050/6656308
 // Handles multiple monitors
 export const popupCenter = (url, w, h) => {
-  const dualScreenLeft = window.screenLeft !== undefined
-    ? window.screenLeft : window.screenX;
-  const dualScreenTop = window.screenTop !== undefined
-    ? window.screenTop : window.screenY;
+  const dualScreenLeft =
+    window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+  const dualScreenTop =
+    window.screenTop !== undefined ? window.screenTop : window.screenY;
 
   const { width, height } = window.screen;
 
-  const left = ((width / 2) - (w / 2)) + dualScreenLeft;
-  const top = ((height / 2) - (h / 2)) + dualScreenTop;
+  const left = width / 2 - w / 2 + dualScreenLeft;
+  const top = height / 2 - h / 2 + dualScreenTop;
   const newWindow = window.open(
-    url, '_blank',
+    url,
+    '_blank',
     `scrollbars=yes,width=${w},height=${h},top=${top},left=${left}`,
   );
 
@@ -108,46 +109,54 @@ export const toDate = (time) => {
 // NOTE: Timestamp.fromMillis() is broken, so using fromDate()
 export const toTimestamp = (time) => {
   if (!time) return null;
-    
-  if (typeof time === 'number') return firebase.firestore.Timestamp.fromDate(new Date(time));
+
+  if (typeof time === 'number')
+    return firebase.firestore.Timestamp.fromDate(new Date(time));
   if (typeof time === 'string') {
     const date = Date.parse(time);
-    return Number.isNaN(date) ? null : firebase.firestore.Timestamp.fromDate(new Date(time));
+    return Number.isNaN(date)
+      ? null
+      : firebase.firestore.Timestamp.fromDate(new Date(time));
   }
   if (time instanceof Date) return firebase.firestore.Timestamp.fromDate(time);
   if (time instanceof firebase.firestore.Timestamp) return time;
-  
+
   return null;
 };
 
-const timeAgoString = (label, amount) => `${amount} ${label}${amount === 1 ? '' : 's'} ago`;
+const timeAgoString = (label, amount) =>
+  `${amount} ${label}${amount === 1 ? '' : 's'} ago`;
 
 export const timeAgo = (date) => {
   date = toDate(date);
   if (!date) return null;
 
   const seconds = Math.round((Date.now() - date.getTime()) / 1000);
-  let minutes,
-      hours,
-      days,
-      weeks,
-      months;
+  let minutes, hours, days, weeks, months;
 
   if (seconds < 90) return 'Just now';
   else if ((minutes = Math.round(seconds / 60)) < 6) return 'A few minutes ago';
   else if (minutes < 60) return timeAgoString('minute', minutes);
-  else if ((hours = Math.round(minutes / 60)) < 12) return timeAgoString('hour', hours);
-  else if ((days = Math.round(hours / 24)) < 7) return timeAgoString('day', days);
-  else if ((weeks = Math.round(days / 7)) < 4) return timeAgoString('week', weeks);
-  else if ((months = Math.round(days / 30)) < 12) return timeAgoString('month', months);
+  else if ((hours = Math.round(minutes / 60)) < 12)
+    return timeAgoString('hour', hours);
+  else if ((days = Math.round(hours / 24)) < 7)
+    return timeAgoString('day', days);
+  else if ((weeks = Math.round(days / 7)) < 4)
+    return timeAgoString('week', weeks);
+  else if ((months = Math.round(days / 30)) < 12)
+    return timeAgoString('month', months);
   else return timeAgoString('year', Math.round(days / 365));
 };
 
-export const onSnap = (ref, cb) => ref.onSnapshot((snap) => {
-  const items = snap.docs.map((doc) => {
-    const itemData = doc.data();
-    itemData.id = doc.id;
-    return itemData;
-  });
-  cb(null, items);
-}, (error) => cb(error, null));
+export const onSnap = (ref, cb) =>
+  ref.onSnapshot(
+    (snap) => {
+      const items = snap.docs.map((doc) => {
+        const itemData = doc.data();
+        itemData.id = doc.id;
+        return itemData;
+      });
+      cb(null, items);
+    },
+    (error) => cb(error, null),
+  );

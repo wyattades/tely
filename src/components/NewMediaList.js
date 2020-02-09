@@ -5,7 +5,6 @@ import BigSelect from './form/BigSelect';
 import { SmallSection } from './misc';
 import services from '../services';
 
-
 const types = services.asArray.map(({ ID, LABEL, DESCRIPTION, CLASS }) => ({
   id: ID,
   label: LABEL,
@@ -14,7 +13,6 @@ const types = services.asArray.map(({ ID, LABEL, DESCRIPTION, CLASS }) => ({
 }));
 
 class NewMediaList extends React.Component {
-  
   state = {
     listName: '',
     type: null,
@@ -22,17 +20,22 @@ class NewMediaList extends React.Component {
     submitting: false,
   };
 
-  createList = (name, type) => db.createList(name, type)
-  .then((ref) => {
-    this.props.history.push(`/list/${ref.id}`);
-  })
-  .catch((err) => {
-    this.setState({ submitting: false, err: { submit: `Failed to create list. Error: ${err.code}` } });
-  });
+  createList = (name, type) =>
+    db
+      .createList(name, type)
+      .then((ref) => {
+        this.props.history.push(`/list/${ref.id}`);
+      })
+      .catch((err) => {
+        this.setState({
+          submitting: false,
+          err: { submit: `Failed to create list. Error: ${err.code}` },
+        });
+      });
 
   handleSubmit = (event) => {
     event.preventDefault();
-    
+
     const { listName, type } = this.state;
     let valid = true;
     const err = {};
@@ -50,11 +53,9 @@ class NewMediaList extends React.Component {
     this.setState({ err });
 
     if (valid) {
-
       this.setState({ submitting: true });
 
-      this.createList(listName, type)
-      .catch((error) => {
+      this.createList(listName, type).catch((error) => {
         console.error(error);
         this.setState({
           submitting: false,
@@ -62,13 +63,14 @@ class NewMediaList extends React.Component {
         });
       });
     }
-  }
+  };
 
-  listNameChange = (e) => this.setState({
-    listName: e.target.value,
-  });
+  listNameChange = (e) =>
+    this.setState({
+      listName: e.target.value,
+    });
 
-  typeChange = (type) => this.setState({ type })
+  typeChange = (type) => this.setState({ type });
 
   render() {
     const { listName, type, err, submitting } = this.state;
@@ -76,39 +78,56 @@ class NewMediaList extends React.Component {
     return (
       <SmallSection>
         <h1 className="is-size-1">Create a New List</h1>
-        <br/>
+        <br />
         <form onSubmit={this.handleSubmit}>
           <div className="field">
-            <label className="label" htmlFor="list-name">List Name</label>
+            <label className="label" htmlFor="list-name">
+              List Name
+            </label>
             <div className="control">
-              <input type="text" className="input" id="list-name" value={listName}
-                maxLength={48} onChange={this.listNameChange}/>
+              <input
+                type="text"
+                className="input"
+                id="list-name"
+                value={listName}
+                maxLength={48}
+                onChange={this.listNameChange}
+              />
             </div>
-            { err.listName && (
+            {err.listName && (
               <p className="help is-danger">This is a required field</p>
             )}
           </div>
           <div className="field">
-            <label className="label" htmlFor="list-type">Select a List Type</label>
+            <label className="label" htmlFor="list-type">
+              Select a List Type
+            </label>
             <div className="control">
-              <BigSelect required options={types} name="list-type" value={type}
-                onChange={this.typeChange}/>
+              <BigSelect
+                required
+                options={types}
+                name="list-type"
+                value={type}
+                onChange={this.typeChange}
+              />
             </div>
-            { err.type && (
+            {err.type && (
               <p className="help is-danger">This is a required field</p>
             )}
           </div>
-          <br/>
+          <br />
           <div className="field">
             <div className="control">
-              <button className={`button is-primary is-medium is-fullwidth ${submitting && 'is-loading'}`}
-                type="submit" disabled={this.state.checking}>
+              <button
+                className={`button is-primary is-medium is-fullwidth ${submitting &&
+                  'is-loading'}`}
+                type="submit"
+                disabled={this.state.checking}
+              >
                 Create
               </button>
             </div>
-            { err.submit && (
-              <p className="help is-danger">{err.submit}</p>
-            )}
+            {err.submit && <p className="help is-danger">{err.submit}</p>}
           </div>
         </form>
       </SmallSection>

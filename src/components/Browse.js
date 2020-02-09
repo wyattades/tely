@@ -8,7 +8,7 @@ import services from '../services';
 
 const _ListView = (props) => (
   <div key={props.id} className="column is-one-third">
-    <ListView {...props}/>
+    <ListView {...props} />
   </div>
 );
 
@@ -20,11 +20,10 @@ const urlPropsQueryConfig = {
 const RESULT_COUNT = 21;
 
 class Browse extends React.Component {
-
   state = {
     lists: null,
     error: null,
-  }
+  };
 
   componentDidMount() {
     this.fetchLists(this.props);
@@ -32,10 +31,15 @@ class Browse extends React.Component {
     window.addEventListener('scroll', this.onScroll);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.filter !== nextProps.filter || this.props.sort !== nextProps.sort) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (
+      this.props.filter !== nextProps.filter ||
+      this.props.sort !== nextProps.sort
+    ) {
       this.lastDoc = null;
-      this.setState({ lists: null, error: null }, () => this.fetchLists(nextProps));
+      this.setState({ lists: null, error: null }, () =>
+        this.fetchLists(nextProps),
+      );
     }
   }
 
@@ -46,7 +50,6 @@ class Browse extends React.Component {
   containerRef = React.createRef();
 
   fetchLists({ sort, filter }) {
-
     let query = db.lists.limit(RESULT_COUNT).where('is_public', '==', true);
 
     if (filter) query = query.where('type', '==', filter);
@@ -59,37 +62,43 @@ class Browse extends React.Component {
     this.lastDoc = null;
 
     if (lastDoc) query = query.startAfter(lastDoc);
-    
-    query.get()
-    .then((snap) => {
-      
-      const lists = [];
-      snap.forEach((item) => {
-        const itemData = item.data();
-        itemData.id = item.id;
-        lists.push(itemData);
-      });
 
-      if (lastDoc && this.state.lists)
-        this.setState((prevState) => ({
-          lists: prevState.lists.concat(lists),
-        }));
-      else
-        this.setState({ lists });
+    query
+      .get()
+      .then((snap) => {
+        const lists = [];
+        snap.forEach((item) => {
+          const itemData = item.data();
+          itemData.id = item.id;
+          lists.push(itemData);
+        });
 
-      this.lastDoc = lists.length >= RESULT_COUNT ? snap.docs[snap.docs.length - 1] : null;
+        if (lastDoc && this.state.lists)
+          this.setState((prevState) => ({
+            lists: prevState.lists.concat(lists),
+          }));
+        else this.setState({ lists });
 
-      this.onScroll();
-    })
-    .catch((error) => console.error(error) || this.setState({ error: error.code }));
+        this.lastDoc =
+          lists.length >= RESULT_COUNT ? snap.docs[snap.docs.length - 1] : null;
+
+        this.onScroll();
+      })
+      .catch(
+        (error) => console.error(error) || this.setState({ error: error.code }),
+      );
   }
 
   onScroll = () => {
-    if (this.lastDoc && this.containerRef.current
-        && this.containerRef.current.getBoundingClientRect().bottom < window.innerHeight) {
+    if (
+      this.lastDoc &&
+      this.containerRef.current &&
+      this.containerRef.current.getBoundingClientRect().bottom <
+        window.innerHeight
+    ) {
       this.fetchLists(this.props);
     }
-  }
+  };
 
   changeFilter = (e) => this.props.onChangeFilter(e.target.value);
 
@@ -106,7 +115,8 @@ class Browse extends React.Component {
       const len = lists.length;
       amount = (
         <p className="has-text-grey">
-          {len || 'No'} Result{len === 1 ? '' : 's'}{len < RESULT_COUNT ? ' Found' : ' Shown'}
+          {len || 'No'} Result{len === 1 ? '' : 's'}
+          {len < RESULT_COUNT ? ' Found' : ' Shown'}
         </p>
       );
     }
@@ -115,12 +125,10 @@ class Browse extends React.Component {
       <ContainerSection>
         <h1 className="is-size-1">Browse</h1>
         <p className="is-size-5 has-text-grey">Public Lists</p>
-        <br/>
+        <br />
         <div className="level">
           <div className="level-left">
-            <div className="level-item">
-              {amount}
-            </div>
+            <div className="level-item">{amount}</div>
           </div>
           <div className="level-right">
             <div className="level-item">
@@ -133,7 +141,9 @@ class Browse extends React.Component {
                     <select value={filter || ''} onChange={this.changeFilter}>
                       <option value="">-</option>
                       {services.asArray.map(({ ID, LABEL }) => (
-                        <option key={ID} value={ID}>{LABEL}</option>
+                        <option key={ID} value={ID}>
+                          {LABEL}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -158,11 +168,18 @@ class Browse extends React.Component {
             </div>
           </div>
         </div>
-        { lists ? (
+        {lists ? (
           <div className="columns is-multiline" ref={this.containerRef}>
             {lists.map(_ListView)}
           </div>
-        ) : <><br/><br/><br/><Spinner centered/></> }
+        ) : (
+          <>
+            <br />
+            <br />
+            <br />
+            <Spinner centered />
+          </>
+        )}
       </ContainerSection>
     );
   }

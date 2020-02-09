@@ -3,7 +3,6 @@ import React from 'react';
 import { encodeQuery, randInt, arrSample, toTimestamp } from '../utils';
 import { TruncateText } from '../components/misc'; // TODO
 
-
 // TODO: hide API key?
 const API_KEY = 'e516ac54480a35fac52c1c9c8af54200';
 const API_URL = 'https://api.themoviedb.org/3';
@@ -12,17 +11,27 @@ const MEDIA_URL = 'https://tmdb.org';
 
 export const ID = 'movies_tv';
 export const LABEL = 'Movies & TV';
-export const DESCRIPTION = 'Select from a large database of movies and television';
+export const DESCRIPTION =
+  'Select from a large database of movies and television';
 export const CLASS = 'is-warning';
 export const ICON = 'tv';
 
 export const init = () => {};
 
-export const renderBody = ({ desc }) => <TruncateText text={desc}/>;
+export const renderBody = ({ desc }) => <TruncateText text={desc} />;
 
-export const textBody = ({ desc = '' }) => desc.length > 120 ? `${desc.substring(0, 120)}...` : desc;
+export const textBody = ({ desc = '' }) =>
+  desc.length > 120 ? `${desc.substring(0, 120)}...` : desc;
 
-const mapResponse = (type) => ({ id, title, name, poster_path, overview, release_date, first_air_date }) => ({
+const mapResponse = (type) => ({
+  id,
+  title,
+  name,
+  poster_path,
+  overview,
+  release_date,
+  first_air_date,
+}) => ({
   service: ID,
   label: type === 'tv' ? 'TV' : 'Movie',
   title: type === 'tv' ? name : title,
@@ -33,13 +42,15 @@ const mapResponse = (type) => ({ id, title, name, poster_path, overview, release
   released: toTimestamp(type === 'tv' ? first_air_date : release_date),
 });
 
-const tmdbFetch = (type, path, query) => window.fetch(`${API_URL}${path}?${query}`)
-.then((res) => {
-  if (!res.ok) return Promise.reject(res);
-  return res;
-})
-.then((res) => res.json())
-.then((res) => res.results.map(mapResponse(type)));
+const tmdbFetch = (type, path, query) =>
+  window
+    .fetch(`${API_URL}${path}?${query}`)
+    .then((res) => {
+      if (!res.ok) return Promise.reject(res);
+      return res;
+    })
+    .then((res) => res.json())
+    .then((res) => res.results.map(mapResponse(type)));
 
 export const search = (str, page = 1) => {
   const query = encodeQuery({
@@ -49,12 +60,13 @@ export const search = (str, page = 1) => {
     include_adult: false,
   });
 
-  return Promise.all([ tmdbFetch('movie', '/search/movie', query), tmdbFetch('tv', '/search/tv', query) ])
-  .then(([ l1, l2 ]) => l1.concat(l2));
+  return Promise.all([
+    tmdbFetch('movie', '/search/movie', query),
+    tmdbFetch('tv', '/search/tv', query),
+  ]).then(([l1, l2]) => l1.concat(l2));
 };
 
 export const suggest = (list) => {
-
   if (list.length === 0) return Promise.resolve([]);
 
   let maxRecPerItem;
@@ -63,7 +75,7 @@ export const suggest = (list) => {
   else maxRecPerItem = 2;
 
   const listMap = {};
-  const sample = [ ...list ];
+  const sample = [...list];
   for (const listItem of list) listMap[listItem.media_id] = true;
 
   const resultMap = {};
@@ -78,12 +90,15 @@ export const suggest = (list) => {
 
     const randIndex = randInt(0, sample.length);
     const randItem = sample[randIndex];
-    if (!(randItem.label in { TV: 0, Movie: 0 })) return Promise.reject('Invalid item label');
+    if (!(randItem.label in { TV: 0, Movie: 0 }))
+      return Promise.reject('Invalid item label');
     const type = randItem.label.toLowerCase();
-  
-    return tmdbFetch(type, `/${type}/${randItem.media_id}/recommendations`, query)
-    .then((recommendations) => {
 
+    return tmdbFetch(
+      type,
+      `/${type}/${randItem.media_id}/recommendations`,
+      query,
+    ).then((recommendations) => {
       // TODO: show user which items recommendations are based on
 
       const shuffledRecs = arrSample(recommendations, 6);

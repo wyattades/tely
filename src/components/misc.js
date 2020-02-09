@@ -4,13 +4,16 @@ import { matchPath } from 'react-router-dom';
 import { roleClick } from '../utils';
 
 export const Spinner = ({ fullPage, centered }) => (
-  <div className={`${fullPage && 'full-page'} ${centered && 'buttons is-centered'}`}>
+  <div
+    className={`${fullPage && 'full-page'} ${centered &&
+      'buttons is-centered'}`}
+  >
     <div className="spinner">
-      <div className="rect1"/>
-      <div className="rect2"/>
-      <div className="rect3"/>
-      <div className="rect4"/>
-      <div className="rect5"/>
+      <div className="rect1" />
+      <div className="rect2" />
+      <div className="rect3" />
+      <div className="rect4" />
+      <div className="rect5" />
     </div>
   </div>
 );
@@ -19,9 +22,7 @@ export const SmallSection = ({ children, size = 6, style = {} }) => (
   <section className="section" style={style}>
     <div className="container">
       <div className="columns is-centered">
-        <div className={`column is-${size}`}>
-          {children}
-        </div>
+        <div className={`column is-${size}`}>{children}</div>
       </div>
     </div>
   </section>
@@ -29,22 +30,19 @@ export const SmallSection = ({ children, size = 6, style = {} }) => (
 
 export const ContainerSection = ({ children }) => (
   <section className="section">
-    <div className="container">
-      {children}
-    </div>
+    <div className="container">{children}</div>
   </section>
 );
 
 // Similar to react-router Switch component, but keeps routes
 // rendered in background after they have been visited
 export class LiveSwitch extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = this.updateRoutes(props);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.location.pathname !== nextProps.location.pathname) {
       this.setState(this.updateRoutes(nextProps));
     }
@@ -55,28 +53,29 @@ export class LiveSwitch extends React.Component {
   CURRENT = 2;
 
   updateRoutes = ({ routes, match: prevMatch, location }) => {
-
     let routeFound = false;
     const routeStates = routes.map(({ path, exact, strict, sensitive }, i) => {
-      const match = !routeFound && matchPath(
-        location.pathname,
-        { path, exact, strict, sensitive },
-        prevMatch,
-      );
+      const match =
+        !routeFound &&
+        matchPath(
+          location.pathname,
+          { path, exact, strict, sensitive },
+          prevMatch,
+        );
 
       if (match) {
         routeFound = true;
         return this.CURRENT;
-      } else if (this.state && this.state.routeStates[i] !== this.UNVISITED) return this.VISITED;
+      } else if (this.state && this.state.routeStates[i] !== this.UNVISITED)
+        return this.VISITED;
       else return this.UNVISITED;
-
     });
 
     return {
       routeStates,
       routeFound,
     };
-  }
+  };
 
   render() {
     const { routeStates, routeFound } = this.state;
@@ -87,26 +86,30 @@ export class LiveSwitch extends React.Component {
       const status = routeStates[i];
       const style = status !== this.CURRENT ? { display: 'none' } : {};
 
-      return status !== this.UNVISITED ? <div key={i} style={style}>{element}</div> : null;
+      return status !== this.UNVISITED ? (
+        <div key={i} style={style}>
+          {element}
+        </div>
+      ) : null;
     });
   }
 }
 
 export class TruncateText extends React.Component {
-
   static defaultProps = {
     maxLength: 200,
-  }
+  };
 
   state = {
     open: false,
     truncated: this.props.text.length > this.props.maxLength,
-  }
+  };
 
-  toggle = () => this.setState(({ open }) => ({
-    open: !open,
-  }))
-  
+  toggle = () =>
+    this.setState(({ open }) => ({
+      open: !open,
+    }));
+
   render() {
     const { open, truncated } = this.state;
     const { text, maxLength } = this.props;
@@ -115,9 +118,14 @@ export class TruncateText extends React.Component {
       return (
         <span>
           {open ? text : `${text.substring(0, maxLength - 3)}...`}
-          <br/>
-          <a onClick={this.toggle} role="button" tabIndex="0" onKeyPress={roleClick}>
-            { open ? 'Show Less' : 'Show More'}
+          <br />
+          <a
+            onClick={this.toggle}
+            role="button"
+            tabIndex="0"
+            onKeyPress={roleClick}
+          >
+            {open ? 'Show Less' : 'Show More'}
           </a>
         </span>
       );

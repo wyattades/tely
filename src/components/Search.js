@@ -9,7 +9,6 @@ const urlPropsQueryConfig = {
 };
 
 class Search extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -22,8 +21,7 @@ class Search extends React.Component {
   }
 
   componentDidMount() {
-    if (this.state.searchQuery)
-      this.search();
+    if (this.state.searchQuery) this.search();
   }
 
   SEARCH_DELAY = 1000;
@@ -31,52 +29,50 @@ class Search extends React.Component {
   search = () => {
     const str = this.state.searchQuery;
     this.props.onChangeSearch(str);
-    
+
     if (str) {
-      this.setState({
-        searching: true,
-      }, () => {
-        this.media.search(str)
-        .then((results) => {
-          this.setState({
-            searching: false,
-            resultCount: results.length,
-          });
-          this.props.setResults(results.length ? results : null);
-        })
-        .catch(console.error);
-      });
+      this.setState(
+        {
+          searching: true,
+        },
+        () => {
+          this.media
+            .search(str)
+            .then((results) => {
+              this.setState({
+                searching: false,
+                resultCount: results.length,
+              });
+              this.props.setResults(results.length ? results : null);
+            })
+            .catch(console.error);
+        },
+      );
     } else {
       this.setState({
         resultCount: null,
       });
       this.props.setResults(null);
     }
-  }
+  };
 
   handleChange = (event) => {
     const searchQuery = event.target.value;
 
     this.setState({ searchQuery }, () => {
+      if (this.searchDelayTimer) clearTimeout(this.searchDelayTimer);
 
-      if (this.searchDelayTimer)
-        clearTimeout(this.searchDelayTimer);
-
-      this.searchDelayTimer = setTimeout(
-        this.search,
-        this.SEARCH_DELAY,
-      );
+      this.searchDelayTimer = setTimeout(this.search, this.SEARCH_DELAY);
     });
-  }
+  };
 
   handleSubmit = (event) => {
     event.preventDefault();
 
-    if (this.searchDelayTimer)
-      clearInterval(this.searchDelayTimer);
+    if (this.searchDelayTimer) clearInterval(this.searchDelayTimer);
 
     this.search();
-  }
+  };
 
   clearSearch = () => {
     this.props.onChangeSearch();
@@ -86,7 +82,7 @@ class Search extends React.Component {
       resultCount: null,
     });
     this.props.setResults(null);
-  }
+  };
 
   render() {
     const { searchQuery, resultCount, searching } = this.state;
@@ -94,35 +90,54 @@ class Search extends React.Component {
     if (!this.media) throw `Invalid list type: ${this.props.type}`;
 
     let Side = null;
-    if (searching) Side = (
-      <span className="icon is-large is-right">
-        <i className="fas fa-circle-notch fa-spin"/>
-      </span>
-    );
-    else if (resultCount !== null) Side = (
-      <span className="icon is-large is-right icon-clickable" onClick={this.clearSearch}
-        role="button" tabIndex="0" onKeyPress={roleClick}>
-        <i className="fas fa-times-circle"/>
-      </span>
-    );
+    if (searching)
+      Side = (
+        <span className="icon is-large is-right">
+          <i className="fas fa-circle-notch fa-spin" />
+        </span>
+      );
+    else if (resultCount !== null)
+      Side = (
+        <span
+          className="icon is-large is-right icon-clickable"
+          onClick={this.clearSearch}
+          role="button"
+          tabIndex="0"
+          onKeyPress={roleClick}
+        >
+          <i className="fas fa-times-circle" />
+        </span>
+      );
 
-    return <>
-      <form onSubmit={this.handleSubmit}>
-        <div className="field has-addons">
-          <div className="control has-icons-right is-expanded">
-            <input className={`input ${resultCount === 0 && 'is-danger'}`} value={searchQuery}
-              type="text" onChange={this.handleChange}
-              placeholder={`Add ${this.media.LABEL}`}/>
-            {Side}
+    return (
+      <>
+        <form onSubmit={this.handleSubmit}>
+          <div className="field has-addons">
+            <div className="control has-icons-right is-expanded">
+              <input
+                className={`input ${resultCount === 0 && 'is-danger'}`}
+                value={searchQuery}
+                type="text"
+                onChange={this.handleChange}
+                placeholder={`Add ${this.media.LABEL}`}
+              />
+              {Side}
+            </div>
+            <div className="control">
+              <button type="submit" className="button is-primary">
+                Search
+              </button>
+            </div>
           </div>
-          <div className="control">
-            <button type="submit" className="button is-primary">Search</button>
-          </div>
-        </div>
-      </form>
-      <br/>
-      { resultCount !== null && <p className="has-text-grey has-text-centered">{resultCount} Results</p> }
-    </>;
+        </form>
+        <br />
+        {resultCount !== null && (
+          <p className="has-text-grey has-text-centered">
+            {resultCount} Results
+          </p>
+        )}
+      </>
+    );
   }
 }
 

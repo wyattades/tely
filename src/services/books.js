@@ -5,7 +5,6 @@ import React from 'react';
 import { encodeQuery, randInt, arrSample, toTimestamp } from '../utils';
 import { TruncateText } from '../components/misc'; // TODO
 
-
 // TODO: hide API key?
 const API_KEY = 'AIzaSyBXbBg-6gZx7eehLHUC4GzPbAQVPgpZqp8';
 const API_URL = 'https://www.googleapis.com/books/v1';
@@ -22,10 +21,20 @@ export const init = () => {};
 
 export const renderBody = ({ desc = '', authors, subtitle }) => (
   <>
-    { subtitle && <><small>{subtitle}</small><br/></> }
-    { authors && <>By <span className="has-text-link">{authors.join(', ')}</span><br/></> }
-    <hr style={{ margin: '0.5rem 0' }}/>
-    <TruncateText text={desc}/>
+    {subtitle && (
+      <>
+        <small>{subtitle}</small>
+        <br />
+      </>
+    )}
+    {authors && (
+      <>
+        By <span className="has-text-link">{authors.join(', ')}</span>
+        <br />
+      </>
+    )}
+    <hr style={{ margin: '0.5rem 0' }} />
+    <TruncateText text={desc} />
   </>
 );
 
@@ -34,12 +43,24 @@ export const textBody = ({ desc = '', authors, subtitle }) => {
 
   if (subtitle) body.push(subtitle);
   if (authors) body.push(authors.join(', '));
-  if (desc) body.push(desc.length > 120 ? `${desc.substring(0, 120)}...` : desc);
+  if (desc)
+    body.push(desc.length > 120 ? `${desc.substring(0, 120)}...` : desc);
 
   return body.join(' -- ');
 };
 
-const mapResponse = ({ id, volumeInfo: { title, subtitle, authors, description, imageLinks, previewLink, publishedDate } }) => ({
+const mapResponse = ({
+  id,
+  volumeInfo: {
+    title,
+    subtitle,
+    authors,
+    description,
+    imageLinks,
+    previewLink,
+    publishedDate,
+  },
+}) => ({
   service: ID,
   label: 'Book',
   title,
@@ -52,13 +73,15 @@ const mapResponse = ({ id, volumeInfo: { title, subtitle, authors, description, 
   released: toTimestamp(publishedDate),
 });
 
-const googleBooks = (path, query) => window.fetch(`${API_URL}${path}?${query}`)
-.then((res) => {
-  if (!res.ok) return Promise.reject(res);
-  return res;
-})
-.then((res) => res.json())
-.then((res) => console.log(res) || res.items.map(mapResponse));
+const googleBooks = (path, query) =>
+  window
+    .fetch(`${API_URL}${path}?${query}`)
+    .then((res) => {
+      if (!res.ok) return Promise.reject(res);
+      return res;
+    })
+    .then((res) => res.json())
+    .then((res) => console.log(res) || res.items.map(mapResponse));
 
 export const search = (str, page = 1) => {
   const query = encodeQuery({
@@ -72,12 +95,10 @@ export const search = (str, page = 1) => {
 };
 
 export const suggest = (list) => {
-
   if (list.length === 0) return Promise.resolve([]);
 
   const randIndex = randInt(0, list.length);
   const randItem = list[randIndex];
 
-  return search(randItem.authors[0])
-  .then((items) => arrSample(items, 6));
+  return search(randItem.authors[0]).then((items) => arrSample(items, 6));
 };

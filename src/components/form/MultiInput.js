@@ -1,14 +1,12 @@
 import React from 'react';
 
-
 export default class MultiInput extends React.Component {
-
   state = {
     addValue: '',
     adding: false,
-  }
+  };
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.items !== this.props.items)
       this.setState({
         adding: false,
@@ -16,7 +14,7 @@ export default class MultiInput extends React.Component {
         valid: false,
       });
   }
-  
+
   addItem = (e) => {
     e.preventDefault();
 
@@ -27,7 +25,7 @@ export default class MultiInput extends React.Component {
 
     this.setState({ adding: true });
     this.props.onAddItem(this.state.addValue);
-  }
+  };
 
   removeItem = (value) => (e) => {
     // Hack way to add waiting animation
@@ -35,7 +33,7 @@ export default class MultiInput extends React.Component {
     e.target.setAttribute('disabled', 'disabled');
 
     this.props.onRemoveItem(value);
-  }
+  };
 
   addItemChange = (e) => {
     const val = e.target.value;
@@ -49,7 +47,7 @@ export default class MultiInput extends React.Component {
       const valid = MultiInput.TEST_URL.test(val);
       this.setState({ addValue: val, valid });
     }
-  }
+  };
 
   static TEST_URL = /^http(s)?:\/\/[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
   static TEST_NUMBER = /^\d*$/;
@@ -58,35 +56,52 @@ export default class MultiInput extends React.Component {
     const { placeholder, minLength, maxLength, type, items } = this.props;
     const { addValue, adding, valid } = this.state;
 
-    return <>
-      {items.map((value) => (
-        <div className="field has-addons" key={value}>
-          <div className="control is-expanded">
-            <input className="input" type="text" value={value} disabled/>
+    return (
+      <>
+        {items.map((value) => (
+          <div className="field has-addons" key={value}>
+            <div className="control is-expanded">
+              <input className="input" type="text" value={value} disabled />
+            </div>
+            <div className="control">
+              <button
+                className="button is-danger"
+                onClick={this.removeItem(value)}
+                title="Remove"
+              >
+                <i className="fas fa-minus" />
+              </button>
+            </div>
           </div>
-          <div className="control">
-            <button className="button is-danger" onClick={this.removeItem(value)}
-              title="Remove">
-              <i className="fas fa-minus"/>
-            </button>
+        ))}
+        <form onSubmit={this.addItem}>
+          <div className="field has-addons">
+            <div className="control is-expanded">
+              <input
+                className="input"
+                type={!type || type === 'number' ? 'text' : type}
+                value={addValue}
+                onChange={this.addItemChange}
+                required
+                minLength={minLength}
+                disabled={adding}
+                placeholder={placeholder}
+                maxLength={maxLength}
+              />
+            </div>
+            <div className="control">
+              <button
+                type="submit"
+                className={`button is-success ${adding ? 'is-loading' : ''}`}
+                disabled={adding || !valid}
+                title="Add"
+              >
+                <i className="fas fa-plus" />
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
-      <form onSubmit={this.addItem}>
-        <div className="field has-addons">
-          <div className="control is-expanded">
-            <input className="input" type={(!type || type === 'number') ? 'text' : type}
-              value={addValue} onChange={this.addItemChange} required minLength={minLength}
-              disabled={adding} placeholder={placeholder} maxLength={maxLength}/>
-          </div>
-          <div className="control">
-            <button type="submit" className={`button is-success ${adding ? 'is-loading' : ''}`}
-              disabled={adding || !valid} title="Add">
-              <i className="fas fa-plus"/>
-            </button>
-          </div>
-        </div>
-      </form>
-    </>;
+        </form>
+      </>
+    );
   }
 }

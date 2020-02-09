@@ -1,10 +1,9 @@
 import React from 'react';
 
 export default class LiveTextEdit extends React.Component {
-
   state = {
     value: this.props.value,
-  }
+  };
 
   componentDidUpdate(prevProps) {
     if (prevProps.value !== this.props.value)
@@ -29,12 +28,12 @@ export default class LiveTextEdit extends React.Component {
     if (e.which === 13) {
       e.target.blur();
     }
-  }
+  };
 
   onBlur = () => {
     this.clearTimeout();
     this.props.onUpdate(this.state.value);
-  }
+  };
 
   onChange = (e) => {
     const value = e.target.value;
@@ -49,16 +48,30 @@ export default class LiveTextEdit extends React.Component {
     }
 
     this.setState({ value });
-  }
+  };
 
   render() {
-    const { value: _, onUpdate: __, className = '', ...inputProps } = this.props;
+    const {
+      value: _,
+      onUpdate: __,
+      className = '',
+      ...inputProps
+    } = this.props;
     const { value } = this.state;
 
-    return <>
-      <input type="text" {...inputProps} value={value} className={`live-text-edit ${className}`}
-        onChange={this.onChange} onKeyPress={this.onKeyPress} onBlur={this.onBlur}/>
-      {/* <span className="fas fa-edit"></span> */}
-    </>;
+    return (
+      <>
+        <input
+          type="text"
+          {...inputProps}
+          value={value}
+          className={`live-text-edit ${className}`}
+          onChange={this.onChange}
+          onKeyPress={this.onKeyPress}
+          onBlur={this.onBlur}
+        />
+        {/* <span className="fas fa-edit"></span> */}
+      </>
+    );
   }
 }

@@ -4,10 +4,9 @@ import { encodeQuery, arrSample, toTimestamp } from '../utils';
 import { apiFactory } from '../api';
 import { initPlayer } from '../spotify_player';
 
-
 export const ID = 'spotify_music';
 export const LABEL = 'Spotify Music';
-export const DESCRIPTION = 'Spotify\'s extensive music library';
+export const DESCRIPTION = "Spotify's extensive music library";
 export const CLASS = 'is-success';
 export const ICON = 'music';
 
@@ -16,12 +15,18 @@ const api = apiFactory('spotify', API_URL, true);
 
 export const init = () => initPlayer();
 
-export const renderBody = ({ artist, artist_id, album, album_id }) => <>
-  By <a href={`https://open.spotify.com/artist/${artist_id}`}>{artist}</a><br/>
-  <small><a href={`https://open.spotify.com/album/${album_id}`}>{album}</a></small>
-</>;
+export const renderBody = ({ artist, artist_id, album, album_id }) => (
+  <>
+    By <a href={`https://open.spotify.com/artist/${artist_id}`}>{artist}</a>
+    <br />
+    <small>
+      <a href={`https://open.spotify.com/album/${album_id}`}>{album}</a>
+    </small>
+  </>
+);
 
-export const textBody = ({ artist }) => artist ? `by ${artist}` : '[Unknown artist]';
+export const textBody = ({ artist }) =>
+  artist ? `by ${artist}` : '[Unknown artist]';
 
 const mapResponse = ({ external_urls, artists, id, name, album }) => ({
   service: ID,
@@ -38,7 +43,6 @@ const mapResponse = ({ external_urls, artists, id, name, album }) => ({
 });
 
 export const search = (str, page = 1) => {
-
   const query = encodeQuery({
     q: str,
     type: 'track',
@@ -47,12 +51,12 @@ export const search = (str, page = 1) => {
     market: 'US',
   });
 
-  return api(`/search?${query}`)
-  .then((res) => res.tracks.items.map(mapResponse));
+  return api(`/search?${query}`).then((res) =>
+    res.tracks.items.map(mapResponse),
+  );
 };
 
 export const suggest = (list) => {
-
   if (list.length === 0) return Promise.resolve([]);
 
   const samples = arrSample(list, 5, true).map((item) => item.media_id);
@@ -63,8 +67,7 @@ export const suggest = (list) => {
     limit: 10,
   });
 
-  return api(`/recommendations?${query}`)
-  .then((res) => {
+  return api(`/recommendations?${query}`).then((res) => {
     const listMap = {};
     for (const listItem of list) listMap[listItem.media_id] = true;
 
@@ -84,7 +87,8 @@ export const suggest = (list) => {
       ids: results.join(','),
     });
 
-    return api(`/tracks?${query2}`)
-    .then((res2) => res2.tracks.map(mapResponse));
+    return api(`/tracks?${query2}`).then((res2) =>
+      res2.tracks.map(mapResponse),
+    );
   });
 };

@@ -5,29 +5,30 @@ import Search from '../Search';
 import * as share from '../../share';
 import { toggleListItem, getProfile } from '../../db';
 
-
 export default class View extends React.Component {
-
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.canWrite = share.canWrite(this.props.meta);
   }
 
   toggleSearchItem = (item) => {
     const { contents, meta } = this.props;
 
-    toggleListItem(item, contents, meta)
-    .then((newItem) => {
+    toggleListItem(item, contents, meta).then((newItem) => {
       const { searchResults, onSearch } = this.props;
-      onSearch(searchResults.map((_item) => _item.media_id === newItem.media_id ? newItem : _item));
+      onSearch(
+        searchResults.map((_item) =>
+          _item.media_id === newItem.media_id ? newItem : _item,
+        ),
+      );
     });
-  }
+  };
 
   toggleListItem = (item) => {
     const { contents } = this.props;
 
     toggleListItem(item, contents, null, false);
-  }
-  
+  };
+
   render() {
     const { meta, searchResults, list, onSearch } = this.props;
 
@@ -38,26 +39,38 @@ export default class View extends React.Component {
     let Content = null;
     if (searchResults) {
       Content = searchResults.map((item) => (
-        <SearchItem key={item.media_id} item={item} canWrite={this.canWrite}
-          toggle={this.toggleSearchItem}/>
+        <SearchItem
+          key={item.media_id}
+          item={item}
+          canWrite={this.canWrite}
+          toggle={this.toggleSearchItem}
+        />
       ));
     } else if (list.length) {
       // grid = true;
       Content = list.map((item) => (
-        <ListItem key={item.id} item={item} className={grid && "column is-4"}
-          toggle={this.toggleListItem} canDelete={this.canWrite} showLabels={loggedIn} listId={meta.id}/>
+        <ListItem
+          key={item.id}
+          item={item}
+          className={grid && 'column is-4'}
+          toggle={this.toggleListItem}
+          canDelete={this.canWrite}
+          showLabels={loggedIn}
+          listId={meta.id}
+        />
       ));
     } else {
       Content = <p className="is-size-4 has-text-centered">Empty List!</p>;
     }
 
-    return <>
-      <p className="is-size-5 has-text-grey">Your List:</p>
-      <h1 className="is-size-1 is-clipped">{meta.name}</h1>
-      <br/>
-      <Search type={meta.type} setResults={onSearch}/>
-      <br/>
-      {/* <div className="field has-addons">
+    return (
+      <>
+        <p className="is-size-5 has-text-grey">Your List:</p>
+        <h1 className="is-size-1 is-clipped">{meta.name}</h1>
+        <br />
+        <Search type={meta.type} setResults={onSearch} />
+        <br />
+        {/* <div className="field has-addons">
         <div className="control">
           <button className="button is-dark">
             <span className="icon">
@@ -73,9 +86,8 @@ export default class View extends React.Component {
           </button>
         </div>
       </div> */}
-      <div className={grid ? 'columns is-multiline' : ''}>
-        {Content}
-      </div>
-    </>;
+        <div className={grid ? 'columns is-multiline' : ''}>{Content}</div>
+      </>
+    );
   }
 }

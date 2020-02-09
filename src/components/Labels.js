@@ -6,7 +6,6 @@ import { ListItem } from './ListItem';
 import LiveTextEdit from './form/LiveTextEdit';
 import { confirm, prompt } from '../alert';
 
-
 const colorMap = [
   ['is-link', 'Blue'],
   ['is-info', 'Light Blue'],
@@ -20,17 +19,13 @@ const colorMap = [
 export const labelColor = (colorId) => colorMap[colorId][0];
 
 export class LabelEditor extends React.Component {
-
   toggleLabel = (labelId) => () => {
     const { item, listId, itemLabels } = this.props;
 
     if (labelId in itemLabels)
-      db.removeItemLabel(item, labelId)
-      .catch(console.error);
-    else
-      db.addItemLabel(item, labelId, listId)
-      .catch(console.error);
-  }
+      db.removeItemLabel(item, labelId).catch(console.error);
+    else db.addItemLabel(item, labelId, listId).catch(console.error);
+  };
 
   render() {
     const { itemLabels, labelMap } = this.props;
@@ -42,20 +37,32 @@ export class LabelEditor extends React.Component {
         amount++;
         const { name, color } = labelMap[labelId];
         const assigned = labelId in itemLabels;
-        Content.push((
-          <button className={`tag ${labelColor(color)} ${assigned ? 'has-border' : ''}`}
-            key={labelId} onClick={this.toggleLabel(labelId)} title={`${assigned ? 'Remove' : 'Add'} Label`}>
+        Content.push(
+          <button
+            className={`tag ${labelColor(color)} ${
+              assigned ? 'has-border' : ''
+            }`}
+            key={labelId}
+            onClick={this.toggleLabel(labelId)}
+            title={`${assigned ? 'Remove' : 'Add'} Label`}
+          >
             {name}
-          </button>
-        ));
+          </button>,
+        );
       }
     } else {
       for (const labelId in itemLabels) {
         amount++;
         const { name, color } = itemLabels[labelId];
-        Content.push((
-          <Link key={labelId} className={`tag ${labelColor(color)}`} to={`/labels/${labelId}`}>{name}</Link>
-        ));
+        Content.push(
+          <Link
+            key={labelId}
+            className={`tag ${labelColor(color)}`}
+            to={`/labels/${labelId}`}
+          >
+            {name}
+          </Link>,
+        );
       }
     }
 
@@ -66,11 +73,10 @@ export class LabelEditor extends React.Component {
 }
 
 export class FilteredLabelItems extends React.Component {
-  
   state = {
     items: null,
     error: null,
-  }
+  };
 
   componentDidMount() {
     this.subscribe();
@@ -92,21 +98,27 @@ export class FilteredLabelItems extends React.Component {
   applyLabels(initItems) {
     const { labelMap } = this.props;
 
-    this.setState(({ items }) => (!initItems && !items) ? ({}) : ({
-      items: (initItems || items).map((item) => {
-        const newLabels = {}; // Need to recreate object to update React
-        for (const itemLabelId in item.labels)
-          newLabels[itemLabelId] = labelMap[itemLabelId];
-        item.labels = newLabels;
-        return { ...item };
-      }),
-    }));
+    this.setState(({ items }) =>
+      !initItems && !items
+        ? {}
+        : {
+            items: (initItems || items).map((item) => {
+              const newLabels = {}; // Need to recreate object to update React
+              for (const itemLabelId in item.labels)
+                newLabels[itemLabelId] = labelMap[itemLabelId];
+              item.labels = newLabels;
+              return { ...item };
+            }),
+          },
+    );
   }
 
-  unsubscribe = () => {}
+  unsubscribe = () => {};
 
   subscribe() {
-    const { meta: { id } } = this.props;
+    const {
+      meta: { id },
+    } = this.props;
 
     this.unsubscribe = db.selectByLabel(id, (error, items) => {
       if (error) this.setState({ error });
@@ -115,43 +127,55 @@ export class FilteredLabelItems extends React.Component {
   }
 
   setColor = (color) => () => {
-    const { meta: { id } } = this.props;
-    
-    db.updateLabel(id, { color })
-    .catch(console.error);
-  }
+    const {
+      meta: { id },
+    } = this.props;
+
+    db.updateLabel(id, { color }).catch(console.error);
+  };
 
   setName = (name) => {
-    const { meta: { id } } = this.props;
-    
-    db.updateLabel(id, { name })
-    .catch(console.error);
-  }
+    const {
+      meta: { id },
+    } = this.props;
+
+    db.updateLabel(id, { name }).catch(console.error);
+  };
 
   delete = () => {
-    const { meta: { id, name }, history } = this.props;
+    const {
+      meta: { id, name },
+      history,
+    } = this.props;
 
-    confirm(<>Are you sure you want to delete the label <strong>{name}</strong>?</>)
-    .then((yes) => {
+    confirm(
+      <>
+        Are you sure you want to delete the label <strong>{name}</strong>?
+      </>,
+    ).then((yes) => {
       if (yes) {
         history.replace('/labels');
-    
-        db.deleteLabel(id)
-        .catch(console.error);
+
+        db.deleteLabel(id).catch(console.error);
       }
     });
-  }
+  };
 
   render() {
     const { error, items } = this.state;
-    const { meta: { name, color } } = this.props;
+    const {
+      meta: { name, color },
+    } = this.props;
 
     if (error) throw error;
 
     let Items;
     if (!items) Items = <div>Loading filtered label items...</div>;
     else if (!items.length) Items = <div>No items!</div>;
-    else Items = items.map((item) => <ListItem key={item.id} item={item} listId={item.listId} showLabels/>);
+    else
+      Items = items.map((item) => (
+        <ListItem key={item.id} item={item} listId={item.listId} showLabels />
+      ));
 
     return (
       <div>
@@ -161,41 +185,54 @@ export class FilteredLabelItems extends React.Component {
               <div style={{ flex: 1, marginRight: 16 }}>
                 <p className="is-size-5 has-text-grey">Filtered By:</p>
                 {/* <h2 className="is-size-2">{name}</h2> */}
-                <LiveTextEdit className="is-size-2 is-clipped" maxLength={32}
-                  onUpdate={this.setName} value={name} placeholder="Name cannot be empty"/>
+                <LiveTextEdit
+                  className="is-size-2 is-clipped"
+                  maxLength={32}
+                  onUpdate={this.setName}
+                  value={name}
+                  placeholder="Name cannot be empty"
+                />
               </div>
             </div>
           </div>
           <div className="level-right">
             <div className="level-item">
               {colorMap.map(([colorClass, colorName], i) => (
-                <button className={`button is-rounded is-small ${colorClass} ${color === i ? 'has-border' : ''}`}
-                  key={i} onClick={this.setColor(i)} style={{ marginRight: 8 }} title={`Set color to ${colorName}`}/>
+                <button
+                  className={`button is-rounded is-small ${colorClass} ${
+                    color === i ? 'has-border' : ''
+                  }`}
+                  key={i}
+                  onClick={this.setColor(i)}
+                  style={{ marginRight: 8 }}
+                  title={`Set color to ${colorName}`}
+                />
               ))}
-              <button className="button is-inverted" title="Delete Label"
-                onClick={this.delete} style={{ marginLeft: 12 }}>
+              <button
+                className="button is-inverted"
+                title="Delete Label"
+                onClick={this.delete}
+                style={{ marginLeft: 12 }}
+              >
                 <span className="icon is-small is-left">
-                  <i className="fas fa-trash"/>
+                  <i className="fas fa-trash" />
                 </span>
               </button>
             </div>
           </div>
         </div>
-        <br/>
-        <div>
-          {Items}
-        </div>
+        <br />
+        <div>{Items}</div>
       </div>
     );
   }
 }
 
 export class Labels extends React.Component {
-  
   state = {
     labels: null,
     error: null,
-  }
+  };
 
   componentDidMount() {
     this.unsubscribe = db.getLabels((error, labels) => {
@@ -215,15 +252,14 @@ export class Labels extends React.Component {
   }
 
   create = () => {
-    prompt('Enter a name for your label')
-    .then((name) => {
+    prompt('Enter a name for your label').then((name) => {
       if (name) {
         db.createLabel(name, 0)
-        .then((doc) => this.props.history.push(`/labels/${doc.id}`))
-        .catch(console.error);
+          .then((doc) => this.props.history.push(`/labels/${doc.id}`))
+          .catch(console.error);
       }
     });
-  }
+  };
 
   renderItems = (props) => {
     if (!this.labelMap) return null; // loading...
@@ -233,14 +269,16 @@ export class Labels extends React.Component {
 
     if (!meta) throw { code: 404 };
 
-    return <FilteredLabelItems {...props} meta={meta} labelMap={this.labelMap}/>;
-  }
+    return (
+      <FilteredLabelItems {...props} meta={meta} labelMap={this.labelMap} />
+    );
+  };
 
   renderNoLabel = () => (
     <div>
       Please select a label or <a onClick={this.create}>create a new one</a>
     </div>
-  )
+  );
 
   render() {
     const { error, labels } = this.state;
@@ -250,11 +288,16 @@ export class Labels extends React.Component {
     let LabelContent;
     if (!labels) LabelContent = <div>Loading labels...</div>;
     else if (!labels.length) LabelContent = <div>No labels!</div>;
-    else LabelContent = labels.map((label) => (
-      <Link key={label.id} className={`button ${labelColor(label.color)}`} to={`/labels/${label.id}`}>
-        {label.name}
-      </Link>
-    ));
+    else
+      LabelContent = labels.map((label) => (
+        <Link
+          key={label.id}
+          className={`button ${labelColor(label.color)}`}
+          to={`/labels/${label.id}`}
+        >
+          {label.name}
+        </Link>
+      ));
 
     return (
       <section className="section">
@@ -271,23 +314,33 @@ export class Labels extends React.Component {
                   <div className="level-item">
                     <button onClick={this.create} className="button is-light">
                       <span className="icon is-small is-left">
-                        <i className="fas fa-plus"/>
+                        <i className="fas fa-plus" />
                       </span>
                       <span>Create New Label</span>
                     </button>
                   </div>
                 </div>
               </div>
-              <hr/>
-              <div className="multiline-items">
-                {LabelContent}
-              </div>
-              <hr/>
-              { labels && (
+              <hr />
+              <div className="multiline-items">{LabelContent}</div>
+              <hr />
+              {labels && (
                 <Switch>
-                  <Route exact path={this.props.match.url} render={this.renderNoLabel}/>
-                  <Route exact path={`${this.props.match.url}/:labelId`} render={this.renderItems}/>
-                  <Route render={() => { throw { code: 404 }; }}/>
+                  <Route
+                    exact
+                    path={this.props.match.url}
+                    render={this.renderNoLabel}
+                  />
+                  <Route
+                    exact
+                    path={`${this.props.match.url}/:labelId`}
+                    render={this.renderItems}
+                  />
+                  <Route
+                    render={() => {
+                      throw { code: 404 };
+                    }}
+                  />
                 </Switch>
               )}
             </div>
@@ -296,5 +349,4 @@ export class Labels extends React.Component {
       </section>
     );
   }
-
 }

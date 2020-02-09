@@ -1,14 +1,11 @@
 import * as db from './db';
 
-
 // TODO: use individual field updates instead of entires role object?
 // TODO: use transaction. Not a big deal if we are sure only one client modifies at a time
 // TODO: move to onWrite function OR make super robust db rules
 // TODO: probably can remove some redundant logic
 
-
 const getHighestRole = (listMeta, userId, excludeServer) => {
-
   let canRead = false;
 
   const userRole = listMeta.shared_users[userId];
@@ -29,9 +26,9 @@ const getHighestRole = (listMeta, userId, excludeServer) => {
 };
 
 export const shareUser = (userId, listMeta, canWrite) => {
-
   const roles = Object.assign({}, listMeta.roles);
-  if (roles[userId] !== 'o' && roles[userId] !== 'w') roles[userId] = canWrite ? 'w' : 'r';
+  if (roles[userId] !== 'o' && roles[userId] !== 'w')
+    roles[userId] = canWrite ? 'w' : 'r';
 
   return db.lists.doc(listMeta.id).update({
     [`shared_users.${userId}`]: canWrite ? 'w' : 'r',
@@ -40,7 +37,6 @@ export const shareUser = (userId, listMeta, canWrite) => {
 };
 
 export const unshareUser = (userId, listMeta) => {
-
   const roles = Object.assign({}, listMeta.roles);
   const thisRole = listMeta.shared_users[userId];
 
@@ -57,29 +53,30 @@ export const unshareUser = (userId, listMeta) => {
   });
 };
 
-export const shareServer = (serverId, listMeta, canWrite) => db.users
-.where(`guilds.${serverId}`, '==', true).get()
-.then((snap) => {
+export const shareServer = (serverId, listMeta, canWrite) =>
+  db.users
+    .where(`guilds.${serverId}`, '==', true)
+    .get()
+    .then((snap) => {
+      const userIds = {};
+      const roles = Object.assign({}, listMeta.roles);
 
-  const userIds = {};
-  const roles = Object.assign({}, listMeta.roles);
+      snap.forEach(({ id: userId }) => {
+        userIds[userId] = true;
+        if (roles[userId] !== 'o' && roles[userId] !== 'w')
+          roles[userId] = canWrite ? 'w' : 'r';
+      });
 
-  snap.forEach(({ id: userId }) => {
-    userIds[userId] = true;
-    if (roles[userId] !== 'o' && roles[userId] !== 'w') roles[userId] = canWrite ? 'w' : 'r';
-  });
-
-  return db.lists.doc(listMeta.id).update({
-    [`shared_servers.${serverId}`]: {
-      role: canWrite ? 'w' : 'r',
-      members: userIds,
-    },
-    roles,
-  });
-});
+      return db.lists.doc(listMeta.id).update({
+        [`shared_servers.${serverId}`]: {
+          role: canWrite ? 'w' : 'r',
+          members: userIds,
+        },
+        roles,
+      });
+    });
 
 export const unshareServer = (serverId, listMeta) => {
-
   const roles = Object.assign({}, listMeta.roles);
   const thisRole = listMeta.shared_servers[serverId].role;
 
@@ -113,18 +110,16 @@ export const isOwner = (listMeta) => {
 
 // TODO: improve performance of onSnapshots with `snap.docChanges`
 
-export const getSharedLists = (cb) => db.lists.where(`roles.${db.getProfile().id}`, '>', '')
-.onSnapshot((snap) => {
-  const userId = db.getProfile().id;
-  const lists = [];
-  const sharedLists = [];
-  snap.forEach((doc) => {
-    const data = doc.data();
-    data.id = doc.id;
-    if (data.roles[userId] === 'o')
-      lists.push(data);
-    else
-      sharedLists.push(data);
-  });
-  cb(null, lists, sharedLists);
-}, cb);
+export const getSharedLists = (cb) =>
+  db.lists.where(`roles.${db.getProfile().id}`, '>', '').onSnapshot((snap) => {
+    const userId = db.getProfile().id;
+    const lists = [];
+    const sharedLists = [];
+    snap.forEach((doc) => {
+      const data = doc.data();
+      data.id = doc.id;
+      if (data.roles[userId] === 'o') lists.push(data);
+      else sharedLists.push(data);
+    });
+    cb(null, lists, sharedLists);
+  }, cb);

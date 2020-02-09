@@ -1,6 +1,27 @@
 {
+  "private": true,
   "name": "tely",
   "description": "Live media sharing",
+  "keywords": [
+    "media",
+    "discord",
+    "share",
+    "books",
+    "movies",
+    "songs"
+  ],
+  "version": "0.1.0",
+  "author": "wyattades",
+  "license": "UNLICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wyattades/tely.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wyattades/tely/issues"
+  },
+  "homepage": "https://github.com/wyattades/tely#readme",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint src",
     "dev": "NODE_ENV=development webpack-dev-server",
@@ -19,11 +40,14 @@
     "react-url-query": "^1.4.0"
   },
   "devDependencies": {
-    "webpack-boiler": "^0.3.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wyattades/tely"
-  },
-  "private": true
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.18.3",
+    "eslint-plugin-react-hooks": "^2.3.0",
+    "prettier": "^1.19.1",
+    "webpack-boiler": "^0.4.2"
+  }
 }
