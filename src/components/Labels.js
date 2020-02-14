@@ -244,7 +244,7 @@ export class Labels extends React.Component {
         }
         this.setState({ labels });
       }
-    }, true);
+    });
   }
 
   componentWillUnmount() {
@@ -284,20 +284,23 @@ export class Labels extends React.Component {
     const { error, labels } = this.state;
 
     if (error) throw error;
-
     let LabelContent;
     if (!labels) LabelContent = <div>Loading labels...</div>;
     else if (!labels.length) LabelContent = <div>No labels!</div>;
-    else
-      LabelContent = labels.map((label) => (
-        <Link
-          key={label.id}
-          className={`button ${labelColor(label.color)}`}
-          to={`/labels/${label.id}`}
-        >
-          {label.name}
-        </Link>
-      ));
+    else {
+      console.log(labels);
+      LabelContent = labels.map((label) =>
+        label ? (
+          <Link
+            key={label.id}
+            className={`button ${labelColor(label.color)}`}
+            to={`/labels/${label.id}`}
+          >
+            {label.name}
+          </Link>
+        ) : null,
+      );
+    }
 
     return (
       <section className="section">
