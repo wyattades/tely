@@ -1,4 +1,9 @@
-import firebase from 'firebase/app';
+import firebase from 'firebase-admin';
+
+/**
+ * This file is shared between frontend and backend
+ * `firebase-admin` is aliased to `firebase/app` on frontend
+ */
 
 export const roleClick = (e) =>
   (e.which || e.charCode || e.keyCode) === 13 && e.target.click();
@@ -33,6 +38,10 @@ export const shuffle = (arr) => {
   return arr;
 };
 
+export const arrUnique = (arr) => {
+  return [...new Set(arr).values()];
+};
+
 export const encodeQuery = (obj) => {
   const str = [];
   for (const key in obj) {
@@ -56,13 +65,17 @@ export const decodeQuery = (str) => {
 };
 
 export const sameSet = (A, B) => {
-  if (typeof A !== 'object' || typeof B !== 'object') return false;
+  if (!A || !B || typeof A !== 'object' || typeof B !== 'object') return false;
+
   const keysA = Object.keys(A).sort(),
     keysB = Object.keys(B).sort();
+
   if (keysA.length !== keysB.length) return false;
+
   for (let i = 0; i < keysA.length; i++) {
     if (keysA[i] !== keysB[i]) return false;
   }
+
   return true;
 };
 
@@ -113,8 +126,8 @@ export const toTimestamp = (time) => {
   if (typeof time === 'number')
     return firebase.firestore.Timestamp.fromDate(new Date(time));
   if (typeof time === 'string') {
-    const date = Date.parse(time);
-    return Number.isNaN(date)
+    const millis = Date.parse(time);
+    return Number.isNaN(millis)
       ? null
       : firebase.firestore.Timestamp.fromDate(new Date(time));
   }
@@ -160,3 +173,29 @@ export const onSnap = (ref, cb) =>
     },
     (error) => cb(error, null),
   );
+
+export const waitFor = async (fn, { interval = 300, timeout } = {}) => {
+  return new Promise((resolve, reject) => {
+    let timeoutRef;
+    const intervalRef = setInterval(async () => {
+      try {
+        if (await fn()) {
+          resolve();
+          clearInterval(intervalRef);
+          clearTimeout(timeoutRef);
+        }
+      } catch (err) {
+        reject(err);
+        clearInterval(intervalRef);
+        clearTimeout(timeoutRef);
+      }
+    }, interval);
+
+    if (timeout)
+      timeoutRef = setTimeout(() => {
+        reject();
+        clearInterval(intervalRef);
+        clearTimeout(timeoutRef);
+      });
+  });
+};

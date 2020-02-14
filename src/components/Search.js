@@ -2,7 +2,7 @@ import React from 'react';
 import addUrlProps from 'react-url-query/lib/react/addUrlProps';
 
 import { roleClick } from '../utils';
-import services from '../services';
+import { servicesMap } from '../services';
 
 const urlPropsQueryConfig = {
   search: {},
@@ -17,7 +17,7 @@ class Search extends React.Component {
       searching: false,
       searchQuery: props.search || '',
     };
-    this.media = services.asObject[props.type];
+    this.media = servicesMap[props.type];
   }
 
   componentDidMount() {

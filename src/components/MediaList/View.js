@@ -34,7 +34,7 @@ export default class View extends React.Component {
 
     const loggedIn = !!getProfile();
 
-    let grid = false;
+    const grid = false;
 
     let Content = null;
     if (searchResults) {

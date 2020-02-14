@@ -1,9 +1,10 @@
 import { decodeQuery, popupCenter } from './utils';
+import { IS_DEV_ENV, PROJECT_ID, FIREBASE_REGION } from './env';
+import { request } from './request';
 
-const SERVER_URL =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000/tely-db/us-central1/widgets'
-    : 'https://us-central1-tely-db.cloudfunctions.net/widgets';
+const SERVER_URL = IS_DEV_ENV
+  ? `http://localhost:5000/${PROJECT_ID}/${FIREBASE_REGION}/widgets`
+  : `https://${FIREBASE_REGION}-${PROJECT_ID}.cloudfunctions.net/widgets`;
 
 export const profiles = {
   spotify: null,
@@ -73,67 +74,48 @@ export const signIn = (service) =>
     throw err;
   });
 
-export const apiFetch = (url, accessToken, method, body) =>
-  window
-    .fetch(url, {
-      method,
-      body: body ? JSON.stringify(body) : undefined,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      },
-      mode: 'cors',
-    })
-    .then((res) => {
-      const contentType = res.headers.get('content-type');
-      const hasJSON =
-        contentType && contentType.indexOf('application/json') !== -1;
-
-      if (res.ok) return hasJSON ? res.json() : {};
-
-      return hasJSON
-        ? res
-            .json()
-            .then((data) =>
-              Promise.reject({ code: res.status, msg: data.message }),
-            )
-        : Promise.reject({ code: res.status });
-    });
-
-export const refreshToken = (service) => {
+export const refreshToken = async (service) => {
   const profile = profiles[service];
   if (!profile || !profile.refreshToken)
     throw { code: 401, msg: 'No refresh token available' };
 
-  return apiFetch(`${SERVER_URL}/auth/${service}/refresh`, null, 'POST', {
-    token: profile.refreshToken,
-  }).then(({ token }) => updateProfile(service, { accessToken: token }));
+  const { token } = await request({
+    url: `${SERVER_URL}/auth/${service}/refresh`,
+    body: {
+      token: profile.refreshToken,
+    },
+  });
+
+  return updateProfile(service, { accessToken: token });
 };
 
-export const apiFactory = (service, api_url, autoSignIn) => (
-  path,
-  method = 'GET',
-  body,
-) => {
-  const profile = profiles[service];
+export const apiFactory = (service, api_url, autoSignIn = false) => {
+  const apiFetch = (path, accessToken, method, body) =>
+    request({ url: api_url + path, accessToken, method, body });
 
-  if (!profile) {
-    if (autoSignIn)
-      return signIn(service).then(() =>
-        apiFetch(api_url + path, profiles[service].accessToken, method, body),
-      );
-    else return Promise.reject({ code: 403 });
-  }
+  return async (path, method = 'GET', body) => {
+    const profile = profiles[service];
 
-  return (expired(service) ? refreshToken(service) : Promise.resolve())
-    .then(() => apiFetch(api_url + path, profile.accessToken, method, body))
-    .catch((res) => {
-      if (autoSignIn && res.code === 401) {
-        return refreshToken(service).then(() =>
-          apiFetch(api_url + path, profile.accessToken, method, body),
-        );
+    if (!profile) {
+      if (autoSignIn) {
+        await signIn(service);
+
+        return apiFetch(path, profiles[service].accessToken, method, body);
+      } else throw { code: 403 };
+    }
+
+    if (expired(service)) await refreshToken(service);
+
+    try {
+      return apiFetch(path, profile.accessToken, method, body);
+    } catch (err) {
+      if (autoSignIn && err.code === 401) {
+        await refreshToken(service);
+
+        return apiFetch(path, profile.accessToken, method, body);
       }
 
-      throw res;
-    });
+      throw err;
+    }
+  };
 };

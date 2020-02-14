@@ -5,7 +5,7 @@ import BigSelect from './form/BigSelect';
 import { SmallSection } from './misc';
 import services from '../services';
 
-const types = services.asArray.map(({ ID, LABEL, DESCRIPTION, CLASS }) => ({
+const types = services.map(({ ID, LABEL, DESCRIPTION, CLASS }) => ({
   id: ID,
   label: LABEL,
   desc: DESCRIPTION,

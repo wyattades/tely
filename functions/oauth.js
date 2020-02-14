@@ -1,18 +1,13 @@
-const admin = require('firebase-admin');
-const express = require('express');
-const passport = require('passport');
-const DiscordStrategy = require('passport-discord').Strategy;
-const SpotifyStrategy = require('passport-spotify').Strategy;
-const refresh = require('passport-oauth2-refresh');
-const Query = require('querystring');
+import express from 'express';
+import cors from 'cors';
+import passport from 'passport';
+import { Strategy as DiscordStrategy } from 'passport-discord';
+import { Strategy as SpotifyStrategy } from 'passport-spotify';
+import refresh from 'passport-oauth2-refresh';
+import Query from 'querystring';
 
-const firestore = admin.firestore();
-firestore.settings({ timestampsInSnapshots: true });
-
-const SERVER_URL = global.DEV
-  ? 'http://localhost:5000/tely-db/us-central1/widgets'
-  : 'https://us-central1-tely-db.cloudfunctions.net/widgets';
-const ORIGIN_URL = global.DEV ? 'http://localhost:8080' : 'https://tely.app';
+import * as db from './db';
+import { config, SERVER_URL, ORIGIN_URL } from './env';
 
 // TODO: necessary?
 passport.serializeUser((user, done) => done(null, user));
@@ -20,8 +15,8 @@ passport.deserializeUser((obj, done) => done(null, obj));
 
 const discordStrat = new DiscordStrategy(
   {
-    clientID: global.config.discord.client_id,
-    clientSecret: global.config.discord.client_secret,
+    clientID: config.discord.client_id,
+    clientSecret: config.discord.client_secret,
     callbackURL: `${SERVER_URL}/auth/discord/callback`,
     scope: ['identify', 'email', 'guilds'],
   },
@@ -41,13 +36,12 @@ const discordStrat = new DiscordStrategy(
     }
 
     // Create user in database
-    firestore
+    db.firestore
       .doc(`/users/${profile.id}`)
       .set(profile, { merge: true })
       .catch(console.error);
 
-    admin
-      .auth()
+    db.auth
       .createCustomToken(profile.id)
       .then((token) => {
         profile.token = token;
@@ -59,8 +53,8 @@ const discordStrat = new DiscordStrategy(
 
 const spotifyStrat = new SpotifyStrategy(
   {
-    clientID: global.config.spotify.client_id,
-    clientSecret: global.config.spotify.client_secret,
+    clientID: config.spotify.client_id,
+    clientSecret: config.spotify.client_secret,
     callbackURL: `${SERVER_URL}/auth/spotify/callback`,
     scope: [
       'streaming',
@@ -73,9 +67,7 @@ const spotifyStrat = new SpotifyStrategy(
   (accessToken, refreshToken, expires_in, profile, cb) => {
     if (accessToken) profile.accessToken = accessToken;
     if (refreshToken) profile.refreshToken = refreshToken;
-    if (expires_in)
-      profile.expires_on =
-        admin.firestore.Timestamp.now().toMillis() + expires_in;
+    if (expires_in) profile.expires_on = db.now().toMillis() + expires_in;
     cb(null, profile);
   },
 );
@@ -88,23 +80,19 @@ refresh.use(spotifyStrat);
 const app = express();
 app.use(passport.initialize());
 app.use(express.json());
+app.use(
+  cors({
+    origin: ORIGIN_URL,
+    // allowedHeaders: 'Origin,X-Requested-With,Content-Type Accept',
+  }),
+);
 
-// CORS!
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', ORIGIN_URL);
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept',
-  );
-  next();
-});
-
-const oauthRoutes = (service) => {
-  app.get(`/auth/${service}`, passport.authenticate(service));
+const oauthRoutes = (provider) => {
+  app.get(`/auth/${provider}`, passport.authenticate(provider));
 
   app.get(
-    `/auth/${service}/callback`,
-    passport.authenticate(service, {
+    `/auth/${provider}/callback`,
+    passport.authenticate(provider, {
       failureRedirect: `${ORIGIN_URL}?error=auth_error`,
     }),
     (req, res) => {
@@ -112,16 +100,18 @@ const oauthRoutes = (service) => {
     },
   );
 
-  app.post(`/auth/${service}/refresh`, (req, res) => {
+  app.post(`/auth/${provider}/refresh`, (req, res) => {
     const refreshToken = req.body.token;
     if (!refreshToken) {
       res.status(400).end();
       return;
     }
 
-    refresh.requestNewAccessToken(service, refreshToken, (err, token) => {
-      if (err) res.status((err && err.status) || 500).send(err);
-      else res.send({ token });
+    refresh.requestNewAccessToken(provider, refreshToken, (err, token) => {
+      if (err) {
+        console.error(err);
+        res.status((err && err.statusCode) || 500).send(err && err.data);
+      } else res.send({ token });
     });
   });
 };
@@ -129,4 +119,4 @@ const oauthRoutes = (service) => {
 oauthRoutes('discord');
 oauthRoutes('spotify');
 
-module.exports = app;
+export const oauthApp = app;

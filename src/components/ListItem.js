@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { roleClick, timeAgo, toDate } from '../utils';
-import services from '../services';
+import { servicesMap } from '../services';
 import { SpotifyPlayer } from '../spotify_player';
 import * as db from '../db';
 import { userAvatar } from '../discord';
@@ -29,7 +29,7 @@ const MediaContent = ({
       </div>
       <div className="media-content">
         <div className="content">
-          <p>
+          <p className="is-marginless">
             <strong>
               <a href={link}>{title}</a>
             </strong>
@@ -41,9 +41,8 @@ const MediaContent = ({
             {releaseDate ? (
               <small>Released {releaseDate.toLocaleDateString()}</small>
             ) : null}
-            <br />
-            {service.renderBody(body)}
           </p>
+          {service.renderBody(body)}
         </div>
         {mediaBottom}
       </div>
@@ -180,7 +179,7 @@ export class ListItem extends React.Component {
       <div className={`box ${className || ''} list-item`}>
         <MediaContent
           item={item}
-          service={services.asObject[item.service]}
+          service={servicesMap[item.service]}
           mediaBottom={levelBottom}
         />
         {(item.labels || labelMap) && (
@@ -263,7 +262,7 @@ export class SearchItem extends React.Component {
     return (
       <MediaContent
         item={item}
-        service={services.asObject[type]}
+        service={servicesMap[type]}
         mediaRight={addIcon}
       />
     );

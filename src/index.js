@@ -1,22 +1,24 @@
-import * as ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 import React from 'react';
-import * as Offline from 'offline-plugin/runtime';
+// import * as Offline from 'offline-plugin/runtime';
+
+import { IS_DEV_ENV } from './env';
+import * as db from './db';
+import App from './components/App';
 
 import './styles/style.scss';
-import App from './components/App';
-import * as db from './db';
 
-if (process.env.NODE_ENV === 'development') {
+if (IS_DEV_ENV) {
   window.db = db;
 } else {
-  Offline.install({
-    onUpdateReady: () => Offline.applyUpdate(),
-    onUpdated: () => {
-      window.swUpdate = true;
-    },
-  });
+  // Offline.install({
+  //   onUpdateReady: () => Offline.applyUpdate(),
+  //   onUpdated: () => {
+  //     window.swUpdate = true;
+  //   },
+  // });
 }
 
 db.init().then(() => {
-  ReactDOM.render(<App />, document.getElementById('root'));
+  render(<App />, document.getElementById('root'));
 });

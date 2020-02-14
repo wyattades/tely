@@ -1,7 +1,7 @@
 import React from 'react';
 
 import NavLink from '../NavLink';
-import services from '../../services';
+import { servicesMap } from '../../services';
 import * as db from '../../db';
 import * as share from '../../share';
 import { Spinner, LiveSwitch } from '../misc';
@@ -43,7 +43,7 @@ class MediaList extends React.Component {
         meta.id = snap.id;
 
         // Call init function for this type of list
-        services.asObject[meta.type].init(meta);
+        servicesMap[meta.type].init(meta);
 
         this.setState({
           meta,

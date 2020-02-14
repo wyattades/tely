@@ -1,11 +1,10 @@
 # Custom
 dist/
-package-lock.json
-.env*
+.env
 .runtimeconfig.json
-functions/scripts/
-gen-test/
 credentials.json
+functions/index.js
+functions/index.js.map
 
 # Logs
 logs

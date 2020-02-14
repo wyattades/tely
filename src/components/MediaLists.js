@@ -2,11 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { SmallSection, Spinner } from './misc';
-import services from '../services';
+import { servicesMap } from '../services';
 import { getSharedLists } from '../share';
 
 export const ListView = ({ id, type, name }) => {
-  const service = services.asObject[type];
+  const service = servicesMap[type];
   if (!service) return <p>[Invalid List]</p>;
 
   return (

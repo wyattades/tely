@@ -24,7 +24,7 @@ export default () => (
       </ul>
       <h4>With the following media types:</h4>
       <ul>
-        {services.asArray.map(({ ID, LABEL, DESCRIPTION }) => (
+        {services.map(({ ID, LABEL, DESCRIPTION }) => (
           <li key={ID}>
             <strong>{LABEL}:</strong> {DESCRIPTION}
           </li>

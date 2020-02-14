@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { SearchItem } from '../ListItem';
-import services from '../../services';
+import { servicesMap } from '../../services';
 import { Spinner } from '../misc';
 import * as share from '../../share';
 import { toggleListItem } from '../../db';
@@ -32,7 +32,7 @@ export default class Suggest extends React.Component {
   };
 
   fetchSuggested = () => {
-    services.asObject[this.props.meta.type]
+    servicesMap[this.props.meta.type]
       .suggest(this.props.list)
       .then((suggested) => this.setState({ suggested }))
       .catch((err) => console.error(err) || this.setState({ err: true }));

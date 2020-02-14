@@ -145,6 +145,8 @@ export default class Share extends React.Component {
       metaData: { name, is_public, shared_users },
     } = this.props;
 
+    const errorMsg = error && typeof error === 'object' && error.msg;
+
     return (
       <>
         <p className="is-size-5 has-text-grey">Share:</p>
@@ -187,20 +189,26 @@ export default class Share extends React.Component {
           onRemoveItem={this.unshareUser}
         />
         <p className="help">
-          A user&rsqou;s ID can be retrieved by right-clicking their Discord
+          A user&rsquo;s ID can be retrieved by right-clicking their Discord
           icon and clicking <code>Copy ID</code>
         </p>
         <br />
         <label className="label">Servers</label>
+        {error && (
+          <p className="has-text-danger">
+            {errorMsg || 'An unknown error occurred'}
+          </p>
+        )}
         <div className="box">
           {sharedGuilds &&
             (sharedGuilds.length ? (
               sharedGuilds.map(this.sharedItem(true))
             ) : (
-              <p className="has-text-centered has-text-danger">No one!</p>
+              <p className="has-text-centered has-text-grey">
+                Not shared with any servers!
+              </p>
             ))}
         </div>
-        {error && <p>{error}</p>}
         <div
           className="box is-clickable"
           onClick={!showGuilds ? this.show('showGuilds', true) : null}

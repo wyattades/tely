@@ -1,30 +1,30 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const { deleteCollection } = require('./utils');
+import * as functions from 'firebase-functions';
 
-const firestore = admin.firestore();
-const lists = firestore.collection('lists');
+import { deleteCollection } from './utils';
+import * as db from './db';
 
-exports.listUpdate = functions.firestore
+const lists = db.firestore.collection('lists');
+
+export const listUpdate = functions.firestore
   .document('lists/{listId}/contents/{contentId}')
   .onWrite(async (snap, ctx) => {
     await lists.doc(ctx.params.listId).update({
-      popularity: admin.firestore.FieldValues.increment(),
-      modified: admin.firestore.Timestamp.now(),
+      popularity: db.FieldValue.increment(),
+      modified: db.now(),
     });
   });
 
-exports.deleteList = functions.firestore
+export const deleteList = functions.firestore
   .document('lists/{listId}')
   .onDelete(async (snap) => {
     await deleteCollection(snap.ref.collection('contents'));
   });
 
-exports.createUser = functions.firestore
+export const createUser = functions.firestore
   .document('users/{userId}')
   .onCreate(async (snap) => {
     const profile = snap.data();
-    const batch = firestore.batch();
+    const batch = db.firestore.batch();
 
     // Add this user to all lists that share with one of their servers
     // This is a very expensive operation, so only do it on account creation
@@ -61,7 +61,7 @@ exports.createUser = functions.firestore
       });
   });
 
-exports.deleteUser = functions.firestore
+export const deleteUser = functions.firestore
   .document('users/{userId}')
   .onDelete(async (snap) => {
     await Promise.all([

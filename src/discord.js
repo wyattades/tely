@@ -1,6 +1,7 @@
 import { apiFactory, apiFetch, profiles } from './api';
-import services from './services';
+import { servicesMap } from './services';
 import { isEmpty } from './utils';
+import { request } from './request';
 
 export const MATCH_ID = /\d{6,20}/;
 
@@ -33,7 +34,7 @@ export const sendWebhooks = (listMeta, item) => {
   if (isEmpty(listMeta.webhooks)) return;
 
   const profile = profiles.discord;
-  const service = services.asObject[listMeta.type];
+  const service = servicesMap[listMeta.type];
 
   const payload = {
     embeds: [
@@ -62,8 +63,11 @@ export const sendWebhooks = (listMeta, item) => {
   };
 
   for (const key in listMeta.webhooks) {
-    apiFetch(listMeta.webhooks[key], null, 'post', payload).catch(() =>
-      console.log('Failed to webhook into:', listMeta.webhooks[key]),
+    request({
+      url: listMeta.webhooks[key],
+      body: payload,
+    }).catch((err) =>
+      console.error('Failed to webhook into:', listMeta.webhooks[key], err),
     );
   }
 };

@@ -8,7 +8,7 @@ const loaderHTML = `<div class="full-page">\
 </div>\
 </div>`;
 
-module.exports = require('webpack-boiler')({
+const config = (module.exports = require('webpack-boiler')({
   googleAnalytics: 'UA-105229811-3',
   url: 'https://tely.app',
   react: true,
@@ -39,4 +39,6 @@ module.exports = require('webpack-boiler')({
       loader: loaderHTML,
     },
   ],
-});
+}));
+
+config.resolve.alias['firebase-admin'] = 'firebase/app';

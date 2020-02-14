@@ -22,6 +22,8 @@ class ErrorBoundary extends React.Component {
     hasError: false,
   };
 
+  historyUnlisten = null;
+
   // TODO use mapErrorToState
   componentDidCatch(error) {
     let message,
@@ -40,14 +42,30 @@ class ErrorBoundary extends React.Component {
       message,
     });
 
-    // HACK
-    const unlisten = this.props.history.listen(() => {
+    this.resetOnRouteChange();
+  }
+
+  componentWillUnmount() {
+    if (this.historyUnlisten) this.historyUnlisten();
+  }
+
+  // HACK
+  resetOnRouteChange() {
+    if (this.historyUnlisten) return;
+
+    this.historyUnlisten = this.props.history.listen(() => {
       this.setState({ hasError: false });
-      unlisten();
+
+      if (this.historyUnlisten) {
+        this.historyUnlisten();
+        this.historyUnlisten = null;
+      }
     });
   }
 
   goBack = () => {
+    this.historyUnlisten = null;
+
     // TODO: Somehow check if error is a result of navigating
     // this.props.history.goBack();
     this.props.history.push('/list');

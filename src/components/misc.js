@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { matchPath } from 'react-router-dom';
 
 import { roleClick } from '../utils';
@@ -95,42 +95,25 @@ export class LiveSwitch extends React.Component {
   }
 }
 
-export class TruncateText extends React.Component {
-  static defaultProps = {
-    maxLength: 200,
-  };
+export const TruncateText = ({ maxLength = 200, text }) => {
+  text = text || '';
 
-  state = {
-    open: false,
-    truncated: this.props.text.length > this.props.maxLength,
-  };
+  const [open, setOpen] = useState(false);
 
-  toggle = () =>
-    this.setState(({ open }) => ({
-      open: !open,
-    }));
-
-  render() {
-    const { open, truncated } = this.state;
-    const { text, maxLength } = this.props;
-
-    if (truncated) {
-      return (
-        <span>
-          {open ? text : `${text.substring(0, maxLength - 3)}...`}
-          <br />
-          <a
-            onClick={this.toggle}
-            role="button"
-            tabIndex="0"
-            onKeyPress={roleClick}
-          >
-            {open ? 'Show Less' : 'Show More'}
-          </a>
-        </span>
-      );
-    } else {
-      return this.props.text;
-    }
-  }
-}
+  return text.length > maxLength ? (
+    <span>
+      {open ? text : `${text.substring(0, maxLength - 3)}...`}
+      <br />
+      <a
+        onClick={() => setOpen((current) => !current)}
+        role="button"
+        tabIndex="0"
+        onKeyPress={roleClick}
+      >
+        {open ? 'Show Less' : 'Show More'}
+      </a>
+    </span>
+  ) : (
+    text
+  );
+};

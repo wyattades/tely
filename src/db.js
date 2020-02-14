@@ -1,23 +1,26 @@
-import firebase from 'firebase/app';
+import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/functions';
 
 import * as API from './api';
 import { sendWebhooks } from './discord';
 import { onSnap, isEmpty, decodeQuery } from './utils';
+import { APP_CONFIG, IS_DEV_ENV } from './env';
 
-firebase.initializeApp({
-  apiKey: 'AIzaSyBBfQI3wMBGwQ4qgsyWPdZSq03qlZ6cc8k',
-  authDomain: 'tely-db.firebaseapp.com',
-  databaseURL: 'https://tely-db.firebaseio.com',
-  projectId: 'tely-db',
-  storageBucket: 'tely-db.appspot.com',
-  messagingSenderId: '591385205122',
-  appId: '1:591385205122:web:b8adbb900bfcae893bd79b',
-});
+const app = firebase.initializeApp(APP_CONFIG);
 
-const auth = firebase.auth();
-const firestore = firebase.firestore();
+const auth = app.auth();
+const firestore = app.firestore();
+const functions = app.functions();
+
+if (IS_DEV_ENV) functions.useFunctionsEmulator('http://localhost:5000');
+
+const callableCache = {};
+export const callable = (name, data) =>
+  (callableCache[name] = callableCache[name] || functions.httpsCallable(name))(
+    data,
+  );
 
 export const Helpers = firebase.firestore;
 
@@ -52,6 +55,9 @@ export const init = async () => {
     else console.error(err);
   }
 
+  users = firestore.collection('users');
+  lists = firestore.collection('lists');
+
   await new Promise((resolve) => {
     const unsubscribe = auth.onAuthStateChanged(
       () => {
@@ -66,9 +72,6 @@ export const init = async () => {
       },
     );
   });
-
-  users = firestore.collection('users');
-  lists = firestore.collection('lists');
 
   if (auth.currentUser) {
     listenLabels();

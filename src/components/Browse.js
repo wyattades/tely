@@ -140,7 +140,7 @@ class Browse extends React.Component {
                   <div className="select">
                     <select value={filter || ''} onChange={this.changeFilter}>
                       <option value="">-</option>
-                      {services.asArray.map(({ ID, LABEL }) => (
+                      {services.map(({ ID, LABEL }) => (
                         <option key={ID} value={ID}>
                           {LABEL}
                         </option>
