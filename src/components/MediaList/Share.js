@@ -30,10 +30,7 @@ class SharedItem extends React.Component {
 
     return (
       <div key={id} className="buttons">
-        <div
-          className="button is-discord is-fullwidth
-          space-between is-medium has-text-left is-unclickable"
-        >
+        <div className="share-item-button button is-discord is-fullwidth space-between is-medium has-text-left is-unclickable">
           {icon && (
             <img
               style={{ marginRight: 16 }}

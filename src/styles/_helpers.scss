@@ -1,0 +1,59 @@
+.space-between {
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// Must be direct child of flex-direction: row OR min-width: 0
+.is-clipped {
+  text-overflow: ellipsis;
+}
+
+.multiline {
+  height: auto;
+}
+
+// Clickable helper
+.is-clickable {
+  cursor: pointer;
+}
+.is-unclickable {
+  pointer-events: none;
+  button {
+    pointer-events: all;
+  }
+}
+
+.is-rounded {
+  border-radius: 50%;
+}
+
+.has-border {
+  box-shadow: 0px 0px 0px 3px rgba(0, 0, 0, 0.16) !important;
+}
+
+.dropdown-icon {
+  @include arrow($link);
+  display: inline-block;
+  position: relative;
+}
+
+.icon-clickable {
+  & > * {
+    pointer-events: all;
+    color: $grey-light;
+    &:hover {
+      color: $grey;
+      cursor: pointer;
+    }
+  }
+}
+
+.multiline-items {
+  margin: -8px;
+  & > * {
+    margin: 8px;
+  }
+}

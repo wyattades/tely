@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './LiveTextEdit.scss';
+
 export default class LiveTextEdit extends React.Component {
   state = {
     value: this.props.value,

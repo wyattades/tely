@@ -67,7 +67,7 @@ export class LabelEditor extends React.Component {
     }
 
     return amount > 0 ? (
-      <div className={`labels ${labelMap ? '' : 'low'}`}>{Content}</div>
+      <div className={`labels ${labelMap ? '' : 'labels--low'}`}>{Content}</div>
     ) : null;
   }
 }

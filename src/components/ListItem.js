@@ -7,6 +7,8 @@ import * as db from '../db';
 import { userAvatar } from '../discord';
 import { LabelEditor } from './Labels';
 
+import './ListItem.scss';
+
 const MediaContent = ({
   service,
   mediaBottom,

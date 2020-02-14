@@ -10,6 +10,8 @@ import ListSuggest from './Suggest';
 import ListShare from './Share';
 import ListSettings from './Settings';
 
+import './styles.scss';
+
 class MediaList extends React.Component {
   constructor(props) {
     super(props);

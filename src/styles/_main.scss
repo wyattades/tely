@@ -1,0 +1,82 @@
+// Misc global styles
+// if possible, move styles to the component level
+
+// Fix navbar margin above tablet
+.navbar > .container > * {
+  // @include tablet {
+  margin: 0 !important;
+  // }
+}
+
+.fixed-above-bottom-nav {
+  position: fixed;
+  bottom: 0;
+}
+@include mobile {
+  html.has-bottom-navbar .fixed-above-bottom-nav {
+    bottom: 64px;
+  }
+}
+
+.input[disabled] {
+  cursor: text;
+}
+
+button.tag {
+  border: none;
+}
+
+.label.optional::after {
+  content: ' (optional)';
+  font-size: 80%;
+  color: $grey;
+  font-weight: normal;
+}
+
+// is-fullheight but account for header
+.hero.is-fullheight-flex {
+  min-height: calc(100vh - 60px);
+  .hero-body {
+    align-items: center;
+    display: flex;
+    & > .container {
+      flex-grow: 1;
+      flex-shrink: 1;
+    }
+  }
+}
+
+// Landing page
+.site-title {
+  color: $primary;
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: bold;
+}
+
+// Error page
+.big-error-code {
+  font-size: 25vw;
+  line-height: 100%;
+  color: $dark;
+  // TODO:
+  // text-shadow: ;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-width: 6px;
+  -webkit-text-stroke-color: $dark;
+}
+
+// Labels page
+.labels {
+  margin-top: 4px;
+  .tag {
+    margin-right: 12px;
+    cursor: pointer;
+  }
+  &--low {
+    margin-bottom: -20px;
+    .tag {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}

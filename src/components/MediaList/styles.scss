@@ -1,0 +1,54 @@
+// MediaList layout
+.fixed-column {
+  position: fixed;
+  z-index: 29;
+
+  @include mobile {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    border-top: 1px solid $grey-lighter;
+    background-color: $white;
+    padding: 0.25rem;
+    .section {
+      padding: 0;
+    }
+    .menu-list {
+      display: flex;
+      justify-content: space-evenly;
+      li a {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        &.is-active {
+          background: none;
+          color: $link;
+        }
+      }
+    }
+  }
+
+  & + .column {
+    @include mobile {
+      // padding: 0;
+      padding-bottom: 64px;
+    }
+  }
+}
+
+// Share page
+.share-item-button {
+  @include mobile {
+    .image {
+      display: none;
+    }
+    .is-clipped {
+      font-size: 1rem;
+    }
+    .is-discordmain {
+      font-size: 1rem;
+    }
+  }
+}

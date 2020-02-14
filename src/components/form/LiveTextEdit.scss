@@ -1,0 +1,24 @@
+.live-text-edit {
+  // position: relative;
+  width: 100%;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+  box-sizing: border-box;
+  border-bottom: 3px solid transparent;
+  // transition: border-width 0.3s ease-in-out;
+
+  // + span {
+  //   float: right;
+  // }
+  &:hover {
+    border-color: $grey;
+    // + span {
+    //   color: $dark;
+    // }
+  }
+  &:focus {
+    border-color: $link;
+  }
+}
