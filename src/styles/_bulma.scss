@@ -1,32 +1,5 @@
 // All bulma specific styles
-
-@import '~bulma/sass/utilities/initial-variables';
-@import '~bulma/sass/utilities/functions';
-// Define variables:
-
-$green: #1db954;
-
-$discordmain: #7289da;
-$discordmain-invert: findColorInvert($discordmain);
-$discord: #333;
-$discord-invert: findColorInvert($discord);
-
-@import '~bulma/sass/utilities/derived-variables';
-
-$navbar-breakpoint: $tablet;
-$navbar-item-active-color: $link;
-
-$addColors: (
-  'discord': (
-    $discord,
-    $discord-invert,
-  ),
-  'discordmain': (
-    $discordmain,
-    $discordmain-invert,
-  ),
-);
-$colors: map-merge($colors, $addColors);
+@import './variables';
 
 // utilities
 @import '~bulma/sass/utilities/_all';

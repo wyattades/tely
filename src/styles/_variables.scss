@@ -1,0 +1,28 @@
+@import '~bulma/sass/utilities/initial-variables';
+@import '~bulma/sass/utilities/functions';
+@import '~bulma/sass/utilities/mixins';
+// Define variables:
+
+$green: #1db954;
+
+$discordmain: #7289da;
+$discordmain-invert: findColorInvert($discordmain);
+$discord: #333;
+$discord-invert: findColorInvert($discord);
+
+@import '~bulma/sass/utilities/derived-variables';
+
+$navbar-breakpoint: $tablet;
+$navbar-item-active-color: $link;
+
+$addColors: (
+  'discord': (
+    $discord,
+    $discord-invert,
+  ),
+  'discordmain': (
+    $discordmain,
+    $discordmain-invert,
+  ),
+);
+$colors: map-merge($colors, $addColors);
