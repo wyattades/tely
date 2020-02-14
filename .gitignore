@@ -1,6 +1,5 @@
 # Custom
 dist/
-.env
 .runtimeconfig.json
 credentials.json
 functions/index.js
@@ -65,6 +64,7 @@ typings/
 
 # dotenv environment variables file
 .env
+.env.json
 
 # Build folder
 .build
