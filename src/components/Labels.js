@@ -36,7 +36,7 @@ export class LabelEditor extends React.Component {
       for (const labelId in labelMap) {
         amount++;
         const { name, color } = labelMap[labelId];
-        const assigned = labelId in itemLabels;
+        const assigned = labelId in (itemLabels || {});
         Content.push(
           <button
             className={`tag ${labelColor(color)} ${
@@ -50,10 +50,13 @@ export class LabelEditor extends React.Component {
           </button>,
         );
       }
-    } else {
+    } else if (itemLabels) {
       for (const labelId in itemLabels) {
+        const itemLabel = itemLabels[labelId];
+        if (!itemLabel) continue;
+
         amount++;
-        const { name, color } = itemLabels[labelId];
+        const { name, color } = itemLabel;
         Content.push(
           <Link
             key={labelId}
@@ -288,18 +291,15 @@ export class Labels extends React.Component {
     if (!labels) LabelContent = <div>Loading labels...</div>;
     else if (!labels.length) LabelContent = <div>No labels!</div>;
     else {
-      console.log(labels);
-      LabelContent = labels.map((label) =>
-        label ? (
-          <Link
-            key={label.id}
-            className={`button ${labelColor(label.color)}`}
-            to={`/labels/${label.id}`}
-          >
-            {label.name}
-          </Link>
-        ) : null,
-      );
+      LabelContent = labels.map((label) => (
+        <Link
+          key={label.id}
+          className={`button ${labelColor(label.color)}`}
+          to={`/labels/${label.id}`}
+        >
+          {label.name}
+        </Link>
+      ));
     }
 
     return (
