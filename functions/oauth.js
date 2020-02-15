@@ -108,7 +108,6 @@ const oauthRoutes = (provider) => {
       provider,
       refreshToken,
       (err, accessToken) => {
-        console.log(refreshToken, err, accessToken);
         if (err) {
           console.error(err);
           res.status((err && err.statusCode) || 500).send(err && err.data);
