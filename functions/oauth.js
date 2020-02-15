@@ -101,18 +101,20 @@ const oauthRoutes = (provider) => {
   );
 
   app.post(`/auth/${provider}/refresh`, (req, res) => {
-    const refreshToken = req.body.token;
-    if (!refreshToken) {
-      res.status(400).end();
-      return;
-    }
+    const refreshToken = req.body.refreshToken;
+    if (!refreshToken) return res.sendStatus(400);
 
-    refresh.requestNewAccessToken(provider, refreshToken, (err, token) => {
-      if (err) {
-        console.error(err);
-        res.status((err && err.statusCode) || 500).send(err && err.data);
-      } else res.send({ token });
-    });
+    refresh.requestNewAccessToken(
+      provider,
+      refreshToken,
+      (err, accessToken) => {
+        console.log(refreshToken, err, accessToken);
+        if (err) {
+          console.error(err);
+          res.status((err && err.statusCode) || 500).send(err && err.data);
+        } else res.send({ accessToken });
+      },
+    );
   });
 };
 

@@ -15,9 +15,9 @@ const api = apiFactory('discord', DISCORD_API);
 
 // export const getMe = () => api('/users/@me');
 
-export const getGuilds = () => api('/users/@me/guilds');
+export const getGuilds = () => api('/users/@me/guilds', 'GET', null, true);
 
-export const getFriends = () => api('/users/@me/channels');
+// export const getFriends = () => api('/users/@me/channels');
 
 const IMAGE_URL = 'https://cdn.discordapp.com';
 

@@ -103,39 +103,40 @@ export const refreshToken = async (service) => {
   const refreshToken = hasProfile(service) && getProfile(service).refreshToken;
   if (!refreshToken) throw { code: 401, msg: 'No refresh token available' };
 
-  const { token } = await request({
+  const { accessToken } = await request({
     url: `${SERVER_URL}/auth/${service}/refresh`,
     body: {
-      token: refreshToken,
+      refreshToken,
     },
   });
 
-  return updateProfile(service, { accessToken: token });
+  return updateProfile(service, { accessToken });
 };
 
 export const apiFactory = (service, api_url, autoSignIn = false) => {
-  const apiFetch = (path, accessToken, method, body) =>
-    request({ url: api_url + path, accessToken, method, body });
+  const apiFetch = async (path, accessToken, method, body) => {
+    return request({ url: api_url + path, accessToken, method, body });
+  };
 
-  return async (path, method = 'GET', body) => {
+  return async (path, method = 'GET', body, routeAutoSignIn = false) => {
     if (!hasProfile(service)) {
-      if (autoSignIn) {
+      if (routeAutoSignIn || autoSignIn) {
         await signIn(service);
 
         // signIn might clear accessToken
-        return apiFetch(path, getProfile(service).accessToken, method, body);
+        return apiFetch(path, getProfile(service)?.accessToken, method, body);
       } else throw { code: 403 };
     }
 
     if (expired(service)) await refreshToken(service);
 
     try {
-      return apiFetch(path, getProfile(service).accessToken, method, body);
+      return apiFetch(path, getProfile(service)?.accessToken, method, body);
     } catch (err) {
-      if (autoSignIn && err.code === 401) {
+      if ((routeAutoSignIn || autoSignIn) && err.code === 401) {
         await refreshToken(service);
 
-        return apiFetch(path, getProfile(service).accessToken, method, body);
+        return apiFetch(path, getProfile(service)?.accessToken, method, body);
       }
 
       throw err;
