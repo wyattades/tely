@@ -13,6 +13,11 @@ export const isEmpty = (obj) => {
   return true;
 };
 
+export const toInt = (str) => {
+  const num = Number.parseInt(str, 10);
+  return Number.isNaN(num) ? null : num;
+};
+
 export const randInt = (a, b) => Math.floor(Math.random() * (b - a) + a);
 
 export const arrSample = (arr, n, clone = false) => {

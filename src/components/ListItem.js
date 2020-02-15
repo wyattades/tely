@@ -114,7 +114,7 @@ export class ListItem extends React.Component {
     const { item, showLabels, canDelete, className, listId } = this.props;
     const { deleting, labelMap } = this.state;
 
-    const userId = db.getProfile() && db.getProfile().id;
+    const userId = db.getUserId();
 
     const levelBottom = (
       <nav className="info-row">

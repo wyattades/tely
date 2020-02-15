@@ -11,6 +11,8 @@ export default class Home extends React.PureComponent {
   };
 
   render() {
+    const username = db.isLoggedIn() && db.getProfile()?.username;
+
     return (
       <section className="hero is-fullheight-flex">
         <div className="hero-body">
@@ -31,15 +33,15 @@ export default class Home extends React.PureComponent {
           </div>
         </div>
         <div className="hero-footer">
-          {db.getProfile() && (
+          {username ? (
             <div className="container has-text-centered">
               <Link className="button" to="/list">
-                Continue as {db.getProfile().username}
+                Continue as {username}
               </Link>
               <br />
               <br />
             </div>
-          )}
+          ) : null}
         </div>
       </section>
     );

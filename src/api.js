@@ -1,4 +1,4 @@
-import { decodeQuery, popupCenter } from './utils';
+import { decodeQuery, popupCenter, toInt, waitFor } from './utils';
 import { IS_DEV_ENV, PROJECT_ID, FIREBASE_REGION } from './env';
 import { request } from './request';
 
@@ -6,7 +6,7 @@ const SERVER_URL = IS_DEV_ENV
   ? `http://localhost:5000/${PROJECT_ID}/${FIREBASE_REGION}/widgets`
   : `https://${FIREBASE_REGION}-${PROJECT_ID}.cloudfunctions.net/widgets`;
 
-export const profiles = {
+const profiles = {
   spotify: null,
   discord: null,
 };
@@ -15,14 +15,29 @@ export const profiles = {
 for (const service in profiles) {
   try {
     const str = localStorage.getItem(`profile:${service}`);
-    profiles[service] = JSON.parse(str);
+    const profile = JSON.parse(str);
+    if (profile && typeof profile === 'object') profiles[service] = profile;
   } catch (_) {
     // Someone put bad data in my localStorage!
   }
 }
 
+export const getProfile = (service) => {
+  const profile = profiles[service];
+  if (profile === undefined) throw `Service ${service} not found!`;
+
+  return profile;
+};
+
+export const hasProfile = (service) => {
+  const profile = profiles[service];
+  if (profile === undefined) throw `Service ${service} not found!`;
+
+  return profile !== null;
+};
+
 export const updateProfile = (service, data) => {
-  if (!profiles[service]) profiles[service] = {};
+  profiles[service] = profiles[service] || {};
   Object.assign(profiles[service], data);
   localStorage.setItem(`profile:${service}`, JSON.stringify(profiles[service]));
 };
@@ -33,56 +48,65 @@ export const clearProfile = (service) => {
 };
 
 export const expired = (service) => {
-  const expires_on = Number.parseInt(profiles[service].expires_on, 10);
-  return Number.isNaN(expires_on) || Date.now() > expires_on;
+  if (!hasProfile(service)) return true;
+
+  const expiresOn = toInt(getProfile(service).expires_on);
+  return !expiresOn || Date.now() > expiresOn;
 };
 
-export const signIn = (service) =>
-  new Promise((resolve, reject) => {
+export const signIn = async (service) => {
+  try {
     const popup = popupCenter(`${SERVER_URL}/auth/${service}`, 500, 600);
     if (!popup) throw 'Sign in window failed to open';
 
-    const intervalId = setInterval(() => {
-      if (!popup) {
-        clearInterval(intervalId);
-        throw 'Sign in window was closed unexpectedly';
-      }
+    await waitFor(
+      () => {
+        if (!popup) throw 'Sign in window was closed unexpectedly';
 
-      let arrived = false;
-      try {
-        if (popup.location.hostname === window.location.hostname)
-          arrived = true;
-      } catch (_) {
-        // Do nothing
-      }
+        let arrived = false;
+        try {
+          if (popup.location.hostname === window.location.hostname)
+            arrived = true;
+        } catch (_) {
+          // Do nothing
+        }
 
-      if (arrived) {
-        clearInterval(intervalId);
-        const { error, ...profile } = decodeQuery(popup.location.search);
-        popup.close();
+        if (arrived) {
+          const { error, ...profile } = decodeQuery(popup.location.search);
+          popup.close();
 
-        if (profile.accessToken && !error) {
-          // TODO: fetch guilds and other profile info from db instead?
-          // console.log('profile', service, profile);
-          updateProfile(service, profile);
-          resolve(profile);
-        } else reject(error || 'Unknown signIn error');
-      }
-    }, 300);
-  }).catch((err) => {
+          if (error) throw error;
+          else if (profile.accessToken) {
+            // TODO: fetch guilds and other profile info from db instead?
+            // console.log('profile', service, profile);
+            updateProfile(service, profile);
+            return true;
+          } else throw 'Failed to receive signIn accessToken';
+        }
+
+        return false;
+      },
+      {
+        interval: 300,
+        timeout: null,
+      },
+    );
+
+    return getProfile(service);
+  } catch (err) {
     clearProfile(service);
     throw err;
-  });
+  }
+};
 
 export const refreshToken = async (service) => {
-  const profile = profiles[service];
-  if (!profile || !profile.refreshToken)
-    throw { code: 401, msg: 'No refresh token available' };
+  const refreshToken = hasProfile(service) && getProfile(service).refreshToken;
+  if (!refreshToken) throw { code: 401, msg: 'No refresh token available' };
 
   const { token } = await request({
     url: `${SERVER_URL}/auth/${service}/refresh`,
     body: {
-      token: profile.refreshToken,
+      token: refreshToken,
     },
   });
 
@@ -94,25 +118,24 @@ export const apiFactory = (service, api_url, autoSignIn = false) => {
     request({ url: api_url + path, accessToken, method, body });
 
   return async (path, method = 'GET', body) => {
-    const profile = profiles[service];
-
-    if (!profile) {
+    if (!hasProfile(service)) {
       if (autoSignIn) {
         await signIn(service);
 
-        return apiFetch(path, profiles[service].accessToken, method, body);
+        // signIn might clear accessToken
+        return apiFetch(path, getProfile(service).accessToken, method, body);
       } else throw { code: 403 };
     }
 
     if (expired(service)) await refreshToken(service);
 
     try {
-      return apiFetch(path, profile.accessToken, method, body);
+      return apiFetch(path, getProfile(service).accessToken, method, body);
     } catch (err) {
       if (autoSignIn && err.code === 401) {
         await refreshToken(service);
 
-        return apiFetch(path, profile.accessToken, method, body);
+        return apiFetch(path, getProfile(service).accessToken, method, body);
       }
 
       throw err;

@@ -29,8 +29,10 @@ export const request = async ({
   const resType = res.headers.get('content-type');
   let data;
   try {
-    if (resType.indexOf('application/json') !== -1) data = await res.json();
-    else if (resType.indexOf('text/plain') !== -1) data = await res.text();
+    if (resType && resType.indexOf('application/json') !== -1)
+      data = await res.json();
+    else if (resType && resType.indexOf('text/plain') !== -1)
+      data = await res.text();
   } catch (err) {
     console.error(err);
     throw { code: res.status, msg: res.statusText };

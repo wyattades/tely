@@ -1,4 +1,4 @@
-import { apiFactory, apiFetch, profiles } from './api';
+import { apiFactory, getProfile } from './api';
 import { servicesMap } from './services';
 import { isEmpty } from './utils';
 import { request } from './request';
@@ -21,7 +21,7 @@ export const getFriends = () => api('/users/@me/channels');
 
 const IMAGE_URL = 'https://cdn.discordapp.com';
 
-export const userAvatar = (profile = profiles.discord, size = 128) =>
+export const userAvatar = (profile = getProfile('discord'), size = 128) =>
   profile.avatar
     ? `${IMAGE_URL}/avatars/${profile.id}/${profile.avatar}.png?size=${size}`
     : `${IMAGE_URL}/embed/avatars/${parseInt(profile.discriminator, 10) %
@@ -33,7 +33,7 @@ export const serverIcon = (serverId, icon) =>
 export const sendWebhooks = (listMeta, item) => {
   if (isEmpty(listMeta.webhooks)) return;
 
-  const profile = profiles.discord;
+  const profile = getProfile('discord');
   const service = servicesMap[listMeta.type];
 
   const payload = {

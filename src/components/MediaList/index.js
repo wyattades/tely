@@ -68,7 +68,7 @@ class MediaList extends React.Component {
       (err) => this.setState({ err }),
     );
 
-    if (db.getProfile()) {
+    if (db.isLoggedIn()) {
       this.unsubscribeLabels = db.getLabels((err, labels) => {
         if (err) console.error(err);
         else {

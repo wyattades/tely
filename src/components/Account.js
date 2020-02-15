@@ -1,7 +1,7 @@
 import React from 'react';
 
 import * as db from '../db';
-import { profiles, clearProfile } from '../api';
+import { getProfile, clearProfile, hasProfile } from '../api';
 import { SmallSection } from './misc';
 import { confirm, alert } from '../alert';
 
@@ -9,7 +9,7 @@ const AVATAR_URL = 'https://cdn.discordapp.com/avatars';
 
 export default class Account extends React.Component {
   state = {
-    spotify: !!profiles.spotify,
+    spotify: hasProfile('spotify'),
   };
 
   disconnect = (service) => () => {
@@ -36,9 +36,9 @@ export default class Account extends React.Component {
   };
 
   render() {
-    const { discord } = profiles;
+    const discord = getProfile('discord');
     const { spotify } = this.state;
-    const user = db.getUser();
+    const user = db.getAuthUser();
 
     return (
       <SmallSection>
@@ -74,7 +74,7 @@ export default class Account extends React.Component {
           <div className="notification is-success space-between">
             <div>
               <strong>Spotify</strong>
-              <p>{profiles.spotify.username}</p>
+              <p>{getProfile('spotify')?.username || '<USERNAME_NOT_FOUND>'}</p>
             </div>
             <button
               className="button is-success is-outlined is-inverted"
@@ -90,7 +90,7 @@ export default class Account extends React.Component {
           </>
         )}
         <p className="label">Account Created</p>
-        <p>{new Date(user.metadata.creationTime).toLocaleString()}</p>
+        <p>{new Date(user?.metadata.creationTime).toLocaleString()}</p>
         <br />
         <button className="button is-danger" onClick={this.deleteAll}>
           Delete Everything

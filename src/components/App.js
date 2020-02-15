@@ -28,7 +28,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
     render={(props) =>
-      db.getUser() ? (
+      db.isLoggedIn() ? (
         <Component {...props} />
       ) : (
         <Redirect

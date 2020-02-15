@@ -19,7 +19,10 @@ class SharedItem extends React.Component {
       guild.id,
       metaData,
       true,
-    ).catch((err) => console.error(err) || this.setState({ waiting: false }));
+    ).catch((err) => {
+      console.error(err);
+      this.setState({ waiting: false });
+    });
   };
 
   render() {
@@ -193,7 +196,7 @@ export default class Share extends React.Component {
         <label className="label">Servers</label>
         {error && (
           <p className="has-text-danger">
-            {errorMsg || 'An unknown error occurred'}
+            {errorMsg ? 'Error: ' + errorMsg : 'An unknown error occurred'}
           </p>
         )}
         <div className="box">

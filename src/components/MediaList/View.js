@@ -3,7 +3,7 @@ import React from 'react';
 import { ListItem, SearchItem } from '../ListItem';
 import Search from '../Search';
 import * as share from '../../share';
-import { toggleListItem, getProfile } from '../../db';
+import * as db from '../../db';
 
 export default class View extends React.Component {
   UNSAFE_componentWillMount() {
@@ -13,7 +13,7 @@ export default class View extends React.Component {
   toggleSearchItem = (item) => {
     const { contents, meta } = this.props;
 
-    toggleListItem(item, contents, meta).then((newItem) => {
+    db.toggleListItem(item, contents, meta).then((newItem) => {
       const { searchResults, onSearch } = this.props;
       onSearch(
         searchResults.map((_item) =>
@@ -26,13 +26,13 @@ export default class View extends React.Component {
   toggleListItem = (item) => {
     const { contents } = this.props;
 
-    toggleListItem(item, contents, null, false);
+    db.toggleListItem(item, contents, null, false);
   };
 
   render() {
     const { meta, searchResults, list, onSearch } = this.props;
 
-    const loggedIn = !!getProfile();
+    const loggedIn = db.isLoggedIn();
 
     const grid = false;
 

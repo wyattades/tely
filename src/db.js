@@ -34,12 +34,16 @@ export let labels;
 /** @type firebase.firestore.CollectionReference */
 export let labelItems;
 
-export const getUser = () => auth.currentUser;
+export const getAuthUser = () => auth.currentUser;
 
-export const getProfile = () => API.profiles.discord;
+export const getUserId = () => (auth.currentUser ? auth.currentUser.uid : null);
+
+export const isLoggedIn = () => !!getUserId();
+
+export const getProfile = () => API.getProfile('discord');
 
 const listenLabels = () => {
-  const userRef = users.doc(getProfile().id);
+  const userRef = users.doc(getUserId());
   labels = userRef.collection('labels');
   labelItems = userRef.collection('labelItems');
 };
@@ -97,13 +101,12 @@ export const signOut = async () => {
 };
 
 export const deleteAll = async () => {
-  const userId = getProfile().id;
-  await users.doc(userId).delete();
+  await users.doc(getUserId()).delete();
 };
 
 const newListMeta = (name, type) => {
   const created = Helpers.Timestamp.now();
-  const userId = getProfile().id;
+  const userId = getUserId();
 
   return {
     created,
@@ -137,7 +140,7 @@ export const toggleListItem = async (
     item.id = null;
     return item;
   } else {
-    const profile = getProfile();
+    const profile = API.getProfile('discord');
     item.created = Helpers.Timestamp.now();
     // TODO: redundant user data
     item.creator = {

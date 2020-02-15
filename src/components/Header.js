@@ -11,14 +11,14 @@ document.documentElement.classList.add('has-navbar-fixed-top');
 class Header extends React.PureComponent {
   state = {
     open: false,
-    loggedIn: !!db.getProfile(),
+    loggedIn: db.isLoggedIn(),
   };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.location !== nextProps.location)
       this.setState({
         open: false,
-        loggedIn: !!db.getProfile(), // HACK to check if loggedIn state changes
+        loggedIn: db.isLoggedIn(), // HACK to check if loggedIn state changes
       });
   }
 
@@ -32,8 +32,6 @@ class Header extends React.PureComponent {
 
   render() {
     const { open, loggedIn } = this.state;
-
-    const username = db.getProfile() && db.getProfile().username;
 
     return (
       <nav className="navbar is-transparent has-shadow is-fixed-top">
@@ -78,7 +76,7 @@ class Header extends React.PureComponent {
                   </NavLink>
                   <div className="navbar-item has-dropdown is-hoverable">
                     <NavLink className="navbar-link" to="/account">
-                      {username}
+                      {db.getProfile()?.username || 'Menu'}
                     </NavLink>
                     <div className="navbar-dropdown is-right is-boxed">
                       <Link className="navbar-item" to="/account">
