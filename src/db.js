@@ -188,8 +188,8 @@ export const deleteLabel = async (id) => {
 };
 
 // TODO This method allows duplicate items
-export const addItemLabel = async (item, labelId, listId) =>
-  firestore.runTransaction(async (trans) => {
+export const addItemLabel = async (item, labelId, listId) => {
+  await firestore.runTransaction(async (trans) => {
     const ref = labelItems.doc(item.id);
 
     const exists = item.labels ? true : (await trans.get(ref)).exists;
@@ -209,25 +209,36 @@ export const addItemLabel = async (item, labelId, listId) =>
       await trans.set(ref, newItem);
     }
   });
+};
 
-// TODO use transaction?
 export const removeItemLabel = async (labelItem, labelId) => {
-  delete labelItem.labels[labelId];
+  await firestore.runTransaction(async (trans) => {
+    const labelItemRef = labelItems.doc(labelItem.id);
+    const itemSnap = await trans.get(labelItemRef);
 
-  if (isEmpty(labelItem.labels)) await labelItems.doc(labelItem.id).delete();
-  else
-    await labelItems.doc(labelItem.id).update({
-      [`labels.${labelId}`]: Helpers.FieldValue.delete(),
-    });
+    if (!itemSnap.exists) return;
+
+    const item = itemSnap.data();
+
+    const newLabels = { ...(item.labels || {}) };
+    const containsThisLabel = labelId in newLabels;
+    delete newLabels[labelId];
+
+    if (isEmpty(newLabels)) await trans.delete(labelItemRef);
+    else if (containsThisLabel)
+      await trans.update(labelItemRef, {
+        [`labels.${labelId}`]: Helpers.FieldValue.delete(),
+      });
+  });
 };
 
 export const listLabelMap = (listId, cb) =>
   labelItems.where('listId', '==', listId).onSnapshot(
     (snap) => {
       const map = {};
-      snap.forEach((doc) => {
-        map[doc.id] = doc.data().labels;
-      });
+      for (const doc of snap.docs) {
+        map[doc.id] = doc.get('labels');
+      }
       cb(null, map);
     },
     (err) => cb(err, null),
