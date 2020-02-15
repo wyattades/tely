@@ -4,7 +4,6 @@
     "serve": "NODE_ENV=development firebase serve --only functions",
     "dev": "yarn && (NODE_ENV=development webpack --watch & NODE_ENV=development firebase emulators:start --only functions; wait)",
     "shell": "firebase functions:shell",
-    "start": "npm run shell",
     "build": "NODE_ENV=production webpack",
     "deploy": "firebase -P tely-db deploy --only functions",
     "logs": "firebase functions:log",

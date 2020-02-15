@@ -27,7 +27,7 @@
     "dev": "yarn && NODE_ENV=development webpack-dev-server",
     "build": "NODE_ENV=production webpack",
     "deploy": "aws s3 rm s3://tely.app --recursive --exclude \"*\" --include \"*.js\" --include \"*.css\" && aws s3 sync dist s3://tely.app/ && cf-invalidate --wait -- $(jq -r '.CFINVALIDATE' .env.json) index.html tely-sw.js",
-    "build-deploy": "npm run build && npm run deploy"
+    "build-deploy": "yarn build && yarn deploy"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
