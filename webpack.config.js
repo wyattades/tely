@@ -9,7 +9,6 @@ const loaderHTML = `<div class="full-page">\
 </div>`;
 
 const config = (module.exports = require('webpack-boiler')({
-  googleAnalytics: 'UA-105229811-3',
   url: 'https://tely.app',
   react: true,
   offline:

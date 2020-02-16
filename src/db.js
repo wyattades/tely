@@ -2,6 +2,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
+import 'firebase/analytics';
 
 import * as API from './api';
 import { sendWebhooks } from './discord';
@@ -13,6 +14,9 @@ const app = firebase.initializeApp(APP_CONFIG);
 const auth = app.auth();
 const firestore = app.firestore();
 const functions = app.functions();
+export const analytics = app.analytics();
+
+analytics.setAnalyticsCollectionEnabled(!IS_DEV_ENV);
 
 if (IS_DEV_ENV) functions.useFunctionsEmulator('http://localhost:5000');
 
@@ -82,6 +86,13 @@ export const init = async () => {
   }
 };
 
+window.__TEST_HOOK = {
+  async login(token) {
+    await auth.signInWithCustomToken(token);
+    listenLabels();
+  },
+};
+
 export const signIn = async () => {
   const profile = await API.signIn('discord');
 
@@ -125,8 +136,8 @@ const newListMeta = (name, type) => {
 export const createList = async (name, type) =>
   lists.add(newListMeta(name, type));
 
-// If force is true then delete, else if false then add,
-// else if null then use item.id to determine
+// If force is `true` then delete, else if `false` then add,
+// else if `null` then use item.id to determine
 export const toggleListItem = async (
   item,
   listContents,
@@ -137,7 +148,13 @@ export const toggleListItem = async (
   if (force === null ? item.id : !force) {
     await listContents.doc(item.id).delete();
 
+    analytics.logEvent('remove_list_item', {
+      listId: listMeta.id,
+      itemId: item.id,
+    });
+
     item.id = null;
+
     return item;
   } else {
     const profile = API.getProfile('discord');
@@ -153,6 +170,11 @@ export const toggleListItem = async (
     const snap = await listContents.add(item);
     item.id = snap.id;
     sendWebhooks(listMeta, item);
+
+    analytics.logEvent('add_list_item', {
+      listId: listMeta.id,
+      itemId: item.id,
+    });
 
     return item;
   }
@@ -178,9 +200,10 @@ export const deleteLabel = async (id) => {
   const snap = await labelItems.where(queryField, '==', true).get();
 
   for (const doc of snap.docs) {
-    const itemData = doc.data();
-    delete itemData.labels[id];
-    if (isEmpty(itemData.labels)) batch.delete(doc.ref);
+    const itemLabels = doc.get('labels');
+    delete itemLabels[id];
+
+    if (isEmpty(itemLabels)) batch.delete(doc.ref);
     else
       batch.update(doc.ref, {
         [queryField]: Helpers.FieldValue.delete(),
@@ -190,18 +213,20 @@ export const deleteLabel = async (id) => {
   await batch.commit();
 };
 
-// TODO This method allows duplicate items
+// TODO This method allows duplicate items???
 export const addItemLabel = async (item, labelId, listId) => {
+  const itemId = item.id;
+
   await firestore.runTransaction(async (trans) => {
-    const ref = labelItems.doc(item.id);
+    const labelItemRef = labelItems.doc(itemId);
+    const itemSnap = await trans.get(labelItemRef);
 
-    const exists = item.labels ? true : (await trans.get(ref)).exists;
-
-    if (exists) {
-      await trans.update(ref, {
-        [`labels.${labelId}`]: true,
-        listId,
-      });
+    if (itemSnap.exists) {
+      if (!(labelId in (itemSnap.get('labels') || {})))
+        await trans.update(labelItemRef, {
+          [`labels.${labelId}`]: true,
+          listId, // TODO: this isn't necessary right?
+        });
     } else {
       const newItem = {
         ...item,
@@ -209,22 +234,30 @@ export const addItemLabel = async (item, labelId, listId) => {
         listId,
       };
       delete newItem.creator;
-      await trans.set(ref, newItem);
+
+      await trans.set(labelItemRef, newItem);
     }
+  });
+
+  analytics.logEvent('add_item_label', {
+    itemId,
+    listId,
+    labelId,
   });
 };
 
-export const removeItemLabel = async (labelItem, labelId) => {
+export const removeItemLabel = async (item, labelId, listId) => {
+  const itemId = item.id;
+
   await firestore.runTransaction(async (trans) => {
-    const labelItemRef = labelItems.doc(labelItem.id);
+    const labelItemRef = labelItems.doc(itemId);
     const itemSnap = await trans.get(labelItemRef);
 
     if (!itemSnap.exists) return;
 
-    const item = itemSnap.data();
-
-    const newLabels = { ...(item.labels || {}) };
+    const newLabels = itemSnap.get('labels') || {};
     const containsThisLabel = labelId in newLabels;
+
     delete newLabels[labelId];
 
     if (isEmpty(newLabels)) await trans.delete(labelItemRef);
@@ -232,6 +265,12 @@ export const removeItemLabel = async (labelItem, labelId) => {
       await trans.update(labelItemRef, {
         [`labels.${labelId}`]: Helpers.FieldValue.delete(),
       });
+  });
+
+  analytics.logEvent('remove_item_label', {
+    itemId,
+    listId,
+    labelId,
   });
 };
 

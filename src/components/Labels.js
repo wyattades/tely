@@ -23,7 +23,7 @@ export class LabelEditor extends React.Component {
     const { item, listId, itemLabels } = this.props;
 
     if (labelId in itemLabels)
-      db.removeItemLabel(item, labelId).catch(console.error);
+      db.removeItemLabel(item, labelId, listId).catch(console.error);
     else db.addItemLabel(item, labelId, listId).catch(console.error);
   };
 

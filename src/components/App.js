@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { hot } from 'react-hot-loader/root';
 import {
   BrowserRouter as Router,
@@ -23,6 +23,20 @@ import { SpotifyControls } from '../spotify_player';
 import { Alerts } from '../alert';
 
 import * as db from '../db';
+
+const RouteListener = ({ location }) => {
+  useEffect(() => {
+    // Auto-update service worker on route change
+    if (window.swUpdate === true) window.location.reload();
+
+    db.analytics.setCurrentScreen(location.href);
+
+    const a = document.activeElement;
+    if (a && a.classList.contains('navbar-item')) a.blur?.();
+  }, [location]);
+
+  return null;
+};
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
@@ -74,15 +88,7 @@ const App = () => (
         </ErrorBoundary>
         <SpotifyControls />
         <Alerts />
-        <Route
-          render={({ history }) => {
-            // Auto-update service worker on route change
-            history.listen(() => {
-              if (window.swUpdate === true) window.location.reload();
-            });
-            return null;
-          }}
-        />
+        <Route component={RouteListener} />
       </>
     </RouterToUrlQuery>
   </Router>

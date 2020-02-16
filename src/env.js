@@ -3,9 +3,10 @@ export const APP_CONFIG = {
   authDomain: 'tely-db.firebaseapp.com',
   databaseURL: 'https://tely-db.firebaseio.com',
   projectId: 'tely-db',
-  storageBucket: 'tely-db.appspot.com',
-  messagingSenderId: '591385205122',
   appId: '1:591385205122:web:b8adbb900bfcae893bd79b',
+  storageBucket: 'tely-db.appspot.com',
+  // messagingSenderId: '591385205122',
+  measurementId: 'G-BVWLJBTL0J',
 };
 
 export const PROJECT_ID = APP_CONFIG.projectId;
