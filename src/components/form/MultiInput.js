@@ -6,8 +6,8 @@ export default class MultiInput extends React.Component {
     adding: false,
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.items !== this.props.items)
+  componentDidUpdate(prevProps) {
+    if (prevProps.items !== this.props.items)
       this.setState({
         adding: false,
         addValue: '',

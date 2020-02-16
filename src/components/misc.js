@@ -42,9 +42,9 @@ export class LiveSwitch extends React.Component {
     this.state = this.updateRoutes(props);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (this.props.location.pathname !== nextProps.location.pathname) {
-      this.setState(this.updateRoutes(nextProps));
+  componentDidUpdate(prevProps) {
+    if (this.props.location.pathname !== prevProps.location.pathname) {
+      this.setState(this.updateRoutes(this.props));
     }
   }
 

@@ -12,9 +12,7 @@ export default class Suggest extends React.Component {
     err: null,
   };
 
-  UNSAFE_componentWillMount() {
-    this.canWrite = share.canWrite(this.props.meta);
-  }
+  canWrite = share.canWrite(this.props.meta);
 
   componentDidMount() {
     this.fetchSuggested();

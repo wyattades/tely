@@ -6,9 +6,7 @@ import * as share from '../../share';
 import * as db from '../../db';
 
 export default class View extends React.Component {
-  UNSAFE_componentWillMount() {
-    this.canWrite = share.canWrite(this.props.meta);
-  }
+  canWrite = share.canWrite(this.props.meta);
 
   toggleSearchItem = (item) => {
     const { contents, meta } = this.props;

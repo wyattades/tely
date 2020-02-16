@@ -78,14 +78,14 @@ export default class Share extends React.Component {
       .catch((error) => this.setState({ error }));
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     if (
       !sameSet(
-        nextProps.metaData.shared_servers,
+        prevProps.metaData.shared_servers,
         this.props.metaData.shared_servers,
       )
     ) {
-      this.filterGuilds(nextProps.metaData.shared_servers);
+      this.filterGuilds(this.props.metaData.shared_servers);
     }
   }
 
