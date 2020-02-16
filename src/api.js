@@ -128,12 +128,22 @@ export const apiFactory = (service, api_url, autoSignIn = false) => {
       } else throw { code: 403 };
     }
 
-    if (expired(service)) await refreshToken(service);
+    if (expired(service)) {
+      try {
+        await refreshToken(service);
+      } catch (err) {
+        if (routeAutoSignIn || autoSignIn) {
+          await signIn(service);
+
+          return apiFetch(path, getProfile(service)?.accessToken, method, body);
+        } else throw err;
+      }
+    }
 
     try {
       return apiFetch(path, getProfile(service)?.accessToken, method, body);
     } catch (err) {
-      if ((routeAutoSignIn || autoSignIn) && err.code === 401) {
+      if (err.code === 401) {
         await refreshToken(service);
 
         return apiFetch(path, getProfile(service)?.accessToken, method, body);

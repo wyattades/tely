@@ -7,7 +7,7 @@ export const MATCH_ID = /\d{6,20}/;
 
 const DISCORD_API = 'https://discordapp.com/api';
 
-const CLIENT_URL = `${process.env.URL}${process.env.BASENAME}`;
+const CLIENT_URL = process.env.URL;
 
 export const MAX_GUILD_MEMBERS = 64; // TODO
 
