@@ -3,6 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/analytics';
+import { EventEmitter } from 'events';
 
 import * as API from './api';
 import { sendWebhooks } from './discord';
@@ -109,6 +110,15 @@ export const signIn = async () => {
 export const signOut = async () => {
   API.clearProfile('discord');
   await auth.signOut();
+};
+
+const ee = new EventEmitter();
+auth.onAuthStateChanged((user) => {
+  ee.emit('auth_user', user);
+});
+export const onAuthStateChanged = (cb) => {
+  ee.on('auth_user', cb);
+  return () => ee.off('auth_user', cb);
 };
 
 export const deleteAll = async () => {
