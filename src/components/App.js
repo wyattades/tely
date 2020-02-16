@@ -2,12 +2,10 @@ import React, { useEffect } from 'react';
 import { hot } from 'react-hot-loader/root';
 import {
   BrowserRouter as Router,
-  __RouterContext as RouterContext,
   Route,
   Switch,
   Redirect,
 } from 'react-router-dom';
-import RouterToUrlQuery from 'react-url-query/lib/react/RouterToUrlQuery';
 
 import Home from './Home';
 import About from './About';
@@ -58,39 +56,37 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 
 const App = () => (
   <Router>
-    <RouterToUrlQuery routerContext={RouterContext}>
-      <>
-        <Header />
-        <ErrorBoundary>
-          <Switch>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/about" component={About} />
-            <Route exact path="/browse" component={Browse} />
-            <PrivateRoute exact path="/account" component={Account} />
-            <PrivateRoute exact path="/list" component={MediaLists} />
-            <PrivateRoute exact path="/list/new" component={NewMediaList} />
-            <PrivateRoute path="/labels" component={Labels} />
-            <Route path="/list/:listid" component={MediaList} />
-            <Route
-              exact
-              path="/logout"
-              render={() => {
-                db.signOut().catch(console.error);
-                return <Redirect to="/" />;
-              }}
-            />
-            <Route
-              render={() => {
-                throw { code: 404 };
-              }}
-            />
-          </Switch>
-        </ErrorBoundary>
-        <SpotifyControls />
-        <Alerts />
-        <Route component={RouteListener} />
-      </>
-    </RouterToUrlQuery>
+    <>
+      <Header />
+      <ErrorBoundary>
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/about" component={About} />
+          <Route exact path="/browse" component={Browse} />
+          <PrivateRoute exact path="/account" component={Account} />
+          <PrivateRoute exact path="/list" component={MediaLists} />
+          <PrivateRoute exact path="/list/new" component={NewMediaList} />
+          <PrivateRoute path="/labels" component={Labels} />
+          <Route path="/list/:listid" component={MediaList} />
+          <Route
+            exact
+            path="/logout"
+            render={() => {
+              db.signOut().catch(console.error);
+              return <Redirect to="/" />;
+            }}
+          />
+          <Route
+            render={() => {
+              throw { code: 404 };
+            }}
+          />
+        </Switch>
+      </ErrorBoundary>
+      <SpotifyControls />
+      <Alerts />
+      <Route component={RouteListener} />
+    </>
   </Router>
 );
 

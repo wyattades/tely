@@ -8,7 +8,6 @@ import { BaseService } from './baseService';
 const API_KEY = 'AIzaSyBXbBg-6gZx7eehLHUC4GzPbAQVPgpZqp8';
 const API_URL = 'https://www.googleapis.com/books/v1';
 // const IMAGE_SRC = 'https://books.google.com/books?printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api&id=';
-// const MEDIA_URL = 'https://tmdb.org';
 
 export class BooksService extends BaseService {
   ID = 'books';
@@ -48,7 +47,7 @@ export class BooksService extends BaseService {
 
     const { items } = await res.json();
 
-    return items.map(this.mapResponse);
+    return (items || []).map(this.mapResponse);
   }
 
   async search(str, page = 1) {

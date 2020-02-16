@@ -6608,7 +6608,7 @@ promise@^7.0.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.5.9, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -6850,7 +6850,7 @@ qs@~6.5.2:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
-query-string@^4.1.0, query-string@^4.2.3:
+query-string@^4.1.0:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/query-string/-/query-string-4.3.4.tgz#bbb693b9ca915c232515b228b1a02b609043dbeb"
   integrity sha1-u7aTucqRXCMlFbIosaArYJBD2+s=
@@ -6975,15 +6975,6 @@ react-router@5.1.2:
     react-is "^16.6.0"
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
-
-react-url-query@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/react-url-query/-/react-url-query-1.5.0.tgz#02675c021731002d64a96c8558827d2ba6a17315"
-  integrity sha512-mivzv+T7+qNIvY3Ho+ja318huiWamFq6MbhxgU/hn71nICd5hqNMmULOZyp6+iTB+fyjQcdjsEI5iwz++syipw==
-  dependencies:
-    loose-envify "^1.2.0"
-    prop-types "^15.5.9"
-    query-string "^4.2.3"
 
 react@^16.12.0:
   version "16.12.0"

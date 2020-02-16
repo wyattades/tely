@@ -23,7 +23,7 @@
   "homepage": "https://github.com/wyattades/tely#readme",
   "main": "src/index.js",
   "scripts": {
-    "lint": "eslint src functions",
+    "lint": "eslint src functions --ignore-path .gitignore",
     "dev": "yarn && NODE_ENV=development webpack-dev-server",
     "build": "NODE_ENV=production webpack",
     "deploy": "aws s3 rm s3://tely.app --recursive --exclude \"*\" --include \"*.js\" --include \"*.css\" && aws s3 sync dist s3://tely.app/ && cf-invalidate --wait -- $(jq -r '.CFINVALIDATE' .env.json) index.html tely-sw.js",
@@ -37,8 +37,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-hot-loader": "^4.12.19",
-    "react-router-dom": "^5.1.2",
-    "react-url-query": "^1.5.0"
+    "react-router-dom": "^5.1.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",

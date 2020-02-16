@@ -1,144 +1,120 @@
-import React from 'react';
-import addUrlProps from 'react-url-query/lib/react/addUrlProps';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { roleClick } from '../utils';
 import { servicesMap } from '../services';
+import { useQueryParam, useDebounce } from '../hooks';
 
-const urlPropsQueryConfig = {
-  search: {},
-};
+const SEARCH_DELAY = 1000;
 
-class Search extends React.Component {
-  constructor(props) {
-    super(props);
+const Search = ({ type, results, setResults }) => {
+  const [searchParam, setSearchParam] = useQueryParam('search');
+  const [searchValue, setSearchValue] = useState(searchParam || '');
+  const [searching, setSearching] = useState(false);
+  const [resultCount, setResultCount] = useState(
+    results ? results.length : null,
+  );
+  const [error, setError] = useState(null);
 
-    this.state = {
-      resultCount: null,
-      searching: false,
-      searchQuery: props.search || '',
-    };
-    this.media = servicesMap[props.type];
-  }
+  const media = servicesMap[type];
 
-  componentDidMount() {
-    if (this.state.searchQuery) this.search();
-  }
+  useEffect(() => {
+    if (searchParam) {
+      setSearching(true);
 
-  SEARCH_DELAY = 1000;
-
-  search = () => {
-    const str = this.state.searchQuery;
-    this.props.onChangeSearch(str);
-
-    if (str) {
-      this.setState(
-        {
-          searching: true,
-        },
-        () => {
-          this.media
-            .search(str)
-            .then((results) => {
-              this.setState({
-                searching: false,
-                resultCount: results.length,
-              });
-              this.props.setResults(results.length ? results : null);
-            })
-            .catch(console.error);
-        },
-      );
+      media
+        .search(searchParam)
+        .then((results) => {
+          setSearching(false);
+          setResults(results.length ? results : null);
+          setResultCount(results.length);
+        })
+        .catch((err) => {
+          setSearching(false);
+          setError(err);
+          console.error(err);
+        });
     } else {
-      this.setState({
-        resultCount: null,
-      });
-      this.props.setResults(null);
+      setResults(null);
+      setResultCount(null);
     }
+  }, [searchParam, media, setResults]);
+
+  const delayedSearchValue = useDebounce(searchValue, SEARCH_DELAY);
+  const latestSetSearchParam = useRef(setSearchParam);
+  latestSetSearchParam.current = setSearchParam;
+  useEffect(() => {
+    latestSetSearchParam.current(delayedSearchValue || null);
+  }, [delayedSearchValue]);
+
+  const handleChange = (event) => {
+    const searchValue = event.target.value || '';
+    setSearchValue(searchValue);
   };
 
-  handleChange = (event) => {
-    const searchQuery = event.target.value;
-
-    this.setState({ searchQuery }, () => {
-      if (this.searchDelayTimer) clearTimeout(this.searchDelayTimer);
-
-      this.searchDelayTimer = setTimeout(this.search, this.SEARCH_DELAY);
-    });
-  };
-
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (this.searchDelayTimer) clearInterval(this.searchDelayTimer);
-
-    this.search();
+    setSearchParam(searchValue || null);
   };
 
-  clearSearch = () => {
-    this.props.onChangeSearch();
-
-    this.setState({
-      searchQuery: '',
-      resultCount: null,
-    });
-    this.props.setResults(null);
+  const clearSearch = () => {
+    setSearchValue('');
+    setSearchParam(null);
+    setResults(null);
+    setResultCount(null);
   };
 
-  render() {
-    const { searchQuery, resultCount, searching } = this.state;
+  if (error) throw error;
+  if (!media) throw `Invalid list type: ${type}`;
 
-    if (!this.media) throw `Invalid list type: ${this.props.type}`;
-
-    let Side = null;
-    if (searching)
-      Side = (
-        <span className="icon is-large is-right">
-          <i className="fas fa-circle-notch fa-spin" />
-        </span>
-      );
-    else if (resultCount !== null)
-      Side = (
-        <span
-          className="icon is-large is-right icon-clickable"
-          onClick={this.clearSearch}
-          role="button"
-          tabIndex="0"
-          onKeyPress={roleClick}
-        >
-          <i className="fas fa-times-circle" />
-        </span>
-      );
-
-    return (
-      <>
-        <form onSubmit={this.handleSubmit}>
-          <div className="field has-addons">
-            <div className="control has-icons-right is-expanded">
-              <input
-                className={`input ${resultCount === 0 && 'is-danger'}`}
-                value={searchQuery}
-                type="text"
-                onChange={this.handleChange}
-                placeholder={`Add ${this.media.LABEL}`}
-              />
-              {Side}
-            </div>
-            <div className="control">
-              <button type="submit" className="button is-primary">
-                Search
-              </button>
-            </div>
-          </div>
-        </form>
-        <br />
-        {resultCount !== null && (
-          <p className="has-text-grey has-text-centered">
-            {resultCount} Results
-          </p>
-        )}
-      </>
+  let Side = null;
+  if (searching)
+    Side = (
+      <span className="icon is-large is-right">
+        <i className="fas fa-circle-notch fa-spin" />
+      </span>
     );
-  }
-}
+  else if (resultCount != null)
+    Side = (
+      <span
+        className="icon is-large is-right icon-clickable"
+        onClick={clearSearch}
+        role="button"
+        tabIndex="0"
+        onKeyPress={roleClick}
+        aria-label="Clear search"
+      >
+        <i className="fas fa-times-circle" />
+      </span>
+    );
 
-export default addUrlProps({ urlPropsQueryConfig })(Search);
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <div className="field has-addons">
+          <div className="control has-icons-right is-expanded">
+            <input
+              className={`input ${resultCount === 0 && 'is-danger'}`}
+              type="text"
+              value={searchValue}
+              onChange={handleChange}
+              placeholder={`Add ${media.LABEL}`}
+            />
+            {Side}
+          </div>
+          <div className="control">
+            <button type="submit" className="button is-primary">
+              Search
+            </button>
+          </div>
+        </div>
+      </form>
+      <br />
+      {resultCount != null && (
+        <p className="has-text-grey has-text-centered">{resultCount} Results</p>
+      )}
+    </>
+  );
+};
+
+export default Search;

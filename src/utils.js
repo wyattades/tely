@@ -204,3 +204,27 @@ export const waitFor = async (fn, { interval = 300, timeout } = {}) => {
       });
   });
 };
+
+export const debounce = (fn, delay = 500) => {
+  let timerRef = null;
+
+  const debouncedFn = () => {
+    if (timerRef) clearTimeout(timerRef);
+    timerRef = setTimeout(fn, delay);
+  };
+  debouncedFn.cancel = () => {
+    if (timerRef) {
+      clearTimeout(timerRef);
+      timerRef = null;
+    }
+  };
+  debouncedFn.flush = () => {
+    if (timerRef) {
+      clearTimeout(timerRef);
+      timerRef = null;
+      fn();
+    }
+  };
+
+  return debouncedFn;
+};
