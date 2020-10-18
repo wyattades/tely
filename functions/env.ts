@@ -14,4 +14,4 @@ export const SERVER_URL = IS_DEV_ENV
 
 export const ORIGIN_URL = IS_DEV_ENV
   ? 'http://localhost:8080'
-  : 'https://tely.app';
+  : 'https://tely.vercel.app';

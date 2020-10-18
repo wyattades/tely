@@ -9,7 +9,7 @@ const loaderHTML = `<div class="full-page">\
 </div>`;
 
 const config = (module.exports = require('webpack-boiler')({
-  url: 'https://tely.app',
+  url: 'https://tely.vercel.app',
   react: true,
   offline:
     process.env.NODE_ENV === 'development'
